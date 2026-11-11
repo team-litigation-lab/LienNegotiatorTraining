@@ -1,5 +1,5 @@
 // Syntax and files: every JavaScript file and inline <script> parses, every local file index.html loads exists,
-// and every module in js/ln-course.js has a deck and a video the page can embed.
+// and every day in js/ln-course.js has modules the page can embed.
 // Usage: node .github/scripts/check-site.mjs   (run from the repository root)
 import fs from 'node:fs';
 import path from 'node:path';
@@ -22,12 +22,19 @@ const ctx = { window: {} };
 vm.runInNewContext(fs.readFileSync(path.join(ROOT, 'js/ln-course.js'), 'utf8'), ctx);
 const { LN_COURSE, lnEmbed } = ctx.window;
 const ids = new Set(), days = new Set();
-for (const m of LN_COURSE.modules) {
-  if (ids.has(m.id) || days.has(m.day)) fail.push(`js/ln-course.js: ${m.id} repeats a module id or day`);
-  ids.add(m.id); days.add(m.day);
-  if (!lnEmbed.deck(m.deck)) fail.push(`js/ln-course.js: ${m.id} deck is not a canva.com/design/… link: ${m.deck}`);
-  if (/\/edit\b/.test(m.deck)) fail.push(`js/ln-course.js: ${m.id} deck is an editor link; use the /view link`);
-  if (!lnEmbed.video(m.video)) fail.push(`js/ln-course.js: ${m.id} video is not a drive.google.com/file/d/… link: ${m.video}`);
+let n = 0;
+for (const d of LN_COURSE.days) {
+  if (days.has(d.day)) fail.push(`js/ln-course.js: day ${d.day} repeats`);
+  days.add(d.day);
+  if (!d.title || !Array.isArray(d.modules) || !d.modules.length) fail.push(`js/ln-course.js: day ${d.day} needs a title and modules`);
+  for (const m of d.modules || []) {
+    n++;
+    if (ids.has(m.id)) fail.push(`js/ln-course.js: module id ${m.id} repeats`);
+    ids.add(m.id);
+    if (m.kind !== 'deck' && m.kind !== 'video') fail.push(`js/ln-course.js: ${m.id} kind must be "deck" or "video"`);
+    else if (!lnEmbed.embed(m.kind, m.link)) fail.push(`js/ln-course.js: ${m.id} is not a ${m.kind === 'video' ? 'drive.google.com/file/d/…' : 'canva.com/design/…'} link: ${m.link}`);
+    if (m.kind === 'deck' && /\/edit\b/.test(m.link)) fail.push(`js/ln-course.js: ${m.id} is a Canva editor link; use the /view link`);
+  }
 }
 if (fail.length) { console.error(fail.join('\n')); process.exit(1); }
-console.log(`OK: scripts parse, index.html's files exist, ${LN_COURSE.modules.length} modules embed.`);
+console.log(`OK: scripts parse, index.html's files exist, ${LN_COURSE.days.length} days and ${n} modules embed.`);

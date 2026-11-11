@@ -1,8 +1,8 @@
 // Smoke test in a browser, against .github/scripts/server.mjs started with MASTER_ADMIN_PASSWORD=ci-admin and
-// PORTAL_SSO_SECRET=ci-portal: a trainee arriving from the Portal lands on the dashboard; each part shows its Canva
-// deck and its Drive video in the frame; checking both off completes the part and is saved; a direct visit shows
-// the admin sign-in; the admin password opens Admin with the trainee listed. Every view at desktop and phone width,
-// with no page error and no sideways scroll. The deck and video frames are stubbed (no Canva or Google in CI).
+// PORTAL_SSO_SECRET=ci-portal: a trainee arriving from the Portal lands on the dashboard's Day cards; a day opens onto its
+// modules; each module shows its Canva deck or Drive video; marking every module complete completes the day and is saved;
+// a direct visit shows the admin sign-in; the admin password opens Admin with the trainee listed. Every view at desktop and
+// phone width, with no page error and no sideways scroll. The deck and video frames are stubbed (no Canva or Google in CI).
 // Usage: node .github/scripts/smoke.cjs http://localhost:8787/
 const { chromium } = require('playwright');
 const crypto = require('node:crypto');
@@ -11,6 +11,7 @@ const assert = require('node:assert/strict');
 const BASE = process.argv[2] || 'http://localhost:8787/';
 const b64u = (b) => Buffer.from(b).toString('base64').replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
 const ticket = (t) => { const p = b64u(JSON.stringify(t)); return `${p}.${b64u(crypto.createHmac('sha256', 'portal-sso:ci-portal').update(p).digest())}`; };
+const DECK = /^https:\/\/www\.canva\.com\/design\/[\w-]+\/[\w-]+\/view\?embed$/, VIDEO = /^https:\/\/drive\.google\.com\/file\/d\/[\w-]+\/preview$/;
 
 (async () => {
   const browser = await chromium.launch();
@@ -32,32 +33,37 @@ const ticket = (t) => { const p = b64u(JSON.stringify(t)); return `${p}.${b64u(c
     const p = await page(viewport);
     const t = ticket({ first: 'Ada', last: 'Lovelace' + viewport.width, b: 'B100926', exp: Date.now() + 5 * 60 * 1000 });
     await p.goto(BASE + '?ticket=' + encodeURIComponent(t));
-    await p.waitForSelector('.dash-top');
+    await p.waitForSelector('.day-card');
     assert.ok(!(await p.evaluate(() => location.search)).includes('ticket'), 'the ticket is taken out of the address');
-    assert.match(await p.textContent('.dash-top h1'), /Welcome, Ada/);
+    assert.match(await p.textContent('.topbar .who'), /Ada Lovelace/);
     // The Portal sign-in's "Opening your training…" cover is lifted as soon as the dashboard is drawn (not after its 10 s fallback).
     await p.waitForFunction(() => ![].some.call(document.documentElement.children, (el) => el.style && el.style.zIndex === '2147483000'), null, { timeout: 2000 });
+    assert.deepEqual(await p.$$eval('.day-card .mh-day', (els) => els.map((e) => e.textContent.trim())), ['Day 1', 'Day 2'], 'the dashboard is Day cards');
     await noSideScroll(p, `${tag} dashboard`);
 
-    for (const [i, part] of ['Part 1', 'Part 2'].entries()) {
-      await p.click(`.module-card:nth-child(${i + 1}) .btn`);
-      await p.waitForSelector('.page-hero');
-      assert.match(await p.getAttribute('.frame iframe', 'src'), /^https:\/\/www\.canva\.com\/design\/[\w-]+\/[\w-]+\/view\?embed$/, `${part} deck`);
-      await noSideScroll(p, `${tag} ${part} deck`);
-      await p.click('.tabs button:nth-child(2)');
-      assert.match(await p.getAttribute('.frame iframe', 'src'), /^https:\/\/drive\.google\.com\/file\/d\/[\w-]+\/preview$/, `${part} video`);
-      await noSideScroll(p, `${tag} ${part} video`);
-      await p.check('.check:nth-of-type(1) input');
-      await p.check('.check:nth-of-type(2) input');
-      await p.waitForSelector('.side .pill-done');
-      await p.click('.topbar .brand');
-      await p.waitForSelector('.dash-top');
+    for (const day of [1, 2]) {
+      await p.click(`#day-${day} .module-start-btn`);
+      await p.waitForSelector('.mod-row');
+      assert.equal(await p.locator('.mod-row').count(), 2, `day ${day} lists its modules`);
+      await noSideScroll(p, `${tag} day ${day}`);
+      for (const [j, kind] of [[0, DECK], [1, VIDEO]]) {
+        await p.locator('.mod-row .btn').nth(j).click();
+        await p.waitForSelector('.frame iframe');
+        assert.match(await p.getAttribute('.frame iframe', 'src'), kind, `day ${day} module ${j + 1}`);
+        await noSideScroll(p, `${tag} day ${day} module ${j + 1}`);
+        await p.click('.mark-btn');
+        await p.waitForSelector('.side .pill-done');
+        await p.click(`.pager button:has-text("Day ${day}")`);
+        await p.waitForSelector('.mod-row');
+      }
+      assert.equal(await p.locator('.mod-row .pill-done').count(), 2);
+      await p.click('.nav button:has-text("Dashboard")');
+      await p.waitForSelector('.day-card');
     }
     await p.waitForTimeout(600);   // the save is debounced
     await p.reload();
-    await p.waitForSelector('.dash-top');
-    assert.equal(await p.locator('.module-card .pill-done').count(), 2, `${tag}: both parts saved as complete`);
-    assert.match(await p.textContent('.dash-top'), /All parts complete/);
+    await p.waitForSelector('.day-card');
+    assert.equal(await p.locator('.day-card.mc-done').count(), 2, `${tag}: both days saved as complete`);
     await p.context().close();
   }
 
@@ -70,12 +76,12 @@ const ticket = (t) => { const p = b64u(JSON.stringify(t)); return `${p}.${b64u(c
   await a.waitForSelector('#gate-aerr:not([style*="none"])');
   await a.fill('#gate-apass', 'ci-admin');
   await a.click('#gate-box .go');
-  await a.waitForSelector('.dash-top');
+  await a.waitForSelector('.day-card');
   await a.click('.nav button:has-text("Admin")');
   await a.waitForSelector('.admin-table td:has-text("Ada Lovelace1366")');
   assert.equal(await a.locator('.admin-table tbody tr').count(), 2);
   await noSideScroll(a, 'admin');
-  await a.fill('#cl-deck-ln1', 'https://example.com/not-canva');
+  await a.fill('#cl-d1-deck', 'https://example.com/not-canva');
   await a.click('text=Save course links');
   await a.waitForSelector('#toast.show:has-text("canva.com/design")');
 

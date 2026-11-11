@@ -10,7 +10,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
 <style>
 /* The base tokens and building blocks are the CM course's (Case-Management-Training/index.html), so the two
-   programs look the same; the classes keep their names there (.topbar, .card, .module-card, .dash-top, .page-hero). */
+   programs look the same; the classes keep their names there (.topbar, .card, .module-card, .page-hero). */
 :root{
   --navy:#262B45;
   --navy-deep:#161829;
@@ -88,59 +88,55 @@ main{flex:1;max-width:1400px;margin:0 auto;padding:32px 20px 60px;width:100%;}
 .login-shell{min-height:70vh;display:flex;align-items:center;justify-content:center;padding:20px;}
 .login-card{background:var(--paper);border-radius:16px;padding:32px;max-width:440px;width:100%;text-align:center;box-shadow:var(--shadow);}
 
-/* ---------- dashboard hero (the CM course's .dash-top) ---------- */
-.dash-top,.page-hero{position:relative;overflow:hidden;border-radius:20px;padding:30px 34px 24px;margin-bottom:22px;
+.page-hero{position:relative;overflow:hidden;border-radius:20px;padding:30px 34px 24px;margin-bottom:22px;
   background:radial-gradient(900px 320px at 85% -20%, rgba(219,132,55,.28), transparent 60%),
              radial-gradient(600px 300px at -5% 120%, rgba(120,132,190,.25), transparent 60%),
              linear-gradient(135deg, #1F2440 0%, #2B3158 55%, #353C68 100%);
   box-shadow:0 18px 40px -22px rgba(20,24,48,.65);color:#fff;}
-.dash-top::after,.page-hero::after{content:"";position:absolute;inset:0;pointer-events:none;opacity:.07;
+.page-hero::after{content:"";position:absolute;inset:0;pointer-events:none;opacity:.07;
   background-image:linear-gradient(rgba(255,255,255,.9) 1px, transparent 1px),linear-gradient(90deg, rgba(255,255,255,.9) 1px, transparent 1px);background-size:28px 28px;
   -webkit-mask-image:linear-gradient(90deg, transparent 0%, #000 55%, transparent 100%);mask-image:linear-gradient(90deg, transparent 0%, #000 55%, transparent 100%);}
-.dash-top > *,.page-hero > *{position:relative;z-index:1;}
-.dash-top .eyebrow,.page-hero .eyebrow{display:inline-block;margin:0 0 12px;padding:5px 12px;border-radius:999px;background:rgba(219,132,55,.16);border:1px solid rgba(240,192,138,.45);color:#F5C99A;font-size:11.5px;letter-spacing:.14em;}
-.dash-top h1,.page-hero h1{color:#fff;font-size:clamp(24px, 2.6vw, 36px);line-height:1.18;margin:0 0 10px;font-weight:700;}
-.dash-top p,.page-hero p.lead{color:#C9CDE3;font-size:15px;line-height:1.6;max-width:72ch;margin:0;font-weight:500;}
-.hero-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:18px;}
+.page-hero > *{position:relative;z-index:1;}
+.page-hero .eyebrow{display:inline-block;margin:0 0 12px;padding:5px 12px;border-radius:999px;background:rgba(219,132,55,.16);border:1px solid rgba(240,192,138,.45);color:#F5C99A;font-size:11.5px;letter-spacing:.14em;}
+.page-hero h1{color:#fff;font-size:clamp(24px, 2.6vw, 36px);line-height:1.18;margin:0 0 10px;font-weight:700;}
+.page-hero p.lead{color:#C9CDE3;font-size:15px;line-height:1.6;max-width:72ch;margin:0;font-weight:500;}
 
-/* progress track */
-.step-timeline{display:flex;flex-wrap:wrap;align-items:center;gap:0;margin:20px 0 0;padding:16px 0 4px;border-top:1px solid rgba(255,255,255,.12);}
-.step-node{display:flex;align-items:center;gap:10px;background:none;border:0;color:#C9CDE3;font-size:13px;font-weight:600;padding:0;}
-.step-circle{width:42px;height:42px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Fraunces';font-weight:700;font-size:16px;flex:0 0 auto;border:2.5px solid rgba(255,255,255,.28);background:rgba(255,255,255,.06);color:#C9CDE3;}
-.step-circle.st-done{background:linear-gradient(135deg,#E39A52,#C9742F);border-color:#F0C08A;color:#fff;}
-.step-circle.st-open{background:rgba(255,255,255,.1);border-color:#F0C08A;color:#fff;}
-.step-dash{width:60px;height:0;border-top:2.5px dashed rgba(255,255,255,.2);margin:0 14px;}
-.step-dash.filled{border-top-style:solid;border-top-color:#E39A52;}
-.bar{height:8px;border-radius:99px;background:rgba(255,255,255,.14);overflow:hidden;margin-top:14px;max-width:420px;}
-.bar > i{display:block;height:100%;background:linear-gradient(90deg,#E39A52,#F0C08A);}
 
-/* ---------- module cards ---------- */
-.module-grid{display:grid;grid-template-columns:repeat(auto-fill, minmax(300px, 1fr));gap:18px;}
+/* ---------- day cards (the CM course's: DAY n and the title in the head, the icon and theme, Start) ---------- */
+.module-grid{display:grid;grid-template-columns:repeat(auto-fill, minmax(280px, 1fr));gap:18px;align-items:stretch;}
 .module-card{border:1px solid var(--line);border-radius:14px;overflow:hidden;box-shadow:var(--shadow);display:flex;flex-direction:column;}
-.module-banner{height:104px;display:flex;align-items:center;justify-content:center;font-size:42px;background:linear-gradient(135deg, var(--navy) 0%, var(--navy-soft) 100%);}
-.module-card:nth-child(2n) .module-banner{background:linear-gradient(135deg, var(--orange) 0%, var(--orange-deep) 100%);}
-.module-body{padding:16px 18px 18px;flex:1;display:flex;flex-direction:column;gap:8px;}
-.module-body .mnum{font-family:'IBM Plex Mono';font-size:var(--font-sub);color:var(--orange-deep);font-weight:700;letter-spacing:.04em;}
-.module-body h3{margin:0;font-size:19px;color:var(--navy);}
-.module-body p{font-size:var(--font-body);color:var(--ink);line-height:1.5;margin:0;font-weight:500;}
-.module-checks{list-style:none;margin:4px 0 6px;padding:0;font-size:13px;font-weight:600;color:var(--ink-soft);}
-.module-checks li{padding:3px 0;}
-.module-foot{margin-top:auto;display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;}
+.module-head{background:linear-gradient(135deg, var(--navy) 0%, var(--navy-soft) 100%);color:#fff;text-align:center;padding:10px 12px 11px;min-height:62px;display:flex;flex-direction:column;justify-content:center;}
+.module-card:nth-child(2n) .module-head{background:linear-gradient(135deg, var(--orange) 0%, var(--orange-deep) 100%);color:#241304;}
+.mh-day{font-family:'IBM Plex Mono';font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;opacity:.85;margin-bottom:2px;}
+.mh-title{font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.01em;line-height:1.25;}
+.module-body{padding:16px 18px 10px;flex:1;display:flex;flex-direction:column;gap:10px;}
+.module-icon{text-align:center;font-size:34px;line-height:1;margin:4px 0 2px;}
+.module-theme{text-align:center;font-size:14px;font-weight:500;color:var(--ink);line-height:1.5;}
+.module-topic-list{list-style:none;margin:4px 0 0;padding:10px 0 0;border-top:1px solid var(--line);font-size:13px;font-weight:600;color:var(--ink-soft);}
+.module-topic-list li{padding:3px 0;}
+.day-count{font-size:12px;color:var(--ink-soft);font-weight:600;}
+.module-start-btn{margin:6px 18px 18px;}
+.mnum{font-family:'IBM Plex Mono';font-size:var(--font-sub);color:var(--orange-deep);font-weight:700;letter-spacing:.04em;}
+
+/* ---------- a day's modules ---------- */
+.mod-list{display:flex;flex-direction:column;gap:12px;}
+.mod-row{display:flex;align-items:center;gap:16px;padding:16px 18px;flex-wrap:wrap;}
+.mod-row-icon{width:48px;height:48px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:22px;background:var(--g-navy, var(--navy));color:#fff;flex:0 0 auto;}
+.mod-row-main{flex:1 1 220px;min-width:0;}
+.mod-row-main h3{margin:2px 0 0;font-size:18px;color:var(--navy);}
+.pager{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px;}
 
 /* ---------- module page ---------- */
 .mod-layout{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:18px;align-items:start;}
 @media(max-width:1000px){.mod-layout{grid-template-columns:1fr;}}
-.tabs{display:inline-flex;background:rgba(255,255,255,.7);border:1px solid var(--line);border-radius:12px;padding:4px;gap:4px;margin-bottom:12px;flex-wrap:wrap;}
-.tabs button{border:0;background:none;padding:9px 16px;border-radius:9px;font-size:14px;font-weight:700;color:var(--ink-soft);}
-.tabs button.active{background:var(--navy);color:#fff;}
 .frame{position:relative;width:100%;aspect-ratio:16/9;border-radius:14px;overflow:hidden;background:#0f1324;box-shadow:var(--shadow);}
 .frame iframe{position:absolute;inset:0;width:100%;height:100%;border:0;}
 .frame-note{font-size:12.5px;color:var(--ink-soft);margin:8px 2px 0;font-weight:500;}
 .frame-note a{color:var(--orange-deep);font-weight:700;}
 .side{padding:18px;}
 .side h3{margin:0 0 6px;font-size:17px;color:var(--navy);}
-.check{display:flex;gap:10px;align-items:flex-start;padding:10px 0;border-top:1px solid var(--line);font-size:14px;font-weight:600;cursor:pointer;}
-.check input{width:18px;height:18px;margin-top:2px;accent-color:var(--orange);}
+.side-note{font-size:13px;color:var(--ink-soft);font-weight:500;margin:4px 0 12px;}
+.mark-btn{width:100%;}
 .empty{padding:30px;text-align:center;color:var(--ink-soft);font-weight:600;}
 
 /* ---------- admin ---------- */
@@ -154,8 +150,7 @@ main{flex:1;max-width:1400px;margin:0 auto;padding:32px 20px 60px;width:100%;}
 .sec{padding:20px 22px;margin-bottom:18px;}
 .sec h2{margin:0 0 4px;font-size:20px;color:var(--navy);}
 .sec > p{margin:0 0 14px;font-size:13.5px;color:var(--ink-soft);font-weight:500;}
-@media(max-width:760px){.dash-top,.page-hero{padding:20px 16px;border-radius:16px;} main{padding:20px 16px 40px;} .step-dash{width:28px;margin:0 8px;}}
-
+@media(max-width:760px){.page-hero{padding:20px 16px;border-radius:16px;} main{padding:20px 16px 40px;} 
 /* ============================================================================
    The LSH standard page style — the see-through surfaces every LSH site shares.
    A vendored copy of the block at the end of the CM course's <style> (itself a copy of the Training Portal's
@@ -215,18 +210,18 @@ body::before{opacity:.40;}
    repo) expects of an engine: state, render(), goto(), authStatus(), logout(), setAdminToken(),
    setTraineeToken(), submitLogin() and resumeWhereLeftOff().
    ============================================================ */
-const APP_BUILD = "2026.11.11-1";
+const APP_BUILD = "2026.11.11-2";
 const PORTAL_HOME = "https://cm-training-activity.pages.dev/";
 const LOGO_FULL_SRC = "/logo.svg";
 const COURSE = window.LN_COURSE;
 const TOKEN_KEYS = { admin: "ln.adminToken", trainee: "ln.traineeToken", last: "ln.last" };
 
 const state = {
-  view: "boot", moduleId: "", tab: "deck",
+  view: "boot", dayNum: 1, moduleId: "",
   secure: true, portalOnly: false, portalSecret: false,
   adminToken: "", authToken: "", isAdmin: false,
   traineeId: "", trainee: null,
-  courseLinks: {},          // settings:course: an admin's replacement deck/video addresses, by module id
+  courseLinks: {},          // settings:course: an admin's replacement addresses, { <module id>: { link } }
   admin: { rows: null, loading: false },
   resumePending: false
 };
@@ -271,12 +266,13 @@ async function logout(){
   state.trainee = null; state.traineeId = ""; state.isAdmin = false; state.admin.rows = null;
   state.view = "login"; render();
 }
-function goto(view, moduleId){
+function goto(view, arg){
   state.view = view;
-  if(moduleId && moduleId !== state.moduleId) state.tab = "deck";   // a part always opens on its slides
-  if(moduleId) state.moduleId = moduleId;
+  if(view === "day") state.dayNum = Number(arg) || state.dayNum;
+  if(view === "module" && arg){ state.moduleId = arg; const d = dayOfModule(arg); if(d) state.dayNum = d.day; }
+  if(view === "day" && !dayByNum(state.dayNum)) state.view = "dashboard";
   if(view === "module" && !moduleById(state.moduleId)) state.view = "dashboard";
-  if(state.traineeId) store(TOKEN_KEYS.last, JSON.stringify({view: state.view, moduleId: state.moduleId}));
+  if(state.traineeId) store(TOKEN_KEYS.last, JSON.stringify({view: state.view, dayNum: state.dayNum, moduleId: state.moduleId}));
   render();
   window.scrollTo(0, 0);
 }
@@ -292,12 +288,13 @@ function resumeWhereLeftOff(){
   state.resumePending = false;
   let last = null; try{ last = JSON.parse(stored(TOKEN_KEYS.last) || "null"); }catch(e){}
   if(last && last.view === "module" && moduleById(last.moduleId)) goto("module", last.moduleId);
+  else if(last && last.view === "day" && dayByNum(last.dayNum)) goto("day", last.dayNum);
   else goto("dashboard");
 }
 
 /* ---------- the trainee's record ----------
-   trainee:<id> carries dayProgress (the Portal's program-progress and attendance read it, the same field as
-   the other courses): { "<day>": { done, deck, video, doneAt } }, plus lastActive. */
+   trainee:<id> carries dayProgress, the field the Portal's program-progress and attendance read for every course:
+   { "<day>": { done, doneAt, modules: { <module id>: true } } }, plus lastActive. A day is done when all its modules are. */
 async function loadTrainee(){
   if(!state.traineeId) return;
   try{ state.trainee = await kvGet("trainee:" + state.traineeId); }catch(e){ state.trainee = null; }
@@ -316,29 +313,31 @@ function saveTrainee(){
 function traineeBlocked(){ const t = state.trainee; return !!(t && (t.rejected || t.archived || t.approved === false)); }
 async function loadCourseLinks(){ try{ state.courseLinks = (await kvGet("settings:course")) || {}; }catch(e){ state.courseLinks = {}; } }
 
-/* ---------- the course ---------- */
-function moduleById(id){ return COURSE.modules.find((m) => m.id === id); }
-function linksOf(m){
-  const o = (state.courseLinks && state.courseLinks[m.id]) || {};
-  const deck = o.deck || m.deck, video = o.video || m.video;
-  return { deck: lnEmbed.deck(deck), deckPage: lnEmbed.deckPage(deck), video: lnEmbed.video(video), videoPage: lnEmbed.videoPage(video) };
-}
-function progressOf(m, rec){ const dp = ((rec || state.trainee) || {}).dayProgress || {}; return dp[m.day] || dp[String(m.day)] || {}; }
-function statusOf(m, rec){ const p = progressOf(m, rec); return p.done ? "done" : (p.deck || p.video) ? "open" : "new"; }
+/* ---------- the course: days, and each day's modules ---------- */
+const ALL_MODULES = COURSE.days.flatMap((d) => d.modules.map((m) => Object.assign({ day: d.day }, m)));
+function dayByNum(n){ return COURSE.days.find((d) => d.day === Number(n)); }
+function moduleById(id){ return ALL_MODULES.find((m) => m.id === id); }
+function dayOfModule(id){ const m = moduleById(id); return m ? dayByNum(m.day) : null; }
+function linkOf(m){ const o = (state.courseLinks || {})[m.id]; return (o && o.link) || m.link; }
+const KIND = { deck: { icon: "🎞", label: "Slide deck" }, video: { icon: "▶", label: "Recorded session" } };
+function dayProg(d, rec){ const dp = ((rec || state.trainee) || {}).dayProgress || {}; return dp[d.day] || dp[String(d.day)] || {}; }
+function moduleDone(m, rec){ const p = dayProg(dayByNum(m.day), rec); return !!(p.modules && p.modules[m.id]); }
+function dayCount(d, rec){ return d.modules.filter((m) => moduleDone(Object.assign({ day: d.day }, m), rec)).length; }
+function dayStatus(d, rec){ const n = dayCount(d, rec); return n === d.modules.length ? "done" : n ? "open" : "new"; }
 function pillFor(st){ return st === "done" ? '<span class="pill pill-done">✓ Completed</span>' : st === "open" ? '<span class="pill pill-open">In progress</span>' : '<span class="pill pill-new">Not started</span>'; }
-function setCheck(m, field, on){
-  if(!state.trainee) return;
-  const dp = state.trainee.dayProgress;
-  const p = Object.assign({}, dp[m.day] || {});
-  p[field] = !!on;
+function setModuleDone(id, on){
+  const m = moduleById(id); if(!state.trainee || !m) return;
+  const d = dayByNum(m.day), dp = state.trainee.dayProgress;
+  const p = Object.assign({}, dp[d.day] || {}); p.modules = Object.assign({}, p.modules || {});
+  if(on) p.modules[id] = true; else delete p.modules[id];
   const was = !!p.done;
-  p.done = !!(p.deck && p.video);
+  p.done = d.modules.every((x) => p.modules[x.id]);
   if(p.done && !was) p.doneAt = new Date().toISOString();
   if(!p.done) delete p.doneAt;
-  dp[m.day] = p;
+  dp[d.day] = p;
   state.trainee.lastActive = new Date().toISOString();
   saveTrainee();
-  if(p.done && !was) toast(m.part + " completed. Nice work!");
+  toast(p.done && !was ? `Day ${d.day} completed. Nice work!` : on ? "Module marked complete." : "Module marked not complete.");
   render();
 }
 
@@ -347,7 +346,7 @@ function topbar(){
   const nav = [];
   if(state.isAdmin || state.traineeId){
     nav.push(`<button class="${state.view === "dashboard" ? "active" : ""}" onclick="goto('dashboard')">🏠 Dashboard</button>`);
-    COURSE.modules.forEach((m) => nav.push(`<button class="${state.view === "module" && state.moduleId === m.id ? "active" : ""}" onclick="goto('module','${m.id}')">${esc(m.part)}</button>`));
+    COURSE.days.forEach((d) => nav.push(`<button class="${(state.view === "day" || state.view === "module") && state.dayNum === d.day ? "active" : ""}" onclick="goto('day',${d.day})">Day ${d.day}</button>`));
     if(state.isAdmin) nav.push(`<button class="${state.view === "admin" ? "active" : ""}" onclick="goto('admin')">🛡 Admin</button>`);
     nav.push(`<a href="${PORTAL_HOME}">↩ Portal</a>`);
     nav.push(`<button onclick="logout()">Sign out</button>`);
@@ -360,79 +359,81 @@ function topbar(){
 }
 function footer(){ return `<div class="footer-note">Legal Support Help · ${esc(COURSE.title)} · <span class="mono">${APP_BUILD}</span></div>`; }
 
+// The dashboard: one Day card per day (the CM course's day cards: DAY n and the title in the head, the icon and theme, Start).
 function viewDashboard(){
-  const mods = COURSE.modules;
-  const done = mods.filter((m) => statusOf(m) === "done").length;
-  const next = mods.find((m) => statusOf(m) !== "done");
-  const first = state.trainee && state.trainee.name ? String(state.trainee.name).split(/\s+/)[0] : "";
-  const steps = mods.map((m, i) => {
-    const st = statusOf(m);
-    return (i ? `<span class="step-dash ${statusOf(mods[i - 1]) === "done" ? "filled" : ""}"></span>` : "")
-      + `<button class="step-node" onclick="goto('module','${m.id}')"><span class="step-circle ${st === "done" ? "st-done" : st === "open" ? "st-open" : ""}">${st === "done" ? "✓" : i + 1}</span>${esc(m.part)}</button>`;
-  }).join("");
-  const hero = `<section class="dash-top">
-    <p class="eyebrow">${state.isAdmin ? "Trainer view" : "Your training"}</p>
-    <h1>${first ? "Welcome, " + esc(first) + "." : "Lien Negotiator Training"}</h1>
-    <p>${mods.length} parts. Each part is a slide deck and its recorded session: go through the slides, watch the session, and check both off to complete the part.</p>
-    ${state.isAdmin ? "" : `<div class="bar" aria-label="${done} of ${mods.length} parts complete"><i style="width:${Math.round(done / mods.length * 100)}%"></i></div>`}
-    <div class="hero-actions">${next ? `<button class="btn btn-primary" onclick="goto('module','${next.id}')">${statusOf(next) === "open" ? "Continue" : "Start"} ${esc(next.part)} →</button>` : `<span class="pill pill-done">✓ All parts complete</span>`}</div>
-    ${state.isAdmin ? "" : `<div class="step-timeline">${steps}</div>`}
-  </section>`;
-  const cards = mods.map((m) => {
-    const p = progressOf(m), st = statusOf(m);
-    return `<article class="module-card">
-      <div class="module-banner" aria-hidden="true">${m.icon}</div>
+  return `<div class="module-grid day-grid">${COURSE.days.map((d) => {
+    const st = state.isAdmin ? "new" : dayStatus(d), n = dayCount(d);
+    return `<article class="module-card day-card mc-${st}" id="day-${d.day}">
+      <div class="module-head"><div class="mh-day">Day ${d.day}${st === "done" ? " · Completed" : ""}</div><div class="mh-title">${esc(d.title)}</div></div>
       <div class="module-body">
-        <span class="mnum">${esc(m.part.toUpperCase())}</span>
-        <h3>${esc(m.title)}</h3>
-        <p>${esc(m.summary)}</p>
-        <ul class="module-checks">
-          <li>${p.deck ? "✅" : "▫️"} Slide deck${m.deckSlides ? ` (${m.deckSlides} slides)` : ""}</li>
-          <li>${p.video ? "✅" : "▫️"} Recorded session</li>
-        </ul>
-        <div class="module-foot">${state.isAdmin ? "" : pillFor(st)}<button class="btn btn-navy btn-sm" onclick="goto('module','${m.id}')">Open ${esc(m.part)} →</button></div>
+        <div class="module-icon" aria-hidden="true">${d.icon}</div>
+        <div class="module-theme">${esc(d.theme)}</div>
+        <ul class="module-topic-list">${d.modules.map((m, i) => `<li>${!state.isAdmin && moduleDone(Object.assign({ day: d.day }, m)) ? "✅" : KIND[m.kind].icon} Module ${i + 1}: ${esc(KIND[m.kind].label)}</li>`).join("")}</ul>
+        ${state.isAdmin ? "" : `<div class="day-count">${n} of ${d.modules.length} modules complete</div>`}
       </div>
+      <button class="btn btn-navy module-start-btn" onclick="goto('day',${d.day})">${st === "done" ? "Review" : st === "open" ? "Continue" : "Start"}</button>
     </article>`;
-  }).join("");
-  return hero + `<div class="module-grid">${cards}</div>`;
+  }).join("")}</div>`;
 }
 
-function viewModule(){
-  const m = moduleById(state.moduleId);
-  const i = COURSE.modules.indexOf(m);
-  const L = linksOf(m), p = progressOf(m);
-  const tab = state.tab === "video" ? "video" : "deck";
-  const src = tab === "video" ? L.video : L.deck;
-  const page = tab === "video" ? L.videoPage : L.deckPage;
-  const frame = src
-    ? `<div class="frame"><iframe src="${esc(src)}" title="${esc(m.title)}: ${tab === "video" ? "recorded session" : "slide deck"}" allow="autoplay; fullscreen" allowfullscreen loading="lazy" referrerpolicy="strict-origin-when-cross-origin"></iframe></div>
-       <p class="frame-note">${tab === "video" ? "The video plays from Google Drive. If it asks you to sign in, use your legalsupporthelp.com Google account." : "Use the arrows under the slides, or the full-screen button, to page through the deck."} <a href="${esc(page)}" target="_blank" rel="noopener">Open in a new tab ↗</a></p>`
-    : `<div class="card empty">This ${tab === "video" ? "video" : "deck"} isn't set up yet. ${state.isAdmin ? "Add its address in Admin → Course links." : "Please tell your trainer."}</div>`;
-  const prev = COURSE.modules[i - 1], next = COURSE.modules[i + 1];
-  const checks = state.isAdmin
-    ? `<p style="font-size:13px;color:var(--ink-soft);font-weight:500;margin:6px 0 0">Trainees check off the deck and the session here. You're signed in as a trainer, so nothing is recorded.</p>`
-    : `<label class="check"><input type="checkbox" ${p.deck ? "checked" : ""} onchange="setCheck(moduleById('${m.id}'),'deck',this.checked)"> I went through the slide deck</label>
-       <label class="check"><input type="checkbox" ${p.video ? "checked" : ""} onchange="setCheck(moduleById('${m.id}'),'video',this.checked)"> I watched the recorded session</label>
-       <div style="margin-top:10px">${pillFor(statusOf(m))}</div>`;
+// A day: its modules, in order.
+function viewDay(){
+  const d = dayByNum(state.dayNum), i = COURSE.days.indexOf(d);
+  const prev = COURSE.days[i - 1], next = COURSE.days[i + 1];
+  const rows = d.modules.map((m0, j) => {
+    const m = Object.assign({ day: d.day }, m0), done = !state.isAdmin && moduleDone(m);
+    return `<article class="card mod-row">
+      <div class="mod-row-icon" aria-hidden="true">${KIND[m.kind].icon}</div>
+      <div class="mod-row-main">
+        <span class="mnum">MODULE ${j + 1} · ${esc(KIND[m.kind].label.toUpperCase())}${m.slides ? ` · ${m.slides} SLIDES` : ""}</span>
+        <h3>${esc(m.title)}</h3>
+      </div>
+      ${state.isAdmin ? "" : pillFor(done ? "done" : "new")}
+      <button class="btn ${done ? "btn-ghost" : "btn-primary"} btn-sm" onclick="goto('module','${m.id}')">${done ? "Review" : "Open"} →</button>
+    </article>`;
+  }).join("");
   return `<section class="page-hero">
-      <p class="eyebrow">${esc(m.part)} of ${COURSE.modules.length}</p>
+      <p class="eyebrow">Day ${d.day} of ${COURSE.days.length}</p>
+      <h1>${esc(d.title)}</h1>
+      <p class="lead">${esc(d.theme)}</p>
+    </section>
+    <div class="mod-list">${rows}</div>
+    <div class="pager">
+      ${prev ? `<button class="btn btn-ghost btn-sm" onclick="goto('day',${prev.day})">← Day ${prev.day}</button>` : `<button class="btn btn-ghost btn-sm" onclick="goto('dashboard')">← Dashboard</button>`}
+      ${next ? `<button class="btn btn-navy btn-sm" onclick="goto('day',${next.day})">Day ${next.day} →</button>` : ""}
+    </div>`;
+}
+
+// A module: its deck or its recorded session, and Mark module complete.
+function viewModule(){
+  const m = moduleById(state.moduleId), d = dayByNum(m.day), j = d.modules.findIndex((x) => x.id === m.id);
+  const k = ALL_MODULES.indexOf(m), prev = ALL_MODULES[k - 1], next = ALL_MODULES[k + 1];
+  const link = linkOf(m), src = lnEmbed.embed(m.kind, link), page = lnEmbed.page(m.kind, link);
+  const frame = src
+    ? `<div class="frame"><iframe src="${esc(src)}" title="${esc(m.title)}" allow="autoplay; fullscreen" allowfullscreen loading="lazy" referrerpolicy="strict-origin-when-cross-origin"></iframe></div>
+       <p class="frame-note">${m.kind === "video" ? "The video plays from Google Drive. If it asks you to sign in, use your legalsupporthelp.com Google account." : "Use the arrows under the slides, or the full-screen button, to page through the deck."} <a href="${esc(page)}" target="_blank" rel="noopener">Open in a new tab ↗</a></p>`
+    : `<div class="card empty">This module isn't set up yet. ${state.isAdmin ? "Add its address in Admin → Course links." : "Please tell your trainer."}</div>`;
+  const done = !state.isAdmin && moduleDone(m);
+  const label = (x) => { const xd = dayByNum(x.day); return `Day ${x.day} · Module ${xd.modules.findIndex((y) => y.id === x.id) + 1}`; };
+  const mark = state.isAdmin
+    ? `<p class="side-note">Trainees mark each module complete here. You're signed in as a trainer, so nothing is recorded.</p>`
+    : `<p class="side-note">${m.kind === "video" ? "Watch the whole session" : "Go through every slide"}, then mark the module complete.</p>
+       ${done ? `<div style="margin:0 0 10px">${pillFor("done")}</div><button class="btn btn-ghost btn-sm mark-btn" onclick="setModuleDone('${m.id}',false)">Mark not complete</button>`
+              : `<button class="btn btn-primary mark-btn" onclick="setModuleDone('${m.id}',true)">✓ Mark module complete</button>`}`;
+  return `<section class="page-hero">
+      <p class="eyebrow">Day ${d.day} · Module ${j + 1} of ${d.modules.length}</p>
       <h1>${esc(m.title)}</h1>
-      <p class="lead">${esc(m.summary)}</p>
+      <p class="lead">${esc(KIND[m.kind].label)}${m.slides ? ` · ${m.slides} slides` : ""} · ${esc(d.title)}</p>
     </section>
     <div class="mod-layout">
-      <div>
-        <div class="tabs" role="tablist">
-          <button role="tab" aria-selected="${tab === "deck"}" class="${tab === "deck" ? "active" : ""}" onclick="state.tab='deck';render()">🎞 Slide deck</button>
-          <button role="tab" aria-selected="${tab === "video"}" class="${tab === "video" ? "active" : ""}" onclick="state.tab='video';render()">▶ Recorded session</button>
-        </div>
-        ${frame}
-      </div>
+      <div>${frame}</div>
       <aside class="card side">
-        <h3>Your checklist</h3>
-        ${checks}
-        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:16px">
-          ${prev ? `<button class="btn btn-ghost btn-sm" onclick="goto('module','${prev.id}')">← ${esc(prev.part)}</button>` : ""}
-          ${next ? `<button class="btn btn-primary btn-sm" onclick="goto('module','${next.id}')">${esc(next.part)} →</button>` : `<button class="btn btn-ghost btn-sm" onclick="goto('dashboard')">Back to the dashboard</button>`}
+        <h3>${esc(KIND[m.kind].icon + " " + KIND[m.kind].label)}</h3>
+        ${mark}
+        <div class="pager" style="margin-top:16px">
+          <button class="btn btn-ghost btn-sm" onclick="goto('day',${d.day})">↑ Day ${d.day}</button>
+          ${prev ? `<button class="btn btn-ghost btn-sm" onclick="goto('module','${prev.id}')">← ${label(prev)}</button>` : ""}
+          ${next ? `<button class="btn btn-navy btn-sm" onclick="goto('module','${next.id}')">${label(next)} →</button>` : ""}
         </div>
       </aside>
     </div>`;
@@ -462,41 +463,36 @@ async function setTraineeFlag(id, flag){
 }
 async function saveCourseLinks(){
   const out = {};
-  for(const m of COURSE.modules){
-    const deck = (document.getElementById("cl-deck-" + m.id) || {}).value || "", video = (document.getElementById("cl-video-" + m.id) || {}).value || "";
-    if(deck.trim() && !lnEmbed.deck(deck)){ toast(m.part + ": the deck address must be a canva.com/design/… link."); return; }
-    if(video.trim() && !lnEmbed.video(video)){ toast(m.part + ": the video address must be a drive.google.com/file/d/… link."); return; }
-    if(deck.trim() || video.trim()) out[m.id] = { deck: deck.trim(), video: video.trim() };
+  for(const m of ALL_MODULES){
+    const v = ((document.getElementById("cl-" + m.id) || {}).value || "").trim();
+    if(!v) continue;
+    if(!lnEmbed.embed(m.kind, v)){ toast(`Day ${m.day}, ${KIND[m.kind].label}: the address must be a ${m.kind === "video" ? "drive.google.com/file/d/…" : "canva.com/design/…"} link.`); return; }
+    out[m.id] = { link: v };
   }
   try{ await kvSet("settings:course", out); state.courseLinks = out; toast("Course links saved."); }catch(e){ toast(e.message); }
 }
 function viewAdmin(){
   if(state.admin.rows == null && !state.admin.loading) setTimeout(loadAdmin, 0);
-  const rows = state.admin.rows || [];
-  const modCols = COURSE.modules.map((m) => `<th>${esc(m.part)}</th>`).join("");
-  const body = state.admin.loading && !rows.length ? `<tr><td colspan="${4 + COURSE.modules.length}">Loading…</td></tr>`
-    : !rows.length ? `<tr><td colspan="${4 + COURSE.modules.length}">No trainees have opened this course yet. They appear here the first time they open it from the LSH Training Portal.</td></tr>`
+  const rows = state.admin.rows || [], cols = 4 + COURSE.days.length;
+  const body = state.admin.loading && !rows.length ? `<tr><td colspan="${cols}">Loading…</td></tr>`
+    : !rows.length ? `<tr><td colspan="${cols}">No trainees have opened this course yet. They appear here the first time they open it from the LSH Training Portal.</td></tr>`
     : rows.map((r) => `<tr>
         <td>${esc(r.name || r.id)}</td><td class="mono">${esc(r.batch || "")}</td>
-        ${COURSE.modules.map((m) => `<td>${pillFor(statusOf(m, r))}</td>`).join("")}
+        ${COURSE.days.map((d) => `<td>${pillFor(dayStatus(d, r))} <span class="mono" style="font-size:11.5px">${dayCount(d, r)}/${d.modules.length}</span></td>`).join("")}
         <td style="font-weight:500">${r.lastActive ? esc(new Date(r.lastActive).toLocaleString()) : "—"}</td>
         <td>${r.archived || r.rejected ? `<button class="btn btn-ghost btn-sm" onclick="setTraineeFlag('${esc(r.id)}','restore')">Restore access</button>` : `<button class="btn btn-ghost btn-sm" onclick="setTraineeFlag('${esc(r.id)}','archive')">Remove access</button>`}</td>
       </tr>`).join("");
-  const links = COURSE.modules.map((m) => {
-    const o = (state.courseLinks || {})[m.id] || {};
-    return `<h3 style="margin:14px 0 8px;font-size:16px;color:var(--navy)">${esc(m.part)}: ${esc(m.title)}</h3>
-      <label class="field"><span>Canva deck (blank = ${esc(m.deck)})</span><input id="cl-deck-${m.id}" value="${esc(o.deck || "")}" placeholder="https://www.canva.com/design/…/view"></label>
-      <label class="field"><span>Drive video (blank = ${esc(m.video)})</span><input id="cl-video-${m.id}" value="${esc(o.video || "")}" placeholder="https://drive.google.com/file/d/…/view"></label>`;
-  }).join("");
-  return `<section class="page-hero"><p class="eyebrow">Admin</p><h1>Trainees & course links</h1><p class="lead">Who has opened the course, how far each trainee is, and where each part's deck and video come from.</p></section>
+  const links = COURSE.days.map((d) => `<h3 style="margin:14px 0 8px;font-size:16px;color:var(--navy)">Day ${d.day}: ${esc(d.title)}</h3>`
+    + d.modules.map((m, j) => `<label class="field"><span>Module ${j + 1} · ${esc(KIND[m.kind].label)} (blank = ${esc(m.link)})</span><input id="cl-${m.id}" value="${esc(((state.courseLinks || {})[m.id] || {}).link || "")}" placeholder="${m.kind === "video" ? "https://drive.google.com/file/d/…/view" : "https://www.canva.com/design/…/view"}"></label>`).join("")).join("");
+  return `<section class="page-hero"><p class="eyebrow">Admin</p><h1>Trainees & course links</h1><p class="lead">Who has opened the course, how far each trainee is, and where each module's deck or video comes from.</p></section>
     <section class="card sec">
       <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap"><h2>Trainees</h2><button class="btn btn-ghost btn-sm" onclick="loadAdmin()">↻ Refresh</button></div>
       <p>Trainees are approved on the LSH Training Portal; removing access here stops them opening this course only.</p>
-      <div class="table-wrap"><table class="admin-table"><thead><tr><th>Name</th><th>Batch</th>${modCols}<th>Last active</th><th></th></tr></thead><tbody>${body}</tbody></table></div>
+      <div class="table-wrap"><table class="admin-table"><thead><tr><th>Name</th><th>Batch</th>${COURSE.days.map((d) => `<th>Day ${d.day}</th>`).join("")}<th>Last active</th><th></th></tr></thead><tbody>${body}</tbody></table></div>
     </section>
     <section class="card sec">
       <h2>Course links</h2>
-      <p>Replace a part's deck or video without a deploy. Paste the Canva <b>view</b> link (Share → View-only link) or the Drive file link. Leave a box blank to use the address in <span class="mono">js/ln-course.js</span>.</p>
+      <p>Replace a module's deck or video without a deploy. Paste the Canva <b>view</b> link or the Drive file link. Leave a box blank to use the address in <span class="mono">js/ln-course.js</span>.</p>
       ${links}
       <button class="btn btn-primary" onclick="saveCourseLinks()">Save course links</button>
     </section>`;
@@ -516,6 +512,7 @@ function render(){
   else if(state.view === "login" || (!state.isAdmin && !state.traineeId)) { state.view = "login"; app.innerHTML = window.portalGate.renderCard(); return; }
   else if(state.view === "pendingApproval") main = viewPending();
   else if(state.view === "admin" && state.isAdmin) main = viewAdmin();
+  else if(state.view === "day" && dayByNum(state.dayNum)) main = viewDay();
   else if(state.view === "module" && moduleById(state.moduleId)) main = viewModule();
   else { state.view = "dashboard"; main = viewDashboard(); }
   app.innerHTML = (state.view === "pendingApproval" ? "" : topbar()) + `<main>${main}</main>` + footer();
