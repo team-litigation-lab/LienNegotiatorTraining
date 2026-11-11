@@ -103,7 +103,7 @@ main{flex:1;max-width:1400px;margin:0 auto;padding:24px 20px 40px;width:100%;}
 .page-hero p.lead{color:#C9CDE3;font-size:15px;line-height:1.6;max-width:72ch;margin:0;font-weight:500;}
 
 
-/* ---------- the dashboard banner (the CM course's: the completion ribbon, the eyebrow and title, Continue and Roadmap) ---------- */
+/* ---------- the dashboard banner (the CM course's: the completion ribbon, the eyebrow and title, Continue where you left off) ---------- */
 .dash-top{position:relative;overflow:hidden;border-radius:20px;padding:18px 30px 12px;margin-bottom:16px;color:#fff;
   background:radial-gradient(900px 320px at 85% -20%, rgba(219,132,55,.28), transparent 60%),
              radial-gradient(600px 300px at -5% 120%, rgba(120,132,190,.25), transparent 60%),
@@ -128,14 +128,7 @@ main{flex:1;max-width:1400px;margin:0 auto;padding:24px 20px 40px;width:100%;}
 .dash-resume-btn span{font-size:12px;font-weight:600;opacity:.92;overflow:hidden;text-overflow:ellipsis;min-width:0;}
 .dash-resume-btn span::before{content:"· ";}
 .dash-resume-btn:hover{background:#B5651F;}
-.dash-roadmap-btn{flex:0 0 auto;border:1px solid rgba(255,255,255,.35);background:rgba(255,255,255,.1);color:#fff;border-radius:999px;padding:6px 14px;font:inherit;font-size:12.5px;font-weight:800;}
-.dash-roadmap-btn:hover{background:#E8833A;border-color:#E8833A;}
 @media(max-width:760px){.dash-top{padding:16px 16px 10px;border-radius:16px;} .dash-hero{grid-template-columns:1fr;gap:10px;text-align:center;} .dash-resume-btn{white-space:normal;}}
-.or-days{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;}
-.or-day{background:#fff;border:1px solid var(--line);border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:4px;}
-.or-day:nth-child(odd){border-top:4px solid var(--navy);} .or-day:nth-child(even){border-top:4px solid var(--orange);}
-.or-day span{font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:700;color:var(--orange-deep);} .or-day b{font-size:14px;color:var(--navy);line-height:1.3;} .or-day em{font-style:normal;font-size:11.5px;color:var(--ink-soft);}
-.or-foot{font-size:13.5px;color:var(--ink-soft);margin:14px 0 0;font-weight:500;}
 
 /* ---------- Day cards (the CM course's dashboard cards) ---------- */
 .module-grid{display:grid;grid-template-columns:repeat(auto-fill, minmax(250px, 300px));gap:16px;align-items:stretch;}
@@ -178,7 +171,7 @@ main{flex:1;max-width:1400px;margin:0 auto;padding:24px 20px 40px;width:100%;}
 .day-headline .mono{color:var(--orange-deep);font-size:13px;font-weight:600;}
 .day-headline h1{margin:0;font-size:20px;color:var(--navy);}
 .stage-shell{background:linear-gradient(135deg,#1F2440 0%,#2B3158 55%,#353C68 100%);border-radius:22px;padding:12px 14px 12px;box-shadow:0 18px 40px -22px rgba(20,24,48,.65);}
-.obj-wrap{background:rgba(255,255,255,.72);border-radius:16px;padding:10px;display:flex;flex-direction:column;gap:10px;border-top:4px solid var(--orange-deep);}
+.obj-wrap{background:rgba(255,255,255,.72);border-radius:16px;padding:10px;display:flex;flex-direction:column;gap:10px;max-height:max(320px, calc(100vh - 220px));overflow-y:auto;border-top:4px solid var(--orange-deep);}
 .obj-box{background:rgba(255,255,255,.82);border-radius:12px;padding:10px 14px;border-top:4px solid var(--orange);}
 .obj-box.obj-navy{border-top-color:var(--navy);}
 .obj-box h2{font-family:var(--font-ui);font-size:16px;font-weight:800;color:var(--navy);margin:0 0 6px;}
@@ -197,7 +190,9 @@ main{flex:1;max-width:1400px;margin:0 auto;padding:24px 20px 40px;width:100%;}
 
 /* ---------- the day's player (the CM course's lesson player) ---------- */
 .player{display:grid;grid-template-columns:minmax(0,1fr) 250px;gap:18px;align-items:start;}
-@media(max-width:1000px){.player{grid-template-columns:1fr;} .player-side{order:-1;}}
+.player-main{min-width:0;}
+@media(max-width:1000px){.player{grid-template-columns:minmax(0,1fr);} .player-side{order:-1;}}
+@media(max-width:600px){.stage-title{white-space:normal;}}
 .stage{position:relative;background:linear-gradient(135deg,#1F2440 0%,#2B3158 55%,#353C68 100%);border-radius:20px;padding:16px 22px 18px;box-shadow:0 18px 40px -22px rgba(20,24,48,.65);color:#fff;overflow:hidden;}
 .stage:fullscreen{border-radius:0;overflow:auto;display:flex;flex-direction:column;}
 .stage:fullscreen .stage-body{flex:1;}
@@ -206,7 +201,7 @@ main{flex:1;max-width:1400px;margin:0 auto;padding:24px 20px 40px;width:100%;}
 .corner.tr{right:10px;top:10px;border-left:0;border-bottom:0;border-radius:0 6px 0 0;}
 .corner.bl{left:10px;bottom:10px;border-right:0;border-top:0;border-radius:0 0 0 6px;}
 .corner.br{right:10px;bottom:10px;border-left:0;border-top:0;border-radius:0 0 6px 0;}
-.stage-title{font-family:var(--font-ui);font-weight:900;font-size:clamp(22px,2.4vw,30px);color:#F2A35C;margin:0 0 10px;padding-bottom:8px;letter-spacing:-.01em;text-shadow:0 0 1px #fff,0 2px 0 rgba(255,255,255,.18);border-bottom:2px solid rgba(255,255,255,.18);background:linear-gradient(90deg,var(--orange) 0 26px,transparent 26px) bottom left/100% 3px no-repeat;}
+.stage-title{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-family:var(--font-ui);font-weight:900;font-size:clamp(22px,2.4vw,30px);color:#F2A35C;margin:0 0 10px;padding-bottom:8px;letter-spacing:-.01em;text-shadow:0 0 1px #fff,0 2px 0 rgba(255,255,255,.18);border-bottom:2px solid rgba(255,255,255,.18);background:linear-gradient(90deg,var(--orange) 0 26px,transparent 26px) bottom left/100% 3px no-repeat;}
 .stage-banner{background:linear-gradient(90deg,#3C4268,#4A5180);border-bottom:3px solid var(--orange);border-radius:6px;text-align:center;padding:9px 12px;font-size:14px;font-weight:800;letter-spacing:.04em;text-transform:uppercase;}
 .stage-chiprow{margin:10px 0 10px;display:flex;align-items:center;flex-wrap:wrap;gap:8px 0;}
 .stage-chip{display:inline-block;background:#EEF0F6;color:var(--navy);border-radius:8px;padding:5px 14px;font-size:16px;font-weight:800;letter-spacing:.04em;}
@@ -246,6 +241,49 @@ main{flex:1;max-width:1400px;margin:0 auto;padding:24px 20px 40px;width:100%;}
 .side-btn.side-dark{background:var(--navy);color:#fff;border-color:var(--navy);}
 .side-tip{font-size:12.5px;color:var(--ink-soft);font-weight:600;margin:2px 0 0;}
 @media(max-width:600px){.stage{padding:16px 14px;} .player-bar .btn{padding:9px 12px;font-size:13.5px;} .step-count{order:-1;flex-basis:100%;}}
+
+/* ---------- Day 3's kinds of module: handouts, process questions, the guide, the wrap-up ---------- */
+.doc-tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px;}
+.doc-tabs button{border:1px solid rgba(255,255,255,.25);background:rgba(255,255,255,.08);color:#fff;border-radius:8px;padding:6px 11px;font-size:13px;font-weight:700;}
+.doc-tabs button.on{background:var(--orange);border-color:var(--orange);color:#241304;}
+.doc-frame{position:relative;height:max(260px, calc(100vh - 500px));border-radius:12px;overflow:hidden;background:#fff;}
+.doc-frame iframe{position:absolute;inset:0;width:100%;height:100%;border:0;}
+.qa-head{display:flex;align-items:center;gap:10px;flex-wrap:wrap;font-size:13px;font-weight:600;color:#C9CDE3;margin-bottom:8px;}
+.qa-head > span:first-child{flex:1 1 300px;}
+.qa-head b{color:#F5C99A;}
+.qa-count{font-family:'IBM Plex Mono',monospace;font-size:12px;color:#fff;}
+.qa-list,.guide{max-height:max(280px, calc(100vh - 470px));overflow-y:auto;background:#FFFDF8;color:var(--ink);border-radius:12px;padding:12px 14px 12px 34px;margin:0;}
+.guide{padding:12px 14px;}
+.qa-list li{padding:6px 0 10px;border-bottom:1px solid var(--line);}
+.qa-list li p{margin:0 0 6px;font-size:14px;line-height:1.45;}
+.qa-list textarea{width:100%;border:1px solid var(--line);border-radius:8px;padding:8px 10px;font:500 13.5px var(--font-ui);resize:vertical;background:#fff;}
+.qa-list textarea:focus{outline:2px solid var(--orange-soft);border-color:var(--orange);}
+.core-tag{display:inline-block;font-size:11px;font-weight:800;color:#7A3F0C;background:rgba(240,192,138,.55);border-radius:4px;padding:1px 6px;}
+.guide-sec{padding:4px 0 12px;border-bottom:1px solid var(--line);margin-bottom:8px;}
+.guide-sec h3{margin:0 0 6px;font-size:16px;color:var(--navy);font-family:var(--font-ui);font-weight:800;}
+.guide-sec p{margin:0 0 8px;font-size:13.5px;font-weight:500;}
+.guide-links{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:6px;}
+.guide-rows{width:100%;border-collapse:collapse;font-size:13px;margin-bottom:8px;}
+.guide-rows th{text-align:left;width:190px;padding:5px 8px;color:var(--ink-soft);font-size:12px;vertical-align:top;}
+.guide-rows td{padding:5px 8px;font-size:12.5px;background:rgba(38,43,69,.04);border-radius:4px;}
+.guide-pre{border:1px solid var(--line);border-radius:10px;margin:8px 0;overflow:hidden;}
+.guide-pre-h{display:flex;align-items:center;justify-content:space-between;padding:6px 10px;background:rgba(38,43,69,.05);font-size:13px;}
+.guide-pre pre{margin:0;padding:10px 12px;font:500 12.5px/1.5 'IBM Plex Mono',monospace;white-space:pre-wrap;}
+.stage-done .done-box{max-height:max(300px, calc(100vh - 380px));overflow-y:auto;}
+.done-count{font-weight:700 !important;color:var(--navy) !important;}
+.wrap-box{text-align:left;background:#FFFDF8;border:1px solid var(--orange-soft);border-radius:12px;padding:12px 16px;margin:6px auto 14px;max-width:720px;}
+.wrap-box h3{margin:0 0 6px;color:var(--navy);font-size:17px;}
+.wrap-box p{margin:0 0 8px !important;max-width:none !important;}
+.wrap-box ol{margin:0 0 8px;padding-left:20px;font-size:13.5px;}
+.wrap-box li{padding:2px 0;}
+.wrap-note{font-weight:700 !important;color:var(--orange-deep) !important;}
+.side-note-box{background:#FFFDF8;border:1px solid var(--orange-soft);border-radius:10px;padding:10px 12px;font-size:13px;font-weight:600;line-height:1.45;color:var(--ink);}
+.trainer-notes{margin-top:6px;background:rgba(255,255,255,.7);border:1px dashed var(--navy-soft);border-radius:10px;padding:10px 12px;font-size:12.5px;}
+.trainer-notes b{color:var(--navy);}
+.trainer-notes ul{margin:6px 0 0;padding-left:16px;}
+.trainer-notes li{padding:2px 0;font-weight:500;overflow-wrap:anywhere;}
+.trainer-notes a{color:var(--orange-deep);font-weight:700;}
+.ans{white-space:pre-wrap;font-weight:500;font-size:13.5px;background:#F6F7FB;border-radius:6px;padding:6px 8px;margin-top:4px;}
 
 /* ---------- admin ---------- */
 .admin-table{width:100%;border-collapse:collapse;font-size:13.5px;}
@@ -318,14 +356,14 @@ body::before{opacity:.40;}
    repo) expects of an engine: state, render(), goto(), authStatus(), logout(), setAdminToken(),
    setTraineeToken(), submitLogin() and resumeWhereLeftOff().
    ============================================================ */
-const APP_BUILD = "2026.11.11-4";
+const APP_BUILD = "2026.11.11-6";
 const PORTAL_HOME = "https://cm-training-activity.pages.dev/";
 const LOGO_FULL_SRC = "/logo.svg";
 const COURSE = window.LN_COURSE;
 const TOKEN_KEYS = { admin: "ln.adminToken", trainee: "ln.traineeToken", last: "ln.last" };
 
 const state = {
-  view: "boot", dayNum: 1, step: 0,
+  view: "boot", dayNum: 1, step: 0, sub: {}, progress: null,
   secure: true, portalOnly: false, portalSecret: false,
   adminToken: "", authToken: "", isAdmin: false,
   traineeId: "", trainee: null,
@@ -408,6 +446,7 @@ async function loadTrainee(){
   if(!state.trainee) state.trainee = { id: state.traineeId, name: state.traineeId, dayProgress: {} };
   state.trainee.dayProgress = state.trainee.dayProgress || {};
   state.trainee.lastActive = new Date().toISOString();
+  try{ state.progress = (await kvGet("progress:" + state.traineeId)) || {}; }catch(e){ state.progress = {}; }
   saveTrainee();
   api("/api/checkin", {training: COURSE.title}).catch(() => {});
 }
@@ -425,11 +464,22 @@ const ALL_MODULES = COURSE.days.flatMap((d) => d.modules.map((m) => Object.assig
 function dayByNum(n){ return COURSE.days.find((d) => d.day === Number(n)); }
 function moduleById(id){ return ALL_MODULES.find((m) => m.id === id); }
 function linkOf(m){ const o = (state.courseLinks || {})[m.id]; return (o && o.link) || m.link; }
-const KIND = { deck: { icon: "🎞", label: "Slide Deck", chip: "📚 The Slides" }, video: { icon: "▶", label: "Recorded Session", chip: "🎬 The Session" } };
+const KIND = {
+  deck: { icon: "🎞", label: "Slide Deck", chip: "📚 The Slides" },
+  video: { icon: "▶", label: "Recorded Session", chip: "🎬 The Video" },
+  files: { icon: "📄", label: "Handouts", chip: "📄 The Handouts" },
+  questions: { icon: "✍️", label: "Process Questions", chip: "✍️ Your Answers" },
+  guide: { icon: "🧭", label: "Guide", chip: "🧭 The Guide" }
+};
+// A module's own label (Live Demo, Shadowing Video …), else its kind's.
+function modLabel(m){ return m.label || KIND[m.kind].label; }
+// Modules with one embeddable address (a deck or a video): the ones Admin → Course links can replace.
+const LINKED = (m) => m.kind === "deck" || m.kind === "video";
+const slidesOf = (t) => t.slides ? ` <span>slides ${esc(t.slides)}</span>` : "";
 // A day's steps, as the CM course plays a day: the Training Agenda, each module, then Day complete.
 function stepsOf(d){
   return [{ type: "agenda", title: "Training Agenda" }]
-    .concat(d.modules.map((m, j) => ({ type: "module", module: Object.assign({ day: d.day }, m), n: j + 1, title: `Module ${j + 1} · ${KIND[m.kind].label}` })))
+    .concat(d.modules.map((m, j) => ({ type: "module", module: Object.assign({ day: d.day }, m), n: j + 1, title: `Module ${j + 1} · ${modLabel(m)}` })))
     .concat([{ type: "done", title: "Day Complete" }]);
 }
 function dayProg(d, rec){ const dp = ((rec || state.trainee) || {}).dayProgress || {}; return dp[d.day] || dp[String(d.day)] || {}; }
@@ -472,7 +522,7 @@ function topbar(){
 function footer(){ return `<div class="footer-note">LSH Lien Negotiator Training · Internal Training Portal · <span class="mono">build ${APP_BUILD}</span></div>`; }
 
 // The dashboard banner, as the CM course draws it: the completion ribbon (its completionRibbonSvg), the eyebrow and the
-// title between two sparks, then ▶ Continue where you left off and 🗺 Roadmap.
+// title between two sparks, then ▶ Continue where you left off (once a day has been started).
 function completionRibbonSvg(pct){
   const points = 14, r1 = 48, r2 = 41, cx = 60, cy = 52;
   let path = "";
@@ -518,18 +568,9 @@ function dashBanner(){
         <h1>${SPARK(true)}Lien Negotiator Professional Development Workshop${SPARK(false)}</h1>
       </div>
     </div>
-    <div class="dash-hero-row">${r ? `<button type="button" class="dash-resume-btn" onclick="resumeDay()" title="Back to ${esc(r.label)}">▶ Continue where you left off<span>${esc(r.label)}</span></button>` : ""}<button type="button" class="dash-roadmap-btn" onclick="openRoadmap()" title="See all ${COURSE.days.length} days at a glance">🗺 Roadmap</button></div>
+    ${r ? `<div class="dash-hero-row"><button type="button" class="dash-resume-btn" onclick="resumeDay()" title="Back to ${esc(r.label)}">▶ Continue where you left off<span>${esc(r.label)}</span></button></div>` : ""}
   </div>`;
 }
-// 🗺 Roadmap: every day at a glance, and where the trainee is on it.
-function openRoadmap(){
-  const next = COURSE.days.find((d) => !dayProg(d).done);
-  const tile = (d) => { const st = state.isAdmin ? `${d.modules.length} modules` : dayProg(d).done ? "✓ Completed" : d === next ? "▶ You're here" : "Open";
-    return `<div class="or-day"><span>Day ${d.day}</span><b>${esc(d.title)}</b><em>${esc(d.theme)} · ${d.topics.length} topics · ${st}</em></div>`; };
-  overlay(`<div class="mh-day">${COURSE.days.length}-day roadmap</div><div class="mh-title">🗺 Your Roadmap</div>`,
-    `<div class="or-days">${COURSE.days.map(tile).join("")}</div><p class="or-foot">Each day is its slide deck and its recorded session; each builds on the one before.</p>`);
-}
-
 // The dashboard: one Day card per day, as the CM course draws them (Day n · title in the head, the icon and the theme
 // in the middle, Start, then ☰ Topics).
 function viewDashboard(){
@@ -558,14 +599,19 @@ function overlay(head, body){
 function showTopics(n){
   const d = dayByNum(n); if(!d) return;
   overlay(`<div class="mh-day">Day ${d.day} · ${d.topics.length} topics</div><div class="mh-title">${esc(d.title)}</div>`,
-    `<ol class="topic-list">${d.topics.map((t) => `<li><b>${esc(t.h)}</b> <span>slides ${esc(t.slides)}</span></li>`).join("")}</ol>`);
+    `<ol class="topic-list">${d.topics.map((t) => `<li><b>${esc(t.h)}</b>${slidesOf(t)}</li>`).join("")}</ol>`);
 }
 
 // A day's Objectives page: what the trainee will be able to do, and the day's outline (the CM course's day page).
 function viewDay(){
   const d = dayByNum(state.dayNum), half = Math.ceil(d.topics.length / 2);
-  const outline = (topics) => topics.map((t) => `<li>📘 <b>${esc(t.h)}</b> <span>slides ${esc(t.slides)}</span></li>`).join("");
-  const mods = d.modules.map((m, j) => `<li>${KIND[m.kind].icon} <b>Module ${j + 1}: ${esc(KIND[m.kind].label)}</b> <span>${m.slides ? m.slides + " slides" : "the recorded class"}${!state.isAdmin && moduleDone(Object.assign({ day: d.day }, m)) ? " · ✓ done" : ""}</span></li>`).join("");
+  const outline = (topics) => topics.map((t) => `<li>📘 <b>${esc(t.h)}</b>${slidesOf(t)}</li>`).join("");
+  const done = (m) => !state.isAdmin && moduleDone(Object.assign({ day: d.day }, m));
+  const groups = [...new Set(d.modules.map((m) => m.group).filter(Boolean))];
+  const mods = d.modules.length > 4 && groups.length
+    ? groups.map((g) => { const ms = d.modules.filter((m) => m.group === g);
+        return `<li>${KIND[ms[0].kind].icon} <b>${esc(g)}</b> <span>${ms.length} module${ms.length === 1 ? "" : "s"}${state.isAdmin ? "" : ` · ${ms.filter(done).length}/${ms.length} done`}</span></li>`; }).join("")
+    : d.modules.map((m, j) => `<li>${KIND[m.kind].icon} <b>Module ${j + 1}: ${esc(modLabel(m))}</b> <span>${m.slides ? m.slides + " slides" : m.kind === "video" ? "the recorded class" : esc(m.title)}${done(m) ? " · ✓ done" : ""}</span></li>`).join("");
   const p = dayProg(d), resume = !state.isAdmin && p.step && !p.done;
   return `<div class="day-headline"><span class="mono">Day ${d.day} of ${COURSE.days.length}</span><h1>Day ${d.day} · ${esc(d.title)}</h1></div>
     <section class="stage-shell">
@@ -616,16 +662,15 @@ function viewPlayer(){
   if(s.type === "agenda"){
     head = "Lien Negotiator Training"; banner = `Day ${d.day} · Training Agenda`; chip = "📅 Training Agenda";
     body = `<div class="agenda-theme"><span class="theme-tag">${esc(d.theme)}</span><p>${esc(d.objectives.join("; "))}.</p></div>
-      <div class="agenda-grid">${d.topics.map((t, k) => `<div class="agenda-item"><span class="agenda-n">${String(k + 1).padStart(2, "0")}</span><div><b>${esc(t.h)}</b><small>📚 slides ${esc(t.slides)}</small></div></div>`).join("")}</div>
+      <div class="agenda-grid">${d.topics.map((t, k) => `<div class="agenda-item"><span class="agenda-n">${String(k + 1).padStart(2, "0")}</span><div><b>${esc(t.h)}</b>${t.slides ? `<small>📚 slides ${esc(t.slides)}</small>` : ""}</div></div>`).join("")}</div>
 `;
-    chipExtra = `<div class="agenda-mods">${d.modules.map((m, j) => `<span class="agenda-mod">${KIND[m.kind].icon} Module ${j + 1}: ${esc(KIND[m.kind].label)}${m.slides ? ` · ${m.slides} slides` : ""}</span>`).join("")}</div>`;
+    chipExtra = `<div class="agenda-mods">${d.modules.length > 4
+      ? `<span class="agenda-mod">🧭 ${d.modules.length} modules</span>${d.modules.some((m) => m.kind === "video") ? `<span class="agenda-mod">▶ ${d.modules.filter((m) => m.kind === "video").length} videos</span>` : ""}`
+      : d.modules.map((m, j) => `<span class="agenda-mod">${KIND[m.kind].icon} Module ${j + 1}: ${esc(modLabel(m))}${m.slides ? ` · ${m.slides} slides` : ""}</span>`).join("")}</div>`;
   } else if(s.type === "module"){
-    const m = s.module, link = linkOf(m), src = lnEmbed.embed(m.kind, link), page = lnEmbed.page(m.kind, link);
-    head = m.title; banner = `Day ${d.day} · Module ${s.n} · ${KIND[m.kind].label}`; chip = KIND[m.kind].chip;
-    body = src
-      ? `<div class="frame"><iframe src="${esc(src)}" title="${esc(m.title)}: ${esc(KIND[m.kind].label)}" allow="autoplay; fullscreen" allowfullscreen loading="lazy" referrerpolicy="strict-origin-when-cross-origin"></iframe></div>
-         <p class="frame-note">${m.kind === "video" ? "The session plays from Google Drive. If it asks you to sign in, use your legalsupporthelp.com Google account." : "Use the arrows under the slides, or the slides' own full-screen button, to page through the deck."} <a href="${esc(page)}" target="_blank" rel="noopener">Open in a new tab ↗</a></p>`
-      : `<div class="empty">This module isn't set up yet. ${state.isAdmin ? "Add its address in Admin → Course links." : "Please tell your trainer."}</div>`;
+    const m = s.module;
+    head = m.title; banner = `Day ${d.day} · Module ${s.n} · ${m.group ? m.group : modLabel(m)}`; chip = m.kind === "video" && m.label ? `▶ ${m.label}` : KIND[m.kind].chip;
+    body = moduleBody(m);
   } else {
     const all = d.modules.every((m) => moduleDone(Object.assign({ day: d.day }, m)));
     const next = dayByNum(d.day + 1);
@@ -633,8 +678,9 @@ function viewPlayer(){
     body = `<div class="done-box">
       <div class="done-icon">${state.isAdmin || all ? "🎉" : "🧭"}</div>
       <h2>${state.isAdmin ? "End of the day's steps" : all ? `Day ${d.day} is complete` : "Almost there"}</h2>
-      <p>${state.isAdmin ? "Trainees reach this step after both modules; their day is recorded as complete here." : all ? "Both modules are done and your progress is saved to your account." : "Go through every module first: a module counts as done once you move on from it with Next."}</p>
-      <ul class="outline">${d.modules.map((m, j) => `<li>${!state.isAdmin && moduleDone(Object.assign({ day: d.day }, m)) ? "✅" : KIND[m.kind].icon} <b>Module ${j + 1}: ${esc(KIND[m.kind].label)}</b></li>`).join("")}</ul>
+      <p>${state.isAdmin ? "Trainees reach this step after every module; their day is recorded as complete here." : all ? "Every module is done and your progress is saved to your account." : "Go through every module first: a module counts as done once you move on from it with Next."}</p>
+      ${d.modules.length > 4 ? `<p class="done-count">${state.isAdmin ? d.modules.length + " modules" : `${dayCount(d)} of ${d.modules.length} modules done`}</p>` : `<ul class="outline">${d.modules.map((m, j) => `<li>${!state.isAdmin && moduleDone(Object.assign({ day: d.day }, m)) ? "✅" : KIND[m.kind].icon} <b>Module ${j + 1}: ${esc(modLabel(m))}</b></li>`).join("")}</ul>`}
+      ${d.wrapUp ? `<div class="wrap-box"><h3>${esc(d.wrapUp.h)}</h3><p>${esc(d.wrapUp.p)}</p><ol>${d.wrapUp.steps.map((x) => `<li>${esc(x)}</li>`).join("")}</ol>${d.wrapUp.note ? `<p class="wrap-note">📅 ${esc(d.wrapUp.note)}</p>` : ""}</div>` : ""}
       <div class="done-actions"><button class="btn btn-ghost" onclick="goto('dashboard')">Back to the Dashboard</button>${next ? `<button class="btn btn-primary" onclick="goto('day',${next.day})">Day ${next.day} →</button>` : ""}</div>
     </div>`;
   }
@@ -642,7 +688,7 @@ function viewPlayer(){
     <div class="player-main">
       <section class="stage stage-${s.type}">
         <span class="corner tl"></span><span class="corner tr"></span><span class="corner bl"></span><span class="corner br"></span>
-        <h1 class="stage-title">${esc(head)}</h1>
+        <h1 class="stage-title" title="${esc(head)}">${esc(head)}</h1>
         <div class="stage-banner">${esc(banner)}</div>
         <div class="stage-chiprow"><span class="stage-chip">${esc(chip)}</span>${chipExtra}</div>
         <div class="stage-body">${body}</div>
@@ -660,9 +706,68 @@ function viewPlayer(){
       <button class="side-btn" onclick="goto('day',${d.day})">📋 Objectives</button>
       <button class="side-btn side-dark" onclick="stageFullScreen()">⛶ Full screen</button>
       <p class="side-tip">Tip: use ← → keys to move between steps.</p>
+      ${s.type === "module" && s.module.note && (s.module.kind === "video" || s.module.kind === "deck") ? `<div class="side-note-box">📌 ${esc(s.module.note)}</div>` : ""}
+      ${trainerNotes(d, s)}
     </aside>
   </div>`;
 }
+// What a module's step shows, by its kind.
+function frameNote(text, page){ return `<p class="frame-note">${esc(text)} ${page ? `<a href="${esc(page)}" target="_blank" rel="noopener">Open in a new tab ↗</a>` : ""}</p>`; }
+function moduleBody(m){
+  if(m.kind === "deck" || m.kind === "video"){
+    const link = linkOf(m), src = lnEmbed.embed(m.kind, link), page = lnEmbed.page(m.kind, link);
+    if(!src) return `<div class="empty">This module isn't set up yet. ${state.isAdmin ? "Add its address in Admin → Course links." : "Please tell your trainer."}</div>`;
+    return `<div class="frame"><iframe src="${esc(src)}" title="${esc(m.title)}" allow="autoplay; fullscreen" allowfullscreen loading="lazy" referrerpolicy="strict-origin-when-cross-origin"></iframe></div>`
+      + frameNote((m.kind === "video" ? "The video plays from Google Drive. If it asks you to sign in, use your legalsupporthelp.com Google account." : "Use the arrows under the slides, or the slides' own full-screen button, to page through the deck."), page);
+  }
+  if(m.kind === "files"){
+    const k = Math.max(0, Math.min(m.items.length - 1, (state.sub[m.id] || 0))), it = m.items[k];
+    return `<div class="doc-tabs" role="tablist">${m.items.map((x, j) => `<button role="tab" aria-selected="${j === k}" class="${j === k ? "on" : ""}" onclick="state.sub['${m.id}']=${j};render()">📄 ${esc(x.title)}</button>`).join("")}</div>
+      <div class="doc-frame"><iframe src="${esc(lnEmbed.video(it.link))}" title="${esc(it.title)}" allow="fullscreen" allowfullscreen loading="lazy"></iframe></div>`
+      + frameNote(`${m.note ? m.note + " " : ""}${it.title}: ${k + 1} of ${m.items.length}.`, lnEmbed.page("video", it.link));
+  }
+  if(m.kind === "questions"){
+    const a = answersOf(m.id);
+    const n = m.questions.filter((q, j) => (a[j] || "").trim()).length;
+    return `<div class="qa-head"><span>Answer each question in your own words. ${state.isAdmin ? "" : "Your answers save to your account as you type."} Name your document <b class="mono">${esc(m.naming)}</b>.</span>
+        ${state.isAdmin ? "" : `<span class="qa-count">${n}/${m.questions.length} answered</span><button class="btn btn-sm btn-orange" onclick="copyAnswers('${m.id}')">⧉ Copy all answers</button>`}</div>
+      <ol class="qa-list">${m.questions.map((q, j) => `<li><p>${q.core ? '<span class="core-tag">★ Core</span> ' : ""}${esc(q.q)}</p>${state.isAdmin ? "" : `<textarea rows="3" aria-label="Your answer to question ${j + 1}" oninput="saveAnswer('${m.id}',${j},this.value)">${esc(a[j] || "")}</textarea>`}</li>`).join("")}</ol>`;
+  }
+  if(m.kind === "guide"){
+    return `<div class="guide">${m.sections.map((g, gi) => `<section class="guide-sec"><h3>${esc(g.h)}</h3>
+      ${g.p ? `<p>${esc(g.p)}</p>` : ""}
+      ${g.links ? `<div class="guide-links">${g.links.map((l) => `<a class="btn btn-sm btn-ghost" href="${esc(l.u)}" target="_blank" rel="noopener">${esc(l.t)} ↗</a>`).join("")}</div>` : ""}
+      ${g.rows ? `<table class="guide-rows">${g.rows.map((r) => `<tr><th>${esc(r[0])}</th><td class="mono">${esc(r[1])}</td></tr>`).join("")}</table>` : ""}
+      ${g.pre ? `<div class="guide-pre"><div class="guide-pre-h"><b>Letter body template</b><button class="btn btn-sm btn-ghost" onclick="copyText(this.parentNode.nextElementSibling.textContent)">⧉ Copy</button></div><pre>${esc(g.pre)}</pre></div>` : ""}
+      ${g.example ? `<div class="guide-pre"><div class="guide-pre-h"><b>Example</b><button class="btn btn-sm btn-ghost" onclick="copyText(this.parentNode.nextElementSibling.textContent)">⧉ Copy</button></div><pre>${esc(g.example)}</pre></div>` : ""}
+    </section>`).join("")}</div>`;
+  }
+  return "";
+}
+// The trainer's notes for a step: shown in the side panel to a trainer only (never to a trainee).
+function linkify(t){ return esc(t).replace(/https:\/\/[^\s<]+/g, (u) => `<a href="${u}" target="_blank" rel="noopener">${u.replace(/^https:\/\/(www\.)?/, "").slice(0, 34)}…</a>`); }
+function trainerNotes(d, s){
+  if(!state.isAdmin || !d.trainerNotes) return "";
+  const notes = d.trainerNotes[s.type === "module" ? s.module.id : s.type];
+  return notes && notes.length ? `<div class="trainer-notes"><b>🔒 Trainer notes</b><ul>${notes.map((x) => `<li>${linkify(x)}</li>`).join("")}</ul></div>` : "";
+}
+// The trainee's answers (process questions), kept in progress:<id> as { answers: { <module id>: [answer, …] } }.
+function answersOf(id, rec){ const a = ((rec || state.progress) || {}).answers || {}; return a[id] || []; }
+let answerTimer = null;
+function saveAnswer(id, j, v){
+  if(state.isAdmin || !state.traineeId) return;
+  state.progress = state.progress || {}; state.progress.answers = state.progress.answers || {};
+  const a = (state.progress.answers[id] = (state.progress.answers[id] || []).slice());
+  a[j] = String(v).slice(0, 6000); state.progress.answers[id] = a;
+  const m = moduleById(id), c = document.querySelector(".qa-count");
+  if(c && m) c.textContent = `${m.questions.filter((q, k) => (a[k] || "").trim()).length}/${m.questions.length} answered`;
+  clearTimeout(answerTimer);
+  answerTimer = setTimeout(() => { kvSet("progress:" + state.traineeId, state.progress).catch(() => toast("Couldn't save your answers. Check your connection.")); }, 600);
+}
+function answersText(m, a){ return m.questions.map((q, j) => `${j + 1}. ${q.q}\n${(a[j] || "").trim() || "(no answer yet)"}`).join("\n\n"); }
+function copyText(t){ try{ navigator.clipboard.writeText(t).then(() => toast("Copied."), () => toast("Couldn't copy. Select the text and copy it.")); }catch(e){ toast("Couldn't copy. Select the text and copy it."); } }
+function copyAnswers(id){ const m = moduleById(id); copyText(answersText(m, answersOf(id))); }
+
 document.addEventListener("keydown", (e) => {
   if(state.view !== "player" || document.getElementById("overlay") || /INPUT|TEXTAREA|SELECT/.test((e.target && e.target.tagName) || "")) return;
   if(e.key === "ArrowRight") stepTo((state.step || 0) + 1);
@@ -680,9 +785,22 @@ async function loadAdmin(){
       Object.values(values).forEach((v) => { try{ const r = JSON.parse(v); if(r) rows.push(r); }catch(e){} });
     }
     rows.sort((a, b) => String(a.batch || "").localeCompare(String(b.batch || "")) || String(a.name || "").localeCompare(String(b.name || "")));
+    // Their answers to the process questions (progress:<id>), read in the same batched way.
+    const pk = rows.map((r) => "progress:" + r.id), prog = {};
+    for(let i = 0; i < pk.length; i += 100){
+      const {values} = await api("/api/storage/get-many", {keys: pk.slice(i, i + 100)});
+      Object.entries(values).forEach(([k, v]) => { try{ prog[k.slice(9)] = JSON.parse(v); }catch(e){} });
+    }
+    state.admin.progress = prog;
     state.admin.rows = rows;
   }catch(e){ state.admin.rows = []; toast(e.message); }
   state.admin.loading = false; render();
+}
+const QUESTION_MODULES = ALL_MODULES.filter((m) => m.kind === "questions");
+function showAnswers(id){
+  const r = (state.admin.rows || []).find((x) => x.id === id), p = (state.admin.progress || {})[id];
+  overlay(`<div class="mh-day">${esc(r ? r.batch || "" : "")}</div><div class="mh-title">${esc(r ? r.name || id : id)}: answers</div>`,
+    QUESTION_MODULES.map((m) => `<h3 style="margin:4px 0 8px;color:var(--navy)">Day ${m.day} · ${esc(m.title)}</h3><ol class="topic-list">${m.questions.map((q, j) => `<li><b>${q.core ? "★ " : ""}${esc(q.q)}</b><div class="ans">${esc((answersOf(m.id, p)[j] || "").trim() || "(no answer)")}</div></li>`).join("")}</ol>`).join(""));
 }
 async function setTraineeFlag(id, flag){
   const r = (state.admin.rows || []).find((x) => x.id === id); if(!r) return;
@@ -693,32 +811,33 @@ async function setTraineeFlag(id, flag){
 }
 async function saveCourseLinks(){
   const out = {};
-  for(const m of ALL_MODULES){
+  for(const m of ALL_MODULES.filter(LINKED)){
     const v = ((document.getElementById("cl-" + m.id) || {}).value || "").trim();
     if(!v) continue;
-    if(!lnEmbed.embed(m.kind, v)){ toast(`Day ${m.day}, ${KIND[m.kind].label}: the address must be a ${m.kind === "video" ? "drive.google.com/file/d/…" : "canva.com/design/…"} link.`); return; }
+    if(!lnEmbed.embed(m.kind, v)){ toast(`Day ${m.day}, ${m.title}: the address must be a ${m.kind === "video" ? "drive.google.com/file/d/…" : "canva.com/design/…"} link.`); return; }
     out[m.id] = { link: v };
   }
   try{ await kvSet("settings:course", out); state.courseLinks = out; toast("Course links saved."); }catch(e){ toast(e.message); }
 }
 function viewAdmin(){
   if(state.admin.rows == null && !state.admin.loading) setTimeout(loadAdmin, 0);
-  const rows = state.admin.rows || [], cols = 4 + COURSE.days.length;
+  const rows = state.admin.rows || [], cols = 5 + COURSE.days.length;
   const body = state.admin.loading && !rows.length ? `<tr><td colspan="${cols}">Loading…</td></tr>`
     : !rows.length ? `<tr><td colspan="${cols}">No trainees have opened this course yet. They appear here the first time they open it from the LSH Training Portal.</td></tr>`
     : rows.map((r) => `<tr>
         <td>${esc(r.name || r.id)}</td><td class="mono">${esc(r.batch || "")}</td>
         ${COURSE.days.map((d) => `<td>${pillFor(dayStatus(d, r))} <span class="mono" style="font-size:11.5px">${dayCount(d, r)}/${d.modules.length}</span></td>`).join("")}
         <td style="font-weight:500">${r.lastActive ? esc(new Date(r.lastActive).toLocaleString()) : "—"}</td>
+        <td>${QUESTION_MODULES.some((m) => answersOf(m.id, state.admin.progress && state.admin.progress[r.id]).some((x) => (x || "").trim())) ? `<button class="btn btn-ghost btn-sm" onclick="showAnswers('${esc(r.id)}')">✍️ Answers</button>` : "—"}</td>
         <td>${r.archived || r.rejected ? `<button class="btn btn-ghost btn-sm" onclick="setTraineeFlag('${esc(r.id)}','restore')">Restore access</button>` : `<button class="btn btn-ghost btn-sm" onclick="setTraineeFlag('${esc(r.id)}','archive')">Remove access</button>`}</td>
       </tr>`).join("");
   const links = COURSE.days.map((d) => `<h3 style="margin:14px 0 8px;font-size:16px;color:var(--navy)">Day ${d.day}: ${esc(d.title)}</h3>`
-    + d.modules.map((m, j) => `<label class="field"><span>Module ${j + 1} · ${esc(KIND[m.kind].label)} (blank = ${esc(m.link)})</span><input id="cl-${m.id}" value="${esc(((state.courseLinks || {})[m.id] || {}).link || "")}" placeholder="${m.kind === "video" ? "https://drive.google.com/file/d/…/view" : "https://www.canva.com/design/…/view"}"></label>`).join("")).join("");
+    + d.modules.map((m, j) => !LINKED(m) ? "" : `<label class="field"><span>Module ${j + 1} · ${esc(modLabel(m))}: ${esc(m.title)} (blank = ${esc(m.link)})</span><input id="cl-${m.id}" value="${esc(((state.courseLinks || {})[m.id] || {}).link || "")}" placeholder="${m.kind === "video" ? "https://drive.google.com/file/d/…/view" : "https://www.canva.com/design/…/view"}"></label>`).join("")).join("");
   return `<section class="page-hero"><p class="eyebrow">Admin</p><h1>Trainees & course links</h1><p class="lead">Who has opened the course, how far each trainee is, and where each module's deck or video comes from.</p></section>
     <section class="card sec">
       <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap"><h2>Trainees</h2><button class="btn btn-ghost btn-sm" onclick="loadAdmin()">↻ Refresh</button></div>
       <p>Trainees are approved on the LSH Training Portal; removing access here stops them opening this course only.</p>
-      <div class="table-wrap"><table class="admin-table"><thead><tr><th>Name</th><th>Batch</th>${COURSE.days.map((d) => `<th>Day ${d.day}</th>`).join("")}<th>Last active</th><th></th></tr></thead><tbody>${body}</tbody></table></div>
+      <div class="table-wrap"><table class="admin-table"><thead><tr><th>Name</th><th>Batch</th>${COURSE.days.map((d) => `<th>Day ${d.day}</th>`).join("")}<th>Last active</th><th>Answers</th><th></th></tr></thead><tbody>${body}</tbody></table></div>
     </section>
     <section class="card sec">
       <h2>Course links</h2>

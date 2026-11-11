@@ -32,10 +32,14 @@ for (const d of LN_COURSE.days) {
     n++;
     if (ids.has(m.id)) fail.push(`js/ln-course.js: module id ${m.id} repeats`);
     ids.add(m.id);
-    if (m.kind !== 'deck' && m.kind !== 'video') fail.push(`js/ln-course.js: ${m.id} kind must be "deck" or "video"`);
-    else if (!lnEmbed.embed(m.kind, m.link)) fail.push(`js/ln-course.js: ${m.id} is not a ${m.kind === 'video' ? 'drive.google.com/file/d/…' : 'canva.com/design/…'} link: ${m.link}`);
+    if (!['deck', 'video', 'files', 'questions', 'guide'].includes(m.kind)) fail.push(`js/ln-course.js: ${m.id} kind must be deck, video, files, questions or guide`);
+    else if ((m.kind === 'deck' || m.kind === 'video') && !lnEmbed.embed(m.kind, m.link)) fail.push(`js/ln-course.js: ${m.id} is not a ${m.kind === 'video' ? 'drive.google.com/file/d/…' : 'canva.com/design/…'} link: ${m.link}`);
+    if (m.kind === 'files' && (!Array.isArray(m.items) || !m.items.length || m.items.some((x) => !x.title || !lnEmbed.video(x.link)))) fail.push(`js/ln-course.js: ${m.id} needs items, each a title and a drive.google.com/file/d/… link`);
+    if (m.kind === 'questions' && (!Array.isArray(m.questions) || !m.questions.length || m.questions.some((q) => !q.q))) fail.push(`js/ln-course.js: ${m.id} needs questions`);
+    if (m.kind === 'guide' && (!Array.isArray(m.sections) || !m.sections.length)) fail.push(`js/ln-course.js: ${m.id} needs sections`);
     if (m.kind === 'deck' && /\/edit\b/.test(m.link)) fail.push(`js/ln-course.js: ${m.id} is a Canva editor link; use the /view link`);
   }
 }
+if (/answer key/i.test(JSON.stringify(LN_COURSE).replace(/answer keys are not on this page/i, ''))) fail.push('js/ln-course.js mentions an answer key: keep answer keys off this public page');
 if (fail.length) { console.error(fail.join('\n')); process.exit(1); }
 console.log(`OK: scripts parse, index.html's files exist, ${LN_COURSE.days.length} days and ${n} modules embed.`);
