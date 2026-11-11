@@ -422,7 +422,7 @@ function head(c, w){
 function vTasks(c, w){
   const sec = (h, list) => `<div class="ld-card"><h2>${h}</h2><ol class="ld-tasks">${list.map((t) => `<li class="${t.ok ? "ok" : ""}">${t.ok ? "✅" : "⬜"} ${E(t.t)}</li>`).join("")}</ol></div>`;
   return `<div class="ld-grid2">${sec("Day 2 · The release, the initial Net Sheet, the Reduction Requests", tasks("day2"))}${sec("Day 3 · Updated bills, reductions, the Closing Statement", tasks("day3"))}</div>
-    <div class="ld-card"><h2>How the demo does it</h2><ol class="ld-how">
+    <div class="ld-card"><div class="ld-row"><h2 style="flex:1;margin:0">How the demo does it</h2><button class="btn btn-sm btn-primary" onclick="LNDesk.demo()">▶ Watch the demo recording</button></div><ol class="ld-how">
       <li><b>Case File:</b> open the Settlement Release Form(s), the bills, the PIP log, the lien notices and payoff letters, and the cost ledger. Note the dates: a statement or payoff can be out of date.</li>
       <li><b>Email:</b> send the release(s) to your trainer; the fully executed release comes back.</li>
       <li><b>Net Sheet:</b> the gross, the fee from the retainer, the costs, and every provider and lien as on file. Check it.</li>
@@ -556,6 +556,12 @@ window.LNDesk = {
   att(id, j){ const c = CASE(), w = W(), m = w.mail.find((x) => x.id === id), a = m && m.att[j]; const d = a && attDoc(c, w, a); if(!d) return;
     window.overlay(`<div class="mh-day">Attachment</div><div class="mh-title">${E(a.name)}</div>`, `<div class="ld-ov">${viewer(Object.assign({ title: a.name }, d))}</div>`); },
   draft(k){ UI.draft = k; window.render(); },
+  // the reference video: the Day 3 Tutorial Demo Recording (its address can be replaced in Admin → Course links)
+  demo(){
+    const m = (window.ALL_MODULES || []).find((x) => x.id === "d3-demo"); if(!m) return;
+    const src = window.lnEmbed.video(window.linkOf ? window.linkOf(m) : m.link);
+    window.overlay(`<div class="mh-day">Reference video</div><div class="mh-title">${E(m.title)}</div>`, `<div class="ld-ov"><div class="frame" style="position:relative;aspect-ratio:16/9"><iframe src="${E(src)}" title="${E(m.title)}" allow="autoplay; fullscreen" allowfullscreen style="position:absolute;inset:0;width:100%;height:100%;border:0"></iframe></div></div>`);
+  },
   field(e, k){
     const w = W(), el = e.target, d = k === "cs" ? (w.drafts.cs = w.drafts.cs || {}) : (w.drafts.rr[k.slice(3)] = w.drafts.rr[k.slice(3)] || {});
     if(el.dataset.d) d[el.dataset.d] = el.value;

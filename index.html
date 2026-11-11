@@ -479,6 +479,7 @@ async function loadCourseLinks(){ try{ state.courseLinks = (await kvGet("setting
 
 /* ---------- the course: days, and each day's steps ---------- */
 const ALL_MODULES = COURSE.days.flatMap((d) => d.modules.map((m) => Object.assign({ day: d.day }, m)));
+window.ALL_MODULES = ALL_MODULES;   // js/ln-desk.js opens the demo recording from it
 function dayByNum(n){ return COURSE.days.find((d) => d.day === Number(n)); }
 function moduleById(id){ return ALL_MODULES.find((m) => m.id === id); }
 function linkOf(m){ const o = (state.courseLinks || {})[m.id]; return (o && o.link) || m.link; }
