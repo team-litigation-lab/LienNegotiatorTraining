@@ -112,6 +112,21 @@ const ticket = (t) => { const p = b64u(JSON.stringify(t)); return `${p}.${b64u(c
   await p.reload(); await p.waitForSelector('.stage');   // a trainee resumes where they left off: the Day 3 step
   assert.equal(await p.evaluate(() => LNDesk.tasks('day3').every((t) => t.ok)), true, 'the desk is saved to the account');
 
+  // every case opens: each document, each draft, the Net Sheet and the tasks, with no page error
+  for (const id of await p.evaluate(() => LNDesk.cases.map((c) => c.id))) {
+    await p.evaluate((x) => { state.deskAssign = x; goto('desk'); }, id);
+    await p.waitForSelector('.ld-head');
+    await tab('Case File');
+    const n = await p.locator('.ld-list button').count();
+    assert.ok(n >= 8, `${id}: a full case file (${n} documents)`);
+    for (let i = 0; i < n; i++) { await p.locator('.ld-list button').nth(i).click(); assert.ok((await p.locator('.ld-doc').getAttribute('srcdoc')).length > 500, `${id}: document ${i} renders`); }
+    await tab('Drafts');
+    for (let i = 0; i < await p.locator('.ld-list button').count(); i++) await p.locator('.ld-list button').nth(i).click();
+    await tab('Net Sheet'); await tab('Tasks');
+    const x = await p.evaluate(() => LNDesk.expected('final'));
+    assert.ok(x.net > 0, `${id}: a positive net`);
+  }
+
   await browser.close();
   if (errors.length) { console.error('Page errors:\n' + errors.join('\n')); process.exit(1); }
   console.log('OK: the Lien Desk plays a case end to end.');

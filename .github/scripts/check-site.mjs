@@ -67,6 +67,18 @@ for (const c of CASES) {
     if (/health subrogation/i.test(p.type) && Math.abs(p.amount - ps.filter((x) => !x.lien).reduce((s, x) => s + (x.health || 0), 0)) > 0.005) fail.push(`${at} ${p.id}: the health lien must equal what the plan paid on the providers' bills`);
   }
   if (!/\.example$/.test(c.client.email || '')) fail.push(`${at}: the client's email ends in .example`);
+  // the money holds together: the net to the client is above zero before and after the reductions
+  const gross = (c.settlements || []).reduce((s, x) => s + x.amount, 0), fee = gross * (/⅓/.test(c.fee.pct) ? 1 / 3 : parseFloat(c.fee.pct) / 100), costs = (c.costs || []).reduce((s, x) => s + x.amount, 0);
+  let ini = 0, fin = 0;
+  for (const p of ps) {
+    const o = Object.assign({ pip: p.pip, health: p.health, adj: p.adj }, p.onFile || {});
+    const bi = p.lien ? (p.onFile && p.onFile.amount != null ? p.onFile.amount : p.amount) : p.lines.concat((p.onFile && p.onFile.extraLines) || []).reduce((s, l) => s + l.amount, 0) - (o.pip || 0) - (o.health || 0) - (o.adj || 0);
+    const bn = p.lien ? p.amount : p.lines.reduce((s, l) => s + l.amount, 0) - (p.pip || 0) - (p.health || 0) - (p.adj || 0);
+    ini += bi; fin += bn <= 0 ? 0 : p.reduce && p.reduce.floor != null ? p.reduce.floor : bn;
+    if (p.onFile && !p.lien && !p.onFile.extraLines && ['pip', 'health', 'adj'].every((k) => (p.onFile[k] || 0) === (p[k] || 0))) fail.push(`${at} ${p.id}: onFile changes nothing (the bill on file must differ from the corrected one)`);
+  }
+  if (!(gross - fee - costs - ini > 0) || !(gross - fee - costs - fin > 0)) fail.push(`${at}: the net to the client must be above $0.00 before and after reductions`);
+  if (!ps.some((p) => p.onFile && !p.lien)) fail.push(`${at}: needs at least one provider bill on file that is out of date (a corrected bill to request)`);
 }
 if (/answer key/i.test(JSON.stringify(LN_COURSE).replace(/answer keys are not on this page/i, ''))) fail.push('js/ln-course.js mentions an answer key: keep answer keys off this public page');
 if (fail.length) { console.error(fail.join('\n')); process.exit(1); }
