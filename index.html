@@ -285,6 +285,14 @@ main{flex:1;max-width:1400px;margin:0 auto;padding:24px 20px 40px;width:100%;}
 .trainer-notes a{color:var(--orange-deep);font-weight:700;}
 .ans{white-space:pre-wrap;font-weight:500;font-size:13.5px;background:#F6F7FB;border-radius:6px;padding:6px 8px;margin-top:4px;}
 
+/* ---------- the Lien Desk's step in a day, and its page ---------- */
+main.main-wide{max-width:1600px;}
+.lab-box{background:#FFFDF8;color:var(--ink);border-radius:12px;padding:14px 18px;max-height:max(300px, calc(100vh - 420px));overflow-y:auto;}
+.lab-case .mono{color:var(--orange-deep);font-size:12px}.lab-case h3{margin:2px 0;font-size:18px;color:var(--navy);font-family:var(--font-ui);font-weight:800}.lab-case p{margin:0 0 8px;font-size:13px;font-weight:500;color:var(--ink-soft)}
+.lab-note{font-size:13.5px;font-weight:600;margin:0 0 6px}
+.lab-tasks{list-style:none;margin:0 0 10px;padding:0;font-size:14px}.lab-tasks li{padding:5px 0;border-bottom:1px solid var(--line)}.lab-tasks li.ok{color:var(--success)}
+.lab-foot{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+
 /* ---------- admin ---------- */
 .admin-table{width:100%;border-collapse:collapse;font-size:13.5px;}
 .admin-table th{text-align:left;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-soft);padding:10px 12px;border-bottom:1px solid var(--line);}
@@ -343,6 +351,7 @@ body::before{opacity:.40;}
 </style>
 <script src="/js/portal-gate.js?v=2026.10.23-dashboard"></script>
 <script src="/js/ln-course.js?v=2026.11.11"></script>
+<script src="/js/ln-desk-cases.js?v=2026.11.12"></script>
 <style>html.lsh-booting #app{visibility:hidden;}</style>
 <script>document.documentElement.classList.add("lsh-booting");setTimeout(function(){document.documentElement.classList.remove("lsh-booting");},4000);</script>
 </head>
@@ -356,14 +365,14 @@ body::before{opacity:.40;}
    repo) expects of an engine: state, render(), goto(), authStatus(), logout(), setAdminToken(),
    setTraineeToken(), submitLogin() and resumeWhereLeftOff().
    ============================================================ */
-const APP_BUILD = "2026.11.11-6";
+const APP_BUILD = "2026.11.12-1";
 const PORTAL_HOME = "https://cm-training-activity.pages.dev/";
 const LOGO_FULL_SRC = "/logo.svg";
 const COURSE = window.LN_COURSE;
 const TOKEN_KEYS = { admin: "ln.adminToken", trainee: "ln.traineeToken", last: "ln.last" };
 
 const state = {
-  view: "boot", dayNum: 1, step: 0, sub: {}, progress: null,
+  view: "boot", dayNum: 1, step: 0, sub: {}, progress: null, deskAssign: "", deskRelease: null,
   secure: true, portalOnly: false, portalSecret: false,
   adminToken: "", authToken: "", isAdmin: false,
   traineeId: "", trainee: null,
@@ -371,6 +380,7 @@ const state = {
   admin: { rows: null, loading: false },
   resumePending: false
 };
+window.state = state;   // js/ln-desk.js reads it
 
 function esc(t){ return String(t == null ? "" : t).replace(/[&<>"']/g, (c) => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c])); }
 function store(k, v){ try{ if(v) localStorage.setItem(k, v); else localStorage.removeItem(k); }catch(e){} }
@@ -447,6 +457,14 @@ async function loadTrainee(){
   state.trainee.dayProgress = state.trainee.dayProgress || {};
   state.trainee.lastActive = new Date().toISOString();
   try{ state.progress = (await kvGet("progress:" + state.traineeId)) || {}; }catch(e){ state.progress = {}; }
+  // the Lien Desk: the case a trainer assigned (assign:<id>), and a fully executed release they uploaded (release:<id>)
+  try{
+    const a = (await kvGet("assign:" + state.traineeId)) || {};
+    state.deskAssign = a.caseId || "";
+    const merged = ((state.progress.desk || {}).cases || {});
+    const have = Object.values(merged).some((w) => w && w.got && w.got.uploadAt === a.releaseAt);
+    if(a.releaseAt && !have) state.deskRelease = await kvGet("release:" + state.traineeId);
+  }catch(e){}
   saveTrainee();
   api("/api/checkin", {training: COURSE.title}).catch(() => {});
 }
@@ -469,7 +487,8 @@ const KIND = {
   video: { icon: "▶", label: "Recorded Session", chip: "🎬 The Video" },
   files: { icon: "📄", label: "Handouts", chip: "📄 The Handouts" },
   questions: { icon: "✍️", label: "Process Questions", chip: "✍️ Your Answers" },
-  guide: { icon: "🧭", label: "Guide", chip: "🧭 The Guide" }
+  guide: { icon: "🧭", label: "Guide", chip: "🧭 The Guide" },
+  lab: { icon: "🗂", label: "Case Activity", chip: "🗂 The Lien Desk" }
 };
 // A module's own label (Live Demo, Shadowing Video …), else its kind's.
 function modLabel(m){ return m.label || KIND[m.kind].label; }
@@ -493,7 +512,7 @@ function recordStep(d, from, to){
   if(state.isAdmin || !state.trainee) return;
   const steps = stepsOf(d), dp = state.trainee.dayProgress;
   const p = Object.assign({}, dp[d.day] || {}); p.modules = Object.assign({}, p.modules || {});
-  if(to > from && steps[from] && steps[from].type === "module") p.modules[steps[from].module.id] = true;
+  if(to > from && steps[from] && steps[from].type === "module"){ const m = steps[from].module; if(m.kind !== "lab" || LNDesk.stageDone(m.stage)) p.modules[m.id] = true; }
   p.step = to;
   const was = !!p.done;
   if(steps[to] && steps[to].type === "done" && d.modules.every((m) => p.modules[m.id])) p.done = true;
@@ -509,6 +528,7 @@ function topbar(){
   if(state.isAdmin || state.traineeId){
     nav.push(`<button class="${state.view === "dashboard" ? "active" : ""}" onclick="goto('dashboard')">Dashboard</button>`);
     COURSE.days.forEach((d) => nav.push(`<button class="${(state.view === "day" || state.view === "player") && state.dayNum === d.day ? "active" : ""}" onclick="goto('day',${d.day})">Day ${d.day}</button>`));
+    nav.push(`<button class="${state.view === "desk" ? "active" : ""}" onclick="goto('desk')">🗂 Lien Desk</button>`);
     if(state.isAdmin) nav.push(`<button class="${state.view === "admin" ? "active" : ""}" onclick="goto('admin')">🛡 Admin</button>`);
     nav.push(`<a class="nav-out" href="${PORTAL_HOME}">← Training Directory</a>`);
     nav.push(`<button onclick="logout()">Sign out</button>`);
@@ -714,6 +734,13 @@ function viewPlayer(){
 // What a module's step shows, by its kind.
 function frameNote(text, page){ return `<p class="frame-note">${esc(text)} ${page ? `<a href="${esc(page)}" target="_blank" rel="noopener">Open in a new tab ↗</a>` : ""}</p>`; }
 function moduleBody(m){
+  if(m.kind === "lab"){
+    const c = LNDesk.caseOf(), list = LNDesk.tasks(m.stage), done = list.filter((t) => t.ok).length;
+    return `<div class="lab-box"><div class="lab-case"><span class="mono">${esc(c.caseNo)}</span><h3>Your case: ${esc(c.client.first)} ${esc(c.client.last)}</h3><p>DOL ${esc(c.dol)} · ${esc(c.facts)}</p></div>
+      ${m.note ? `<p class="lab-note">${esc(m.note)}</p>` : ""}
+      <ol class="lab-tasks">${list.map((t) => `<li class="${t.ok ? "ok" : ""}">${t.ok ? "✅" : "⬜"} ${esc(t.t)}</li>`).join("")}</ol>
+      <div class="lab-foot"><span class="mono">${done}/${list.length} done</span><button class="btn btn-primary" onclick="goto('desk')">🗂 Open the Lien Desk →</button></div></div>`;
+  }
   if(m.kind === "deck" || m.kind === "video"){
     const link = linkOf(m), src = lnEmbed.embed(m.kind, link), page = lnEmbed.page(m.kind, link);
     if(!src) return `<div class="empty">This module isn't set up yet. ${state.isAdmin ? "Add its address in Admin → Course links." : "Please tell your trainer."}</div>`;
@@ -753,7 +780,13 @@ function trainerNotes(d, s){
 }
 // The trainee's answers (process questions), kept in progress:<id> as { answers: { <module id>: [answer, …] } }.
 function answersOf(id, rec){ const a = ((rec || state.progress) || {}).answers || {}; return a[id] || []; }
-let answerTimer = null;
+// progress:<id> (the process-question answers and the Lien Desk), saved a moment after the last change.
+let progressTimer = null;
+function saveProgress(){
+  if(state.isAdmin || !state.traineeId || !state.progress) return;
+  clearTimeout(progressTimer);
+  progressTimer = setTimeout(() => { kvSet("progress:" + state.traineeId, state.progress).catch(() => toast("Couldn't save your work. Check your connection.")); }, 600);
+}
 function saveAnswer(id, j, v){
   if(state.isAdmin || !state.traineeId) return;
   state.progress = state.progress || {}; state.progress.answers = state.progress.answers || {};
@@ -761,8 +794,7 @@ function saveAnswer(id, j, v){
   a[j] = String(v).slice(0, 6000); state.progress.answers[id] = a;
   const m = moduleById(id), c = document.querySelector(".qa-count");
   if(c && m) c.textContent = `${m.questions.filter((q, k) => (a[k] || "").trim()).length}/${m.questions.length} answered`;
-  clearTimeout(answerTimer);
-  answerTimer = setTimeout(() => { kvSet("progress:" + state.traineeId, state.progress).catch(() => toast("Couldn't save your answers. Check your connection.")); }, 600);
+  saveProgress();
 }
 function answersText(m, a){ return m.questions.map((q, j) => `${j + 1}. ${q.q}\n${(a[j] || "").trim() || "(no answer yet)"}`).join("\n\n"); }
 function copyText(t){ try{ navigator.clipboard.writeText(t).then(() => toast("Copied."), () => toast("Couldn't copy. Select the text and copy it.")); }catch(e){ toast("Couldn't copy. Select the text and copy it."); } }
@@ -792,6 +824,13 @@ async function loadAdmin(){
       Object.entries(values).forEach(([k, v]) => { try{ prog[k.slice(9)] = JSON.parse(v); }catch(e){} });
     }
     state.admin.progress = prog;
+    // the Lien Desk assignments (assign:<id>)
+    const ak = rows.map((r) => "assign:" + r.id), asg = {};
+    for(let i = 0; i < ak.length; i += 100){
+      const {values} = await api("/api/storage/get-many", {keys: ak.slice(i, i + 100)});
+      Object.entries(values).forEach(([k, v]) => { try{ asg[k.slice(7)] = JSON.parse(v); }catch(e){} });
+    }
+    state.admin.assign = asg;
     state.admin.rows = rows;
   }catch(e){ state.admin.rows = []; toast(e.message); }
   state.admin.loading = false; render();
@@ -801,6 +840,28 @@ function showAnswers(id){
   const r = (state.admin.rows || []).find((x) => x.id === id), p = (state.admin.progress || {})[id];
   overlay(`<div class="mh-day">${esc(r ? r.batch || "" : "")}</div><div class="mh-title">${esc(r ? r.name || id : id)}: answers</div>`,
     QUESTION_MODULES.map((m) => `<h3 style="margin:4px 0 8px;color:var(--navy)">Day ${m.day} · ${esc(m.title)}</h3><ol class="topic-list">${m.questions.map((q, j) => `<li><b>${q.core ? "★ " : ""}${esc(q.q)}</b><div class="ans">${esc((answersOf(m.id, p)[j] || "").trim() || "(no answer)")}</div></li>`).join("")}</ol>`).join(""));
+}
+async function assignCase(id, caseId){
+  const a = Object.assign({}, (state.admin.assign || {})[id] || {}, { caseId });
+  try{ await kvSet("assign:" + id, a); state.admin.assign[id] = a; toast(caseId ? "Case assigned." : "Assignment cleared: the trainee gets their own case."); }catch(e){ toast(e.message); }
+  render();
+}
+// a real fully executed release from the trainer: kept in release:<id>, and it lands in the trainee's Lien Desk inbox
+function uploadRelease(id, input){
+  const f = input.files && input.files[0]; if(!f) return;
+  if(f.size > 5 * 1024 * 1024){ toast("That file is over 5 MB. Upload a smaller PDF."); return; }
+  const rd = new FileReader();
+  rd.onload = async () => {
+    const at = new Date().toISOString();
+    try{
+      await kvSet("release:" + id, { name: f.name, url: rd.result, at });
+      const a = Object.assign({}, (state.admin.assign || {})[id] || {}, { releaseAt: at, releaseName: f.name });
+      await kvSet("assign:" + id, a); state.admin.assign[id] = a;
+      toast("Release uploaded. It's in the trainee's Lien Desk inbox the next time they open it.");
+    }catch(e){ toast(e.message); }
+    render();
+  };
+  rd.readAsDataURL(f);
 }
 async function setTraineeFlag(id, flag){
   const r = (state.admin.rows || []).find((x) => x.id === id); if(!r) return;
@@ -840,6 +901,16 @@ function viewAdmin(){
       <div class="table-wrap"><table class="admin-table"><thead><tr><th>Name</th><th>Batch</th>${COURSE.days.map((d) => `<th>Day ${d.day}</th>`).join("")}<th>Last active</th><th>Answers</th><th></th></tr></thead><tbody>${body}</tbody></table></div>
     </section>
     <section class="card sec">
+      <h2>🗂 Lien Desk</h2>
+      <p>Each trainee works one case on Days 2 and 3. Assign one, or leave it on "Their own case" (each trainee gets one of the ${LNDesk.cases.length}, the same every time). Upload a fully executed release to send it to the trainee's inbox (the simulator sends one too).</p>
+      <div class="table-wrap"><table class="admin-table"><thead><tr><th>Name</th><th>Case</th><th>Progress</th><th>Executed release</th></tr></thead><tbody>${rows.map((r) => {
+        const a = (state.admin.assign || {})[r.id] || {}, sm = LNDesk.summary(r, (state.admin.progress || {})[r.id]);
+        return `<tr><td>${esc(r.name || r.id)}</td>
+          <td><select onchange="assignCase('${esc(r.id)}', this.value)"><option value="">Their own case</option>${LNDesk.cases.map((c) => `<option value="${c.id}" ${a.caseId === c.id ? "selected" : ""}>${esc(c.client.first)} ${esc(c.client.last)}</option>`).join("")}</select></td>
+          <td style="font-weight:500;font-size:12.5px">${sm ? `${esc(sm.caseId)} · ${sm.emails} emails · release ${sm.exec ? "✓" : "—"} · initial sheet ${sm.initial ? sm.initial.passed + "/" + sm.initial.total : "—"} · final ${sm.final ? sm.final.passed + "/" + sm.final.total : "—"} · signed ${sm.signed ? "✓" : "—"}` : "Not started"}</td>
+          <td><label class="btn btn-ghost btn-sm" style="cursor:pointer">⬆ Upload<input type="file" accept="application/pdf,image/*" style="display:none" onchange="uploadRelease('${esc(r.id)}', this)"></label>${a.releaseName ? ` <small>${esc(a.releaseName)}</small>` : ""}</td></tr>`; }).join("") || `<tr><td colspan="4">No trainees yet.</td></tr>`}</tbody></table></div>
+    </section>
+    <section class="card sec">
       <h2>Course links</h2>
       <p>Replace a module's deck or video without a deploy. Paste the Canva <b>view</b> link or the Drive file link. Leave a box blank to use the address in <span class="mono">js/ln-course.js</span>.</p>
       ${links}
@@ -863,8 +934,10 @@ function render(){
   else if(state.view === "admin" && state.isAdmin) main = viewAdmin();
   else if(state.view === "day" && dayByNum(state.dayNum)) main = viewDay();
   else if(state.view === "player" && dayByNum(state.dayNum)) main = viewPlayer();
+  else if(state.view === "desk") main = LNDesk.view();
   else { state.view = "dashboard"; main = viewDashboard(); }
-  app.innerHTML = (state.view === "pendingApproval" ? "" : topbar()) + `<main>${main}</main>` + footer();
+  app.innerHTML = (state.view === "pendingApproval" ? "" : topbar()) + `<main class="${state.view === "desk" ? "main-wide" : ""}">${main}</main>` + footer();
+  if(state.view === "desk") LNDesk.after();
 }
 
 /* ---------- boot ---------- */
@@ -893,5 +966,6 @@ function render(){
   if(state.view !== "login") setTimeout(() => { [].forEach.call(document.documentElement.children, (el) => { if(el.tagName === "DIV" && el.style.zIndex === "2147483000") el.remove(); }); }, 150);
 })();
 </script>
+<script src="/js/ln-desk.js?v=2026.11.12"></script>
 </body>
 </html>

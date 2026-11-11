@@ -68,6 +68,13 @@ const ticket = (t, secret = SECRET) => { const p = b64u(JSON.stringify(t)); retu
   r = await call(base, '/api/storage/list', { prefix: 'trainee:' }, aTok); assert.deepEqual(r.j.keys, ['trainee:jane-doe--b100926']);
   r = await call(base, '/api/storage/get', { key: 'trainee:jane-doe--b100926' }); assert.equal(r.status, 401);
 
+  // The Lien Desk: a trainer writes a trainee's case assignment and executed release; the trainee reads only their own.
+  r = await call(base, '/api/storage/set', { key: 'assign:jane-doe--b100926', value: JSON.stringify({ caseId: 'miller' }) }, aTok); assert.equal(r.status, 200);
+  r = await call(base, '/api/storage/get', { key: 'assign:jane-doe--b100926' }, tTok); assert.equal(JSON.parse(r.j.value).caseId, 'miller');
+  r = await call(base, '/api/storage/get', { key: 'assign:someone-else--b100926' }, tTok); assert.equal(r.status, 403);
+  r = await call(base, '/api/storage/set', { key: 'assign:jane-doe--b100926', value: '{"caseId":"other"}' }, tTok); assert.equal(r.status, 403, 'a trainee cannot pick their own case');
+  r = await call(base, '/api/storage/set', { key: 'release:jane-doe--b100926', value: '{}' }, tTok); assert.equal(r.status, 403, 'a trainee cannot upload an executed release');
+  r = await call(base, '/api/storage/get', { key: 'release:jane-doe--b100926' }, tTok); assert.equal(r.status, 200);
   r = await call(base, '/api/checkin', { training: 'Lien Negotiator Training' }, tTok);
   assert.equal(r.j.ok, true);
   console.log('OK: single sign-on and storage rules hold.');

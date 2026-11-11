@@ -81,24 +81,27 @@ const DECK = /^https:\/\/www\.canva\.com\/design\/[\w-]+\/[\w-]+\/view\?embed$/,
       }
       await p.click('.next-btn');
       await p.waitForSelector('.stage-done');
-      assert.match(await p.textContent('.done-box h2'), new RegExp(`Day ${day} is complete`));
+      // Days 2 and 3 have a Case Activity: clicking past it doesn't finish the case, so the day isn't complete yet
+      // (.github/scripts/desk.cjs plays the case itself). Day 1 completes on its steps alone.
+      const hasLab = day !== 1;
+      assert.match(await p.textContent('.done-box h2'), hasLab ? /Almost there/ : new RegExp(`Day ${day} is complete`));
       if (day === 3) assert.match(await p.textContent('.wrap-box'), /Litigation Training/);
       assert.equal(await p.locator('.trainer-notes').count(), 0, 'a trainee never sees trainer notes');
       await p.click('.next-btn');   // Finish → the dashboard
       await p.waitForSelector('.day-card');
-      assert.equal(await p.locator(`#day-${day}.mc-done`).count(), 1, `day ${day} shows as completed`);
+      assert.equal(await p.locator(`#day-${day}.mc-done`).count(), hasLab ? 0 : 1, `day ${day} ${hasLab ? 'waits for its case activity' : 'shows as completed'}`);
     }
     // The Slide Map jumps to a step.
     await p.click('#day-2 .module-start-btn'); await p.waitForSelector('.obj-list li');
     await p.click('.stage-bar .btn-primary'); await p.waitForSelector('.stage');
     await p.click('text=Slide Map'); await p.click('#overlay .map-list li:nth-child(3) button');
-    await p.waitForSelector('.stage-module'); assert.match(await p.textContent('.step-count'), /Step 3 of 4/);
+    await p.waitForSelector('.stage-module'); assert.match(await p.textContent(".step-count"), /Step 3 of 5/);
     await p.click('.nav button:has-text("Dashboard")'); await p.waitForSelector('.day-card');
     await p.waitForTimeout(600);   // the save is debounced
     await p.reload();
     await p.waitForSelector('.day-card');
-    assert.equal(await p.locator('.day-card.mc-done').count(), 3, `${tag}: every day saved as complete`);
-    assert.match(await p.getAttribute('.completion-ribbon', 'aria-label'), /^100% /, 'the ribbon shows the program complete');
+    assert.equal(await p.locator('.day-card.mc-done').count(), 1, `${tag}: Day 1 saved as complete (Days 2 and 3 wait for the case)`);
+    assert.match(await p.getAttribute('.completion-ribbon', 'aria-label'), /^33% /, 'the ribbon shows one day of three');
     await p.context().close();
   }
 
@@ -114,7 +117,12 @@ const DECK = /^https:\/\/www\.canva\.com\/design\/[\w-]+\/[\w-]+\/view\?embed$/,
   await a.waitForSelector('.day-card');
   await a.click('.nav button:has-text("Admin")');
   await a.waitForSelector('.admin-table td:has-text("Ada Lovelace1366")');
-  assert.equal(await a.locator('.admin-table tbody tr').count(), 2);
+  assert.equal(await a.locator('.admin-table').first().locator('tbody tr').count(), 2);
+  // 🗂 Lien Desk: a trainer assigns a case
+  const desk = a.locator('.admin-table').nth(1);
+  assert.equal(await desk.locator('tbody tr').count(), 2);
+  await desk.locator('tbody tr').first().locator('select').selectOption('miller');
+  await a.waitForSelector('#toast.show:has-text("Case assigned")');
   await noSideScroll(a, 'admin');
   await a.click('.admin-table button:has-text("Answers")');
   assert.match(await a.textContent('#overlay'), /Answer from 1366px/, 'a trainer reads the trainee\'s answers');

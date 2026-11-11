@@ -97,7 +97,9 @@ window.LN_COURSE = {
         { id: "d2-deck", kind: "deck", title: "The Lien Negotiator Role, Pt. 2", slides: 72,
           link: "https://www.canva.com/design/DAHabx7BhKE/BPidIfAISKJuol56ntSmZg/view" },
         { id: "d2-video", kind: "video", title: "The Lien Negotiator Role, Pt. 2",
-          link: "https://drive.google.com/file/d/1sUjQCpEqkrvf802Ck23aajx4Z2ox8zgE/view" }
+          link: "https://drive.google.com/file/d/1sUjQCpEqkrvf802Ck23aajx4Z2ox8zgE/view" },
+        { id: "d2-lab", kind: "lab", stage: "day2", title: "Your Case: the Release, the Initial Net Sheet and the Reduction Request", label: "Case Activity",
+          note: "You're assigned a settled case. Download the Settlement Release(s) and handle the process from there: email the release(s) to your trainer, who sends back the fully executed release. Once it's in, draft the initial Net Sheet, up to the point where you'll send the Reduction Request." }
       ]
     },
     {
@@ -194,6 +196,8 @@ window.LN_COURSE = {
               ["Example", "DOE, JOHN TEST - Closing Statement and Settlement Release Form/s"]
             ], pre: "Good day!\n\nCongratulations on your case settlement! I hope this message finds you well. Please find attached your closing statement and settlement release for your review and signature. Kindly review the documents, sign them, and return them to me once completed.\n\nIf you have any questions, please feel free to reach out.\n\nThank you for your prompt attention.\n\nBest regards," }
           ] },
+        { id: "d3-lab", kind: "lab", stage: "day3", title: "Your Case: Updated Bills, Reductions and the Closing Statement", label: "Case Activity", group: "Live Demo · Your Case",
+          note: "Continue your case, step by step, just like the demo: request updated bills and payoffs where the file is out of date (the provider sends the corrected bill), send your Reduction Requests, finalize the Net Sheet, draft the Closing Statement, and send it with the Settlement Release Form(s) to the client." },
         { id: "d3-v-reduction", kind: "video", title: "Reduction & Disbursement Training", label: "Training Video", group: "PM · Shadowing and Training Video Viewing",
           link: "https://drive.google.com/file/d/1rv1Vwatczu3JVegzpEA_pAMxwXsO0EIl/view" },
         { id: "d3-v-recording", kind: "video", title: "Lien Negotiator Recording", label: "Training Video", group: "PM · Shadowing and Training Video Viewing",
