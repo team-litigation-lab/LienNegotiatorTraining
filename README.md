@@ -4,22 +4,24 @@ The Lien Negotiator program, set up the way the Case Management course (`Case-Ma
 
 ## What's in it
 
-Organised the way the CM course is: **Day cards** on the dashboard, and each day opens onto its **modules**.
+In the CM course's format: **Day cards** on the dashboard → the day's **Objectives** page → the day's **steps**, played one at a time.
 
-| Day | Module 1: Slide deck (Canva) | Module 2: Recorded session (Google Drive) |
-|---|---|---|
-| **Day 1: The Lien Negotiator Role, Pt. 1** | [34 slides](https://www.canva.com/design/DAGthtOQUg4/8AoCnBiC8yWJGOM_zLUXjg/view) | [Video](https://drive.google.com/file/d/1rmdqifC5m_3c9FYDZkrzsUampVKmUMaY/view) |
-| **Day 2: The Lien Negotiator Role, Pt. 2** (ERISA liens: basics, process, key risks) | [72 slides](https://www.canva.com/design/DAHabx7BhKE/BPidIfAISKJuol56ntSmZg/view) | [Video](https://drive.google.com/file/d/1sUjQCpEqkrvf802Ck23aajx4Z2ox8zgE/view) |
+| Day | Theme | Module 1: Slide Deck (Canva) | Module 2: Recorded Session (Google Drive) |
+|---|---|---|---|
+| **Day 1 · The Lien Negotiator Role, Pt. 1** | Liens, Lien Holders & Reductions (9 topics) | [34 slides](https://www.canva.com/design/DAGthtOQUg4/8AoCnBiC8yWJGOM_zLUXjg/view) | [Video](https://drive.google.com/file/d/1rmdqifC5m_3c9FYDZkrzsUampVKmUMaY/view) |
+| **Day 2 · The Lien Negotiator Role, Pt. 2** | ERISA & Government Plan Liens (10 topics) | [72 slides](https://www.canva.com/design/DAHabx7BhKE/BPidIfAISKJuol56ntSmZg/view) | [Video](https://drive.google.com/file/d/1sUjQCpEqkrvf802Ck23aajx4Z2ox8zgE/view) |
 
-- **🏠 Dashboard:** one Day card per day, like the CM course's: DAY n and the title in the head, the day's icon and theme, its modules, how many are complete, and **Start** / **Continue** / **Review**. No welcome panel.
-- **A day's page:** its modules in order (Module 1 · Slide deck, Module 2 · Recorded session), each with its status and **Open**.
-- **A module's page:** the Canva deck or the Drive video, embedded, with *Open in a new tab*, and **✓ Mark module complete**. A day is complete when all its modules are. Previous / next module carry on across days.
+- **Dashboard:** one Day card per day, drawn like the CM course's: *Day n · title* in the head, the day's icon and theme pill, **Start** / **Continue** / **Review**, and **☰ Topics** (the day's outline, with the slides each topic covers). No welcome panel.
+- **Objectives page** (the CM day page): *🎯 By the end of today you'll be able to …*, *📘 The Lesson* outline in two columns, *🧭 Today's Modules*, and **← Dashboard** / **Start Day n →**.
+- **The day's steps** (the CM lesson player): a stage with the step's title, banner and chip, **← Previous · 🗺 Slide Map · Step n of N · Next →** under it (← → keys too), and the side panel (the day, **📋 Objectives**, **⛶ Full screen**). The steps are **Training Agenda** (the theme, objectives and numbered topics) → **Module 1 · Slide Deck** (the Canva deck) → **Module 2 · Recorded Session** (the Drive video) → **Day Complete**. Every step fits on one screen. A module counts as done once the trainee moves on from it with Next; the day is done when they reach Day Complete with both modules done. A trainee who leaves mid-day continues from the same step.
 - **🛡 Admin:** every trainee who has opened the course, their batch, each day's status (modules done), when they were last active, with *Remove access* / *Restore access*; and **Course links**, to replace a module's deck or video without a deploy.
+
+The day's objectives and topics were written from the decks' own slides (their section headings, with slide numbers).
 
 | File | What it is |
 |---|---|
-| `js/ln-course.js` | **The course content.** The days, in order, and each day's modules (a Canva deck or a Drive video). |
-| `index.html` | The page: the dashboard's Day cards, the day and module pages and Admin, and the hooks `js/portal-gate.js` expects of an engine. |
+| `js/ln-course.js` | **The course content.** The days, in order: title, theme, objectives, topics (with slides), and the modules (a Canva deck or a Drive video). |
+| `index.html` | The page: the Day cards, the Objectives page, the day's player and Admin, and the hooks `js/portal-gate.js` expects of an engine. |
 | `js/portal-gate.js` | The Portal sign-in screen. **The same file as in every LSH course repo** (copied from Case-Management-Training); change it in all of them. |
 | `worker.js` | The Worker: the CM Worker's sign-in (tokens, admin password, Portal tickets, Batch IDs) unchanged, plus progress storage and the automatic Time In. |
 | `wrangler.json` | The Worker's name (`liennegotiatortraining`) and its `LSH_KV` binding. |
@@ -35,14 +37,15 @@ The same as the CM course. Trainees sign in once, on the LSH Training Portal, an
 
 Everything is in `LSH_KV` under the **`ln:`** prefix, so it never mixes with the CM (`cm:`) or EA/PA records in the same namespace.
 
-- `trainee:<id>`: the trainee (the same id as every LSH course: name + Batch ID), `approved`, `lastActive`, and **`dayProgress`**, one entry per day: `{ "1": { done, doneAt, modules: { "d1-deck": true, … } } }`. This is the field the Portal's progress and attendance pages read for the other courses. A trainee can update their own record but never its approval.
+- `trainee:<id>`: the trainee (the same id as every LSH course: name + Batch ID), `approved`, `lastActive`, and **`dayProgress`**, one entry per day: `{ "1": { done, doneAt, step, modules: { "d1-deck": true, … } } }` (`step` is where they left off in the day). This is the field the Portal's progress and attendance pages read for the other courses. A trainee can update their own record but never its approval.
 - `checkin:<date>:<id>`: the automatic Time In on a trainee's first visit of the day (the same as the CM course).
 - `settings:course`: the admin's replacement addresses, by module id: `{ "d1-deck": { link } }` (Admin → Course links).
 
 ## ✍️ Editing the course
 
 - **Change a deck or video:** Admin → **Course links**, paste the new address next to the module, **Save course links**. It takes effect at once, no deploy. Leave a box blank to go back to the address in `js/ln-course.js`. To change it for good, edit `js/ln-course.js`.
-- **Add a module or a day:** add a module (`id`, `kind` `"deck"` or `"video"`, `title`, `link`) to a day's `modules`, or a new day (`day`, `title`, `icon`, `theme`, `modules`) to `days`. Never reuse or renumber a module `id` or a `day`: progress is saved against them. (A trainee who had already finished that day still counts as done on the Portal until they mark a module on it.)
+- **Objectives and topics:** each day's `objectives` and `topics` (`{ h, slides }`) in `js/ln-course.js`. Keep the topics in step with the deck when it changes.
+- **Add a module or a day:** add a module (`id`, `kind` `"deck"` or `"video"`, `title`, `link`) to a day's `modules`, or a new day (`day`, `title`, `theme`, `icon`, `objectives`, `topics`, `modules`) to `days`. Never reuse or renumber a module `id` or a `day`: progress is saved against them. (A trainee who had already finished that day still counts as done on the Portal until they mark a module on it.)
 - **Deck links:** use the Canva **view** link (`https://www.canva.com/design/<id>/<token>/view`). The page embeds it as `…/view?embed`. A `canva.link/…` short link opens the editor (`/edit`), so don't use it here: the checks refuse an `/edit` link.
 - **Video links:** the Drive file link (`https://drive.google.com/file/d/<id>/view`); the page embeds it as `…/preview`. The file has to be shared with the trainees (the legalsupporthelp.com Workspace, or *anyone with the link*), or the player asks them to sign in.
 
@@ -50,10 +53,11 @@ Everything is in `LSH_KV` under the **`ln:`** prefix, so it never mixes with the
 
 `.github/workflows/checks.yml` runs on every pull request and every push to `main`:
 
-- **Syntax and files** (`.github/scripts/check-site.mjs`): every JavaScript file and inline `<script>` parses, every local file `index.html` loads exists, and every day has modules, every module id is unique, and every module is a Canva deck or Drive video the page can embed (and no editor link).
+- **Syntax and files** (`.github/scripts/check-site.mjs`): every JavaScript file and inline `<script>` parses, every local file `index.html` loads exists, and every day has a theme, objectives, topics and modules, every module id is unique, and every module is a Canva deck or Drive video the page can embed (and no editor link).
 - **Single sign-on and storage rules** (`.github/scripts/sso.cjs`): a Portal ticket signs a trainee in and approves them; a ticket with another secret (`signature`) or out of date (`expired`) is refused; an admin ticket works once; a name + batch typed here is refused; a missing `PORTAL_SSO_SECRET` says so; a trainee writes their own progress but never their approval, and reads and lists nobody else's records; every key is under `ln:`.
 - **The Worker builds** (`wrangler deploy --dry-run`; nothing is deployed).
-- **Smoke test in a browser** (`.github/scripts/smoke.cjs`): serves the site through `worker.js` with an in-memory KV store (`.github/scripts/server.mjs`); a trainee from the Portal lands on the Day cards and the opening cover is lifted; each day lists its modules; each module shows its deck or video; marking every module complete completes the day and survives a reload; the admin password opens Admin with the trainees listed; every view at desktop and phone width, with no page error and no sideways scroll.
+- **Smoke test in a browser** (`.github/scripts/smoke.cjs`): serves the site through `worker.js` with an in-memory KV store (`.github/scripts/server.mjs`); a trainee from the Portal lands on the Day cards and the opening cover is lifted; ☰ Topics lists the day's outline; Day card → Objectives → Start plays the Training Agenda, each module's deck or video and Day Complete; finishing the steps completes the day and survives a reload; the Slide Map jumps to a step; the admin password opens Admin with the trainees listed; every view at desktop and phone width, with no page error and no sideways scroll.
+- **Every step fits on one screen** (`.github/scripts/fit.cjs`): at 1366×768, 1920×1080 and 1280×720 each day's Objectives page ends with its Start bar inside the window, and every step ends with its Previous / Next bar inside the window (the same rule as the CM course's `fit.cjs`).
 
 To run them locally:
 
@@ -63,7 +67,7 @@ node .github/scripts/check-site.mjs && node .github/scripts/sso.cjs
 
 ```bash
 MASTER_ADMIN_PASSWORD=ci-admin PORTAL_SSO_SECRET=ci-portal node .github/scripts/server.mjs 8787 &
-node .github/scripts/smoke.cjs http://localhost:8787/
+node .github/scripts/smoke.cjs http://localhost:8787/ && node .github/scripts/fit.cjs http://localhost:8787/
 ```
 
 ## Deploy (Cloudflare Workers)

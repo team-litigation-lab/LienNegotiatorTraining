@@ -26,7 +26,8 @@ let n = 0;
 for (const d of LN_COURSE.days) {
   if (days.has(d.day)) fail.push(`js/ln-course.js: day ${d.day} repeats`);
   days.add(d.day);
-  if (!d.title || !Array.isArray(d.modules) || !d.modules.length) fail.push(`js/ln-course.js: day ${d.day} needs a title and modules`);
+  if (!d.title || !d.theme || !Array.isArray(d.modules) || !d.modules.length) fail.push(`js/ln-course.js: day ${d.day} needs a title, a theme and modules`);
+  if (!Array.isArray(d.objectives) || !d.objectives.length || !Array.isArray(d.topics) || !d.topics.length || d.topics.some((t) => !t.h)) fail.push(`js/ln-course.js: day ${d.day} needs objectives and topics`);
   for (const m of d.modules || []) {
     n++;
     if (ids.has(m.id)) fail.push(`js/ln-course.js: module id ${m.id} repeats`);

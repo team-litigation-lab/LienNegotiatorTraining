@@ -1,6 +1,7 @@
 // Smoke test in a browser, against .github/scripts/server.mjs started with MASTER_ADMIN_PASSWORD=ci-admin and
-// PORTAL_SSO_SECRET=ci-portal: a trainee arriving from the Portal lands on the dashboard's Day cards; a day opens onto its
-// modules; each module shows its Canva deck or Drive video; marking every module complete completes the day and is saved;
+// PORTAL_SSO_SECRET=ci-portal: a trainee arriving from the Portal lands on the dashboard's Day cards; a day opens on its
+// Objectives page; Start plays the day's steps (Training Agenda, each module's Canva deck or Drive video, Day complete);
+// finishing the steps completes the day and is saved; the Topics pop-up and the Slide Map work;
 // a direct visit shows the admin sign-in; the admin password opens Admin with the trainee listed. Every view at desktop and
 // phone width, with no page error and no sideways scroll. The deck and video frames are stubbed (no Canva or Google in CI).
 // Usage: node .github/scripts/smoke.cjs http://localhost:8787/
@@ -38,28 +39,42 @@ const DECK = /^https:\/\/www\.canva\.com\/design\/[\w-]+\/[\w-]+\/view\?embed$/,
     assert.match(await p.textContent('.topbar .who'), /Ada Lovelace/);
     // The Portal sign-in's "Opening your training…" cover is lifted as soon as the dashboard is drawn (not after its 10 s fallback).
     await p.waitForFunction(() => ![].some.call(document.documentElement.children, (el) => el.style && el.style.zIndex === '2147483000'), null, { timeout: 2000 });
-    assert.deepEqual(await p.$$eval('.day-card .mh-day', (els) => els.map((e) => e.textContent.trim())), ['Day 1', 'Day 2'], 'the dashboard is Day cards');
+    assert.deepEqual(await p.$$eval('.day-card .mh-title', (els) => els.map((e) => e.textContent.trim().split(' · ')[0])), ['Day 1', 'Day 2'], 'the dashboard is Day cards');
     await noSideScroll(p, `${tag} dashboard`);
 
+    // ☰ Topics opens the day's outline.
+    await p.click('#day-1 .module-topics-btn');
+    assert.ok(await p.locator('#overlay .topic-list li').count() > 3, 'Topics lists the day\'s outline');
+    await p.click('#overlay .btn');
+
     for (const day of [1, 2]) {
+      // Day card → the Objectives page → Start → the Training Agenda, then each module, then Day complete.
       await p.click(`#day-${day} .module-start-btn`);
-      await p.waitForSelector('.mod-row');
-      assert.equal(await p.locator('.mod-row').count(), 2, `day ${day} lists its modules`);
-      await noSideScroll(p, `${tag} day ${day}`);
+      await p.waitForSelector('.obj-list li');
+      await noSideScroll(p, `${tag} day ${day} objectives`);
+      await p.click(`.stage-bar .btn-primary`);
+      await p.waitForSelector('.stage-agenda');
+      assert.match(await p.textContent('.step-count'), /Step 1 of 4/);
+      await noSideScroll(p, `${tag} day ${day} agenda`);
       for (const [j, kind] of [[0, DECK], [1, VIDEO]]) {
-        await p.locator('.mod-row .btn').nth(j).click();
-        await p.waitForSelector('.frame iframe');
+        await p.click('.next-btn');
+        await p.waitForSelector('.stage-module .frame iframe');
         assert.match(await p.getAttribute('.frame iframe', 'src'), kind, `day ${day} module ${j + 1}`);
         await noSideScroll(p, `${tag} day ${day} module ${j + 1}`);
-        await p.click('.mark-btn');
-        await p.waitForSelector('.side .pill-done');
-        await p.click(`.pager button:has-text("Day ${day}")`);
-        await p.waitForSelector('.mod-row');
       }
-      assert.equal(await p.locator('.mod-row .pill-done').count(), 2);
-      await p.click('.nav button:has-text("Dashboard")');
+      await p.click('.next-btn');
+      await p.waitForSelector('.stage-done');
+      assert.match(await p.textContent('.done-box h2'), new RegExp(`Day ${day} is complete`));
+      await p.click('.next-btn');   // Finish → the dashboard
       await p.waitForSelector('.day-card');
+      assert.equal(await p.locator(`#day-${day}.mc-done`).count(), 1, `day ${day} shows as completed`);
     }
+    // The Slide Map jumps to a step.
+    await p.click('#day-2 .module-start-btn'); await p.waitForSelector('.obj-list li');
+    await p.click('.stage-bar .btn-primary'); await p.waitForSelector('.stage');
+    await p.click('text=Slide Map'); await p.click('#overlay .map-list li:nth-child(3) button');
+    await p.waitForSelector('.stage-module'); assert.match(await p.textContent('.step-count'), /Step 3 of 4/);
+    await p.click('.nav button:has-text("Dashboard")'); await p.waitForSelector('.day-card');
     await p.waitForTimeout(600);   // the save is debounced
     await p.reload();
     await p.waitForSelector('.day-card');

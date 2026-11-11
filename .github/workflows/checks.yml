@@ -31,10 +31,11 @@ jobs:
         run: node .github/scripts/sso.cjs
       - name: The Worker builds (nothing is deployed)
         run: npx --yes wrangler@3 deploy --dry-run --outdir=/tmp/wrangler-out
-      - name: Smoke test in a browser
+      - name: Smoke test in a browser, and every step fits on one screen
         run: |
           npm install --no-save playwright@1
           npx playwright install --with-deps chromium
           MASTER_ADMIN_PASSWORD=ci-admin PORTAL_SSO_SECRET=ci-portal node .github/scripts/server.mjs 8787 &
           for i in $(seq 1 30); do curl -sf -o /dev/null http://localhost:8787/ && break; sleep 1; done
           node .github/scripts/smoke.cjs http://localhost:8787/
+          node .github/scripts/fit.cjs http://localhost:8787/

@@ -61,9 +61,10 @@ button{font-family:inherit;cursor:pointer;}
 .nav button,.nav a{background:transparent;border:none;color:#D7DAEC;font-size:13px;font-weight:600;padding:8px 10px;border-radius:7px;white-space:nowrap;text-decoration:none;}
 .nav button.active{background:var(--orange);color:#241304;}
 .nav button:not(.active):hover,.nav a:hover{background:rgba(255,255,255,.09);color:#fff;}
+.nav a.nav-out{border:1px solid rgba(255,255,255,.35);margin-left:4px;}
 .who{font-size:12.5px;color:#C9CDE3;font-weight:600;white-space:nowrap;}
 
-main{flex:1;max-width:1400px;margin:0 auto;padding:32px 20px 60px;width:100%;}
+main{flex:1;max-width:1400px;margin:0 auto;padding:24px 20px 40px;width:100%;}
 .footer-note{text-align:center;font-size:var(--font-sub);color:var(--ink-soft);padding:20px 24px 32px;}
 
 /* ---------- building blocks ---------- */
@@ -102,42 +103,115 @@ main{flex:1;max-width:1400px;margin:0 auto;padding:32px 20px 60px;width:100%;}
 .page-hero p.lead{color:#C9CDE3;font-size:15px;line-height:1.6;max-width:72ch;margin:0;font-weight:500;}
 
 
-/* ---------- day cards (the CM course's: DAY n and the title in the head, the icon and theme, Start) ---------- */
-.module-grid{display:grid;grid-template-columns:repeat(auto-fill, minmax(280px, 1fr));gap:18px;align-items:stretch;}
-.module-card{border:1px solid var(--line);border-radius:14px;overflow:hidden;box-shadow:var(--shadow);display:flex;flex-direction:column;}
-.module-head{background:linear-gradient(135deg, var(--navy) 0%, var(--navy-soft) 100%);color:#fff;text-align:center;padding:10px 12px 11px;min-height:62px;display:flex;flex-direction:column;justify-content:center;}
-.module-card:nth-child(2n) .module-head{background:linear-gradient(135deg, var(--orange) 0%, var(--orange-deep) 100%);color:#241304;}
-.mh-day{font-family:'IBM Plex Mono';font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;opacity:.85;margin-bottom:2px;}
-.mh-title{font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.01em;line-height:1.25;}
-.module-body{padding:16px 18px 10px;flex:1;display:flex;flex-direction:column;gap:10px;}
-.module-icon{text-align:center;font-size:34px;line-height:1;margin:4px 0 2px;}
-.module-theme{text-align:center;font-size:14px;font-weight:500;color:var(--ink);line-height:1.5;}
-.module-topic-list{list-style:none;margin:4px 0 0;padding:10px 0 0;border-top:1px solid var(--line);font-size:13px;font-weight:600;color:var(--ink-soft);}
-.module-topic-list li{padding:3px 0;}
-.day-count{font-size:12px;color:var(--ink-soft);font-weight:600;}
-.module-start-btn{margin:6px 18px 18px;}
-.mnum{font-family:'IBM Plex Mono';font-size:var(--font-sub);color:var(--orange-deep);font-weight:700;letter-spacing:.04em;}
+/* ---------- Day cards (the CM course's dashboard cards) ---------- */
+.module-grid{display:grid;grid-template-columns:repeat(auto-fill, minmax(250px, 300px));gap:16px;align-items:stretch;}
+.module-card{position:relative;border:1px solid rgba(255,255,255,.7);border-radius:16px;overflow:hidden;box-shadow:var(--shadow);display:flex;flex-direction:column;min-height:300px;padding:6px;}
+.module-card::before{content:"";position:absolute;left:14px;right:14px;top:0;height:4px;border-radius:0 0 4px 4px;background:var(--navy);}
+.module-card:nth-child(2n)::before{background:var(--orange);}
+.module-head{text-align:center;padding:14px 12px 12px;border-bottom:1px solid rgba(38,43,69,.18);min-height:66px;display:flex;flex-direction:column;justify-content:center;gap:2px;}
+.mh-title{font-size:15.5px;font-weight:700;color:var(--navy);line-height:1.25;}
+.mh-day{font-family:'IBM Plex Mono';font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--success);font-weight:700;}
+.module-body{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;padding:18px 14px;}
+.module-icon{font-size:34px;line-height:1;}
+.module-theme{font-family:'Fraunces',Georgia,serif;font-size:14.5px;font-weight:600;color:#3A2410;text-align:center;line-height:1.3;background:rgba(240,192,138,.38);border:1px solid rgba(219,132,55,.55);border-radius:10px;padding:9px 16px;}
+.module-start-btn{border:0;border-top:1px solid rgba(38,43,69,.18);border-bottom:1px solid rgba(38,43,69,.18);background:transparent;padding:11px;font-size:15px;font-weight:700;color:var(--navy);}
+.module-start-btn:hover{background:rgba(38,43,69,.06);}
+.mc-row{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:8px 10px 4px;}
+.module-topics-btn{border:0;background:transparent;font-size:12.5px;font-weight:600;color:var(--navy);padding:4px 6px;border-radius:6px;}
+.module-topics-btn span{color:var(--ink-soft);}
+.module-topics-btn:hover{background:rgba(38,43,69,.06);}
+.mc-count{font-size:12px;font-weight:600;color:var(--ink-soft);}
+.mc-done .module-head{background:rgba(231,241,234,.5);}
 
-/* ---------- a day's modules ---------- */
-.mod-list{display:flex;flex-direction:column;gap:12px;}
-.mod-row{display:flex;align-items:center;gap:16px;padding:16px 18px;flex-wrap:wrap;}
-.mod-row-icon{width:48px;height:48px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:22px;background:var(--g-navy, var(--navy));color:#fff;flex:0 0 auto;}
-.mod-row-main{flex:1 1 220px;min-width:0;}
-.mod-row-main h3{margin:2px 0 0;font-size:18px;color:var(--navy);}
-.pager{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px;}
+/* ---------- pop-ups (Topics, Slide Map) ---------- */
+.overlay{position:fixed;inset:0;z-index:120;background:rgba(15,19,36,.55);display:flex;align-items:center;justify-content:center;padding:16px;}
+.overlay-card{width:min(560px,100%);max-height:85vh;display:flex;flex-direction:column;background:#fff !important;overflow:hidden;}
+.overlay-card .module-head{background:var(--g-navy);border:0;}
+.overlay-card .mh-title{color:#fff;}
+.overlay-card .mh-day{color:#F5C99A;}
+.overlay-body{padding:14px 18px;overflow-y:auto;}
+.overlay-foot{padding:10px 18px 14px;text-align:right;}
+.topic-list{margin:0;padding-left:22px;font-size:14px;}
+.topic-list li{padding:6px 0;border-bottom:1px solid var(--line);}
+.topic-list li span{font-size:12px;color:var(--ink-soft);font-weight:500;margin-left:4px;}
+.map-list{list-style:none;padding:0;}
+.map-list button{width:100%;text-align:left;border:0;background:none;padding:6px 8px;border-radius:8px;font-size:14px;color:var(--ink);}
+.map-list button.on{background:rgba(219,132,55,.16);}
+.map-list button:hover{background:rgba(38,43,69,.06);}
 
-/* ---------- module page ---------- */
-.mod-layout{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:18px;align-items:start;}
-@media(max-width:1000px){.mod-layout{grid-template-columns:1fr;}}
-.frame{position:relative;width:100%;aspect-ratio:16/9;border-radius:14px;overflow:hidden;background:#0f1324;box-shadow:var(--shadow);}
-.frame iframe{position:absolute;inset:0;width:100%;height:100%;border:0;}
-.frame-note{font-size:12.5px;color:var(--ink-soft);margin:8px 2px 0;font-weight:500;}
-.frame-note a{color:var(--orange-deep);font-weight:700;}
-.side{padding:18px;}
-.side h3{margin:0 0 6px;font-size:17px;color:var(--navy);}
-.side-note{font-size:13px;color:var(--ink-soft);font-weight:500;margin:4px 0 12px;}
-.mark-btn{width:100%;}
-.empty{padding:30px;text-align:center;color:var(--ink-soft);font-weight:600;}
+/* ---------- a day's Objectives page (the CM course's day page) ---------- */
+.day-headline{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;padding:0 4px 10px;margin-bottom:12px;border-bottom:1px solid rgba(38,43,69,.15);}
+.day-headline .mono{color:var(--orange-deep);font-size:13px;font-weight:600;}
+.day-headline h1{margin:0;font-size:20px;color:var(--navy);}
+.stage-shell{background:linear-gradient(135deg,#1F2440 0%,#2B3158 55%,#353C68 100%);border-radius:22px;padding:12px 14px 12px;box-shadow:0 18px 40px -22px rgba(20,24,48,.65);}
+.obj-wrap{background:rgba(255,255,255,.72);border-radius:16px;padding:10px;display:flex;flex-direction:column;gap:10px;border-top:4px solid var(--orange-deep);}
+.obj-box{background:rgba(255,255,255,.82);border-radius:12px;padding:10px 14px;border-top:4px solid var(--orange);}
+.obj-box.obj-navy{border-top-color:var(--navy);}
+.obj-box h2{font-family:var(--font-ui);font-size:16px;font-weight:800;color:var(--navy);margin:0 0 6px;}
+.obj-list{list-style:none;margin:0;padding:0;columns:2 340px;column-gap:28px;}
+.obj-list li{position:relative;padding:2px 0 2px 22px;font-size:13.5px;line-height:1.4;break-inside:avoid;}
+.obj-list li::before{content:"";position:absolute;left:2px;top:8px;width:10px;height:10px;border-radius:50%;background:var(--orange);}
+.obj-cols{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+@media(max-width:860px){.obj-cols{grid-template-columns:1fr;}}
+.outline{list-style:none;margin:0;padding:0;font-size:13px;}
+.outline li{padding:2px 0;}
+.outline li span{font-size:12px;color:var(--ink-soft);font-weight:500;}
+.stage-bar{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:10px;flex-wrap:wrap;}
+.stage-bar .mono{color:#C9CDE3;font-size:12.5px;}
+.btn-white{background:#fff;color:var(--navy);border-color:#fff;padding:10px 20px;font-size:15px;}
+.stage-bar .btn-primary{padding:10px 20px;font-size:15px;}
+
+/* ---------- the day's player (the CM course's lesson player) ---------- */
+.player{display:grid;grid-template-columns:minmax(0,1fr) 250px;gap:18px;align-items:start;}
+@media(max-width:1000px){.player{grid-template-columns:1fr;} .player-side{order:-1;}}
+.stage{position:relative;background:linear-gradient(135deg,#1F2440 0%,#2B3158 55%,#353C68 100%);border-radius:20px;padding:16px 22px 18px;box-shadow:0 18px 40px -22px rgba(20,24,48,.65);color:#fff;overflow:hidden;}
+.stage:fullscreen{border-radius:0;overflow:auto;display:flex;flex-direction:column;}
+.stage:fullscreen .stage-body{flex:1;}
+.corner{position:absolute;width:56px;height:30px;border:2px solid rgba(219,132,55,.85);pointer-events:none;}
+.corner.tl{left:10px;top:10px;border-right:0;border-bottom:0;border-radius:6px 0 0 0;opacity:0;}
+.corner.tr{right:10px;top:10px;border-left:0;border-bottom:0;border-radius:0 6px 0 0;}
+.corner.bl{left:10px;bottom:10px;border-right:0;border-top:0;border-radius:0 0 0 6px;}
+.corner.br{right:10px;bottom:10px;border-left:0;border-top:0;border-radius:0 0 6px 0;}
+.stage-title{font-family:var(--font-ui);font-weight:900;font-size:clamp(22px,2.4vw,30px);color:#F2A35C;margin:0 0 10px;padding-bottom:8px;letter-spacing:-.01em;text-shadow:0 0 1px #fff,0 2px 0 rgba(255,255,255,.18);border-bottom:2px solid rgba(255,255,255,.18);background:linear-gradient(90deg,var(--orange) 0 26px,transparent 26px) bottom left/100% 3px no-repeat;}
+.stage-banner{background:linear-gradient(90deg,#3C4268,#4A5180);border-bottom:3px solid var(--orange);border-radius:6px;text-align:center;padding:9px 12px;font-size:14px;font-weight:800;letter-spacing:.04em;text-transform:uppercase;}
+.stage-chiprow{margin:10px 0 10px;display:flex;align-items:center;flex-wrap:wrap;gap:8px 0;}
+.stage-chip{display:inline-block;background:#EEF0F6;color:var(--navy);border-radius:8px;padding:5px 14px;font-size:16px;font-weight:800;letter-spacing:.04em;}
+.stage-body{position:relative;}
+/* A slide or the session is 16:9 and as large as the window allows, so the Previous / Next bar stays on the screen (as in the CM course). */
+.stage .frame{position:relative;width:min(100%, calc((100vh - 400px) * 16 / 9));min-width:min(100%, 420px);aspect-ratio:16/9;margin:0 auto;border-radius:12px;overflow:hidden;background:#0f1324;}
+.stage .frame iframe{position:absolute;inset:0;width:100%;height:100%;border:0;}
+.stage .frame-note{font-size:12.5px;color:#C9CDE3;margin:8px 2px 0;font-weight:500;}
+.stage .frame-note a{color:#F5C99A;font-weight:700;}
+.stage .empty{background:rgba(255,255,255,.08);border-radius:12px;padding:30px;text-align:center;color:#fff;}
+.agenda-theme{background:#FFFDF8;color:var(--ink);border:1px solid var(--orange-soft);border-radius:12px;padding:8px 14px;text-align:center;}
+.theme-tag{display:inline-block;font-size:11px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:#7A3F0C;background:rgba(240,192,138,.5);border-radius:4px;padding:2px 8px;margin-bottom:6px;}
+.agenda-theme p{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;margin:0;font-size:12.5px;font-weight:600;text-align:left;line-height:1.5;}
+.agenda-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:6px;margin-top:8px;}
+.agenda-item{display:flex;gap:10px;align-items:center;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.16);border-radius:10px;padding:4px 10px;}
+.agenda-n{width:28px;height:28px;border-radius:50%;background:var(--orange);color:#241304;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;flex:0 0 auto;}
+.agenda-item b{display:block;font-size:12.5px;line-height:1.25;}
+.agenda-item small{font-size:11px;color:#C9CDE3;font-weight:500;}
+.agenda-mods{display:inline-flex;gap:8px;flex-wrap:wrap;vertical-align:middle;margin-left:8px;}
+.agenda-mod{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);border-radius:8px;padding:6px 10px;font-size:12.5px;font-weight:700;}
+.done-box{background:#fff;color:var(--ink);border-radius:14px;padding:26px;text-align:center;}
+.done-icon{font-size:40px;}
+.done-box h2{margin:6px 0 6px;color:var(--navy);font-size:22px;}
+.done-box p{margin:0 auto 12px;max-width:60ch;font-size:14px;font-weight:500;color:var(--ink-soft);}
+.done-box .outline{display:inline-block;text-align:left;margin-bottom:14px;}
+.done-actions{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;}
+.player-bar{display:flex;align-items:center;gap:12px;margin-top:12px;background:rgba(255,255,255,.82);backdrop-filter:var(--surface-blur);-webkit-backdrop-filter:var(--surface-blur);border-radius:14px;padding:10px 12px;flex-wrap:wrap;}
+.player-bar .btn{padding:11px 18px;font-size:15px;}
+.btn-orange{background:var(--orange);color:#fff;}
+.btn-orange:hover{background:var(--orange-deep);}
+.step-count{flex:1;text-align:center;font-size:13px;color:var(--ink);font-weight:600;}
+.player-side{display:flex;flex-direction:column;gap:10px;padding-top:4px;}
+.side-day{color:var(--orange-deep);font-size:12.5px;font-weight:600;}
+.player-side h2{margin:0 0 4px;font-size:19px;color:var(--navy);line-height:1.25;}
+.side-btn{border:1px solid rgba(38,43,69,.12);background:rgba(255,255,255,.55);border-radius:8px;padding:9px 12px;font-size:14px;font-weight:600;color:var(--ink);}
+.side-btn:hover{background:rgba(255,255,255,.85);}
+.side-btn.side-dark{background:var(--navy);color:#fff;border-color:var(--navy);}
+.side-tip{font-size:12.5px;color:var(--ink-soft);font-weight:600;margin:2px 0 0;}
+@media(max-width:600px){.stage{padding:16px 14px;} .player-bar .btn{padding:9px 12px;font-size:13.5px;} .step-count{order:-1;flex-basis:100%;}}
 
 /* ---------- admin ---------- */
 .admin-table{width:100%;border-collapse:collapse;font-size:13.5px;}
@@ -210,14 +284,14 @@ body::before{opacity:.40;}
    repo) expects of an engine: state, render(), goto(), authStatus(), logout(), setAdminToken(),
    setTraineeToken(), submitLogin() and resumeWhereLeftOff().
    ============================================================ */
-const APP_BUILD = "2026.11.11-2";
+const APP_BUILD = "2026.11.11-3";
 const PORTAL_HOME = "https://cm-training-activity.pages.dev/";
 const LOGO_FULL_SRC = "/logo.svg";
 const COURSE = window.LN_COURSE;
 const TOKEN_KEYS = { admin: "ln.adminToken", trainee: "ln.traineeToken", last: "ln.last" };
 
 const state = {
-  view: "boot", dayNum: 1, moduleId: "",
+  view: "boot", dayNum: 1, step: 0,
   secure: true, portalOnly: false, portalSecret: false,
   adminToken: "", authToken: "", isAdmin: false,
   traineeId: "", trainee: null,
@@ -267,12 +341,11 @@ async function logout(){
   state.view = "login"; render();
 }
 function goto(view, arg){
+  closeOverlay();
   state.view = view;
   if(view === "day") state.dayNum = Number(arg) || state.dayNum;
-  if(view === "module" && arg){ state.moduleId = arg; const d = dayOfModule(arg); if(d) state.dayNum = d.day; }
-  if(view === "day" && !dayByNum(state.dayNum)) state.view = "dashboard";
-  if(view === "module" && !moduleById(state.moduleId)) state.view = "dashboard";
-  if(state.traineeId) store(TOKEN_KEYS.last, JSON.stringify({view: state.view, dayNum: state.dayNum, moduleId: state.moduleId}));
+  if((view === "day" || view === "player") && !dayByNum(state.dayNum)) state.view = "dashboard";
+  if(state.traineeId) store(TOKEN_KEYS.last, JSON.stringify({view: state.view, dayNum: state.dayNum, step: state.step}));
   render();
   window.scrollTo(0, 0);
 }
@@ -287,14 +360,14 @@ async function submitLogin(){
 function resumeWhereLeftOff(){
   state.resumePending = false;
   let last = null; try{ last = JSON.parse(stored(TOKEN_KEYS.last) || "null"); }catch(e){}
-  if(last && last.view === "module" && moduleById(last.moduleId)) goto("module", last.moduleId);
+  if(last && last.view === "player" && dayByNum(last.dayNum)){ state.dayNum = last.dayNum; state.step = Math.max(0, Math.min(stepsOf(dayByNum(last.dayNum)).length - 1, Number(last.step) || 0)); goto("player"); }
   else if(last && last.view === "day" && dayByNum(last.dayNum)) goto("day", last.dayNum);
   else goto("dashboard");
 }
 
 /* ---------- the trainee's record ----------
    trainee:<id> carries dayProgress, the field the Portal's program-progress and attendance read for every course:
-   { "<day>": { done, doneAt, modules: { <module id>: true } } }, plus lastActive. A day is done when all its modules are. */
+   { "<day>": { done, doneAt, step, modules: { <module id>: true } } }, plus lastActive (see recordStep). */
 async function loadTrainee(){
   if(!state.traineeId) return;
   try{ state.trainee = await kvGet("trainee:" + state.traineeId); }catch(e){ state.trainee = null; }
@@ -313,42 +386,47 @@ function saveTrainee(){
 function traineeBlocked(){ const t = state.trainee; return !!(t && (t.rejected || t.archived || t.approved === false)); }
 async function loadCourseLinks(){ try{ state.courseLinks = (await kvGet("settings:course")) || {}; }catch(e){ state.courseLinks = {}; } }
 
-/* ---------- the course: days, and each day's modules ---------- */
+/* ---------- the course: days, and each day's steps ---------- */
 const ALL_MODULES = COURSE.days.flatMap((d) => d.modules.map((m) => Object.assign({ day: d.day }, m)));
 function dayByNum(n){ return COURSE.days.find((d) => d.day === Number(n)); }
 function moduleById(id){ return ALL_MODULES.find((m) => m.id === id); }
-function dayOfModule(id){ const m = moduleById(id); return m ? dayByNum(m.day) : null; }
 function linkOf(m){ const o = (state.courseLinks || {})[m.id]; return (o && o.link) || m.link; }
-const KIND = { deck: { icon: "🎞", label: "Slide deck" }, video: { icon: "▶", label: "Recorded session" } };
+const KIND = { deck: { icon: "🎞", label: "Slide Deck", chip: "📚 The Slides" }, video: { icon: "▶", label: "Recorded Session", chip: "🎬 The Session" } };
+// A day's steps, as the CM course plays a day: the Training Agenda, each module, then Day complete.
+function stepsOf(d){
+  return [{ type: "agenda", title: "Training Agenda" }]
+    .concat(d.modules.map((m, j) => ({ type: "module", module: Object.assign({ day: d.day }, m), n: j + 1, title: `Module ${j + 1} · ${KIND[m.kind].label}` })))
+    .concat([{ type: "done", title: "Day Complete" }]);
+}
 function dayProg(d, rec){ const dp = ((rec || state.trainee) || {}).dayProgress || {}; return dp[d.day] || dp[String(d.day)] || {}; }
 function moduleDone(m, rec){ const p = dayProg(dayByNum(m.day), rec); return !!(p.modules && p.modules[m.id]); }
 function dayCount(d, rec){ return d.modules.filter((m) => moduleDone(Object.assign({ day: d.day }, m), rec)).length; }
-function dayStatus(d, rec){ const n = dayCount(d, rec); return n === d.modules.length ? "done" : n ? "open" : "new"; }
+function dayStatus(d, rec){ const p = dayProg(d, rec); return p.done ? "done" : (dayCount(d, rec) || p.step) ? "open" : "new"; }
 function pillFor(st){ return st === "done" ? '<span class="pill pill-done">✓ Completed</span>' : st === "open" ? '<span class="pill pill-open">In progress</span>' : '<span class="pill pill-new">Not started</span>'; }
-function setModuleDone(id, on){
-  const m = moduleById(id); if(!state.trainee || !m) return;
-  const d = dayByNum(m.day), dp = state.trainee.dayProgress;
+// The trainee's place in a day, and what moving on from a step records: a module is complete once they go past it,
+// the day once they finish its last step. A trainer moves freely and nothing is recorded.
+function recordStep(d, from, to){
+  if(state.isAdmin || !state.trainee) return;
+  const steps = stepsOf(d), dp = state.trainee.dayProgress;
   const p = Object.assign({}, dp[d.day] || {}); p.modules = Object.assign({}, p.modules || {});
-  if(on) p.modules[id] = true; else delete p.modules[id];
+  if(to > from && steps[from] && steps[from].type === "module") p.modules[steps[from].module.id] = true;
+  p.step = to;
   const was = !!p.done;
-  p.done = d.modules.every((x) => p.modules[x.id]);
-  if(p.done && !was) p.doneAt = new Date().toISOString();
-  if(!p.done) delete p.doneAt;
+  if(steps[to] && steps[to].type === "done" && d.modules.every((m) => p.modules[m.id])) p.done = true;
+  if(p.done && !was){ p.doneAt = new Date().toISOString(); toast(`Day ${d.day} completed. Nice work!`); }
   dp[d.day] = p;
   state.trainee.lastActive = new Date().toISOString();
   saveTrainee();
-  toast(p.done && !was ? `Day ${d.day} completed. Nice work!` : on ? "Module marked complete." : "Module marked not complete.");
-  render();
 }
 
 /* ---------- views ---------- */
 function topbar(){
   const nav = [];
   if(state.isAdmin || state.traineeId){
-    nav.push(`<button class="${state.view === "dashboard" ? "active" : ""}" onclick="goto('dashboard')">🏠 Dashboard</button>`);
-    COURSE.days.forEach((d) => nav.push(`<button class="${(state.view === "day" || state.view === "module") && state.dayNum === d.day ? "active" : ""}" onclick="goto('day',${d.day})">Day ${d.day}</button>`));
+    nav.push(`<button class="${state.view === "dashboard" ? "active" : ""}" onclick="goto('dashboard')">Dashboard</button>`);
+    COURSE.days.forEach((d) => nav.push(`<button class="${(state.view === "day" || state.view === "player") && state.dayNum === d.day ? "active" : ""}" onclick="goto('day',${d.day})">Day ${d.day}</button>`));
     if(state.isAdmin) nav.push(`<button class="${state.view === "admin" ? "active" : ""}" onclick="goto('admin')">🛡 Admin</button>`);
-    nav.push(`<a href="${PORTAL_HOME}">↩ Portal</a>`);
+    nav.push(`<a class="nav-out" href="${PORTAL_HOME}">← Training Directory</a>`);
     nav.push(`<button onclick="logout()">Sign out</button>`);
   }
   const who = state.isAdmin ? "Trainer" : (state.trainee && state.trainee.name) || "";
@@ -357,87 +435,146 @@ function topbar(){
     <div class="topbar-right">${who ? `<span class="who">${esc(who)}</span>` : ""}${nav.length ? `<nav class="nav">${nav.join("")}</nav>` : ""}</div>
   </div></header>`;
 }
-function footer(){ return `<div class="footer-note">Legal Support Help · ${esc(COURSE.title)} · <span class="mono">${APP_BUILD}</span></div>`; }
+function footer(){ return `<div class="footer-note">LSH Lien Negotiator Training · Internal Training Portal · <span class="mono">build ${APP_BUILD}</span></div>`; }
 
-// The dashboard: one Day card per day (the CM course's day cards: DAY n and the title in the head, the icon and theme, Start).
+// The dashboard: one Day card per day, as the CM course draws them (Day n · title in the head, the icon and the theme
+// in the middle, Start, then ☰ Topics).
 function viewDashboard(){
   return `<div class="module-grid day-grid">${COURSE.days.map((d) => {
-    const st = state.isAdmin ? "new" : dayStatus(d), n = dayCount(d);
+    const st = state.isAdmin ? "new" : dayStatus(d);
     return `<article class="module-card day-card mc-${st}" id="day-${d.day}">
-      <div class="module-head"><div class="mh-day">Day ${d.day}${st === "done" ? " · Completed" : ""}</div><div class="mh-title">${esc(d.title)}</div></div>
+      <div class="module-head"><div class="mh-title">Day ${d.day} · ${esc(d.title)}</div>${st === "done" ? `<div class="mh-day">✓ Completed</div>` : ""}</div>
       <div class="module-body">
         <div class="module-icon" aria-hidden="true">${d.icon}</div>
         <div class="module-theme">${esc(d.theme)}</div>
-        <ul class="module-topic-list">${d.modules.map((m, i) => `<li>${!state.isAdmin && moduleDone(Object.assign({ day: d.day }, m)) ? "✅" : KIND[m.kind].icon} Module ${i + 1}: ${esc(KIND[m.kind].label)}</li>`).join("")}</ul>
-        ${state.isAdmin ? "" : `<div class="day-count">${n} of ${d.modules.length} modules complete</div>`}
       </div>
-      <button class="btn btn-navy module-start-btn" onclick="goto('day',${d.day})">${st === "done" ? "Review" : st === "open" ? "Continue" : "Start"}</button>
+      <button class="module-start-btn" onclick="goto('day',${d.day})">${st === "done" ? "Review" : st === "open" ? "Continue" : "Start"}</button>
+      <div class="mc-row"><button class="module-topics-btn" onclick="showTopics(${d.day})">☰ Topics <span>· ${d.topics.length}</span></button>${st !== "new" ? `<span class="mc-count">${dayCount(d)}/${d.modules.length} modules</span>` : `<span class="mc-count">${d.modules.length} modules</span>`}</div>
     </article>`;
   }).join("")}</div>`;
 }
+function closeOverlay(){ const o = document.getElementById("overlay"); if(o) o.remove(); }
+function overlay(head, body){
+  closeOverlay();
+  const el = document.createElement("div");
+  el.id = "overlay"; el.className = "overlay";
+  el.innerHTML = `<div class="overlay-card card" role="dialog" aria-modal="true"><div class="module-head">${head}</div><div class="overlay-body">${body}</div><div class="overlay-foot"><button class="btn btn-ghost btn-sm" onclick="closeOverlay()">Close</button></div></div>`;
+  el.addEventListener("click", (e) => { if(e.target === el) closeOverlay(); });
+  document.body.appendChild(el);
+}
+function showTopics(n){
+  const d = dayByNum(n); if(!d) return;
+  overlay(`<div class="mh-day">Day ${d.day} · ${d.topics.length} topics</div><div class="mh-title">${esc(d.title)}</div>`,
+    `<ol class="topic-list">${d.topics.map((t) => `<li><b>${esc(t.h)}</b> <span>slides ${esc(t.slides)}</span></li>`).join("")}</ol>`);
+}
 
-// A day: its modules, in order.
+// A day's Objectives page: what the trainee will be able to do, and the day's outline (the CM course's day page).
 function viewDay(){
-  const d = dayByNum(state.dayNum), i = COURSE.days.indexOf(d);
-  const prev = COURSE.days[i - 1], next = COURSE.days[i + 1];
-  const rows = d.modules.map((m0, j) => {
-    const m = Object.assign({ day: d.day }, m0), done = !state.isAdmin && moduleDone(m);
-    return `<article class="card mod-row">
-      <div class="mod-row-icon" aria-hidden="true">${KIND[m.kind].icon}</div>
-      <div class="mod-row-main">
-        <span class="mnum">MODULE ${j + 1} · ${esc(KIND[m.kind].label.toUpperCase())}${m.slides ? ` · ${m.slides} SLIDES` : ""}</span>
-        <h3>${esc(m.title)}</h3>
-      </div>
-      ${state.isAdmin ? "" : pillFor(done ? "done" : "new")}
-      <button class="btn ${done ? "btn-ghost" : "btn-primary"} btn-sm" onclick="goto('module','${m.id}')">${done ? "Review" : "Open"} →</button>
-    </article>`;
-  }).join("");
-  return `<section class="page-hero">
-      <p class="eyebrow">Day ${d.day} of ${COURSE.days.length}</p>
-      <h1>${esc(d.title)}</h1>
-      <p class="lead">${esc(d.theme)}</p>
-    </section>
-    <div class="mod-list">${rows}</div>
-    <div class="pager">
-      ${prev ? `<button class="btn btn-ghost btn-sm" onclick="goto('day',${prev.day})">← Day ${prev.day}</button>` : `<button class="btn btn-ghost btn-sm" onclick="goto('dashboard')">← Dashboard</button>`}
-      ${next ? `<button class="btn btn-navy btn-sm" onclick="goto('day',${next.day})">Day ${next.day} →</button>` : ""}
-    </div>`;
-}
-
-// A module: its deck or its recorded session, and Mark module complete.
-function viewModule(){
-  const m = moduleById(state.moduleId), d = dayByNum(m.day), j = d.modules.findIndex((x) => x.id === m.id);
-  const k = ALL_MODULES.indexOf(m), prev = ALL_MODULES[k - 1], next = ALL_MODULES[k + 1];
-  const link = linkOf(m), src = lnEmbed.embed(m.kind, link), page = lnEmbed.page(m.kind, link);
-  const frame = src
-    ? `<div class="frame"><iframe src="${esc(src)}" title="${esc(m.title)}" allow="autoplay; fullscreen" allowfullscreen loading="lazy" referrerpolicy="strict-origin-when-cross-origin"></iframe></div>
-       <p class="frame-note">${m.kind === "video" ? "The video plays from Google Drive. If it asks you to sign in, use your legalsupporthelp.com Google account." : "Use the arrows under the slides, or the full-screen button, to page through the deck."} <a href="${esc(page)}" target="_blank" rel="noopener">Open in a new tab ↗</a></p>`
-    : `<div class="card empty">This module isn't set up yet. ${state.isAdmin ? "Add its address in Admin → Course links." : "Please tell your trainer."}</div>`;
-  const done = !state.isAdmin && moduleDone(m);
-  const label = (x) => { const xd = dayByNum(x.day); return `Day ${x.day} · Module ${xd.modules.findIndex((y) => y.id === x.id) + 1}`; };
-  const mark = state.isAdmin
-    ? `<p class="side-note">Trainees mark each module complete here. You're signed in as a trainer, so nothing is recorded.</p>`
-    : `<p class="side-note">${m.kind === "video" ? "Watch the whole session" : "Go through every slide"}, then mark the module complete.</p>
-       ${done ? `<div style="margin:0 0 10px">${pillFor("done")}</div><button class="btn btn-ghost btn-sm mark-btn" onclick="setModuleDone('${m.id}',false)">Mark not complete</button>`
-              : `<button class="btn btn-primary mark-btn" onclick="setModuleDone('${m.id}',true)">✓ Mark module complete</button>`}`;
-  return `<section class="page-hero">
-      <p class="eyebrow">Day ${d.day} · Module ${j + 1} of ${d.modules.length}</p>
-      <h1>${esc(m.title)}</h1>
-      <p class="lead">${esc(KIND[m.kind].label)}${m.slides ? ` · ${m.slides} slides` : ""} · ${esc(d.title)}</p>
-    </section>
-    <div class="mod-layout">
-      <div>${frame}</div>
-      <aside class="card side">
-        <h3>${esc(KIND[m.kind].icon + " " + KIND[m.kind].label)}</h3>
-        ${mark}
-        <div class="pager" style="margin-top:16px">
-          <button class="btn btn-ghost btn-sm" onclick="goto('day',${d.day})">↑ Day ${d.day}</button>
-          ${prev ? `<button class="btn btn-ghost btn-sm" onclick="goto('module','${prev.id}')">← ${label(prev)}</button>` : ""}
-          ${next ? `<button class="btn btn-navy btn-sm" onclick="goto('module','${next.id}')">${label(next)} →</button>` : ""}
+  const d = dayByNum(state.dayNum), half = Math.ceil(d.topics.length / 2);
+  const outline = (topics) => topics.map((t) => `<li>📘 <b>${esc(t.h)}</b> <span>slides ${esc(t.slides)}</span></li>`).join("");
+  const mods = d.modules.map((m, j) => `<li>${KIND[m.kind].icon} <b>Module ${j + 1}: ${esc(KIND[m.kind].label)}</b> <span>${m.slides ? m.slides + " slides" : "the recorded class"}${!state.isAdmin && moduleDone(Object.assign({ day: d.day }, m)) ? " · ✓ done" : ""}</span></li>`).join("");
+  const p = dayProg(d), resume = !state.isAdmin && p.step && !p.done;
+  return `<div class="day-headline"><span class="mono">Day ${d.day} of ${COURSE.days.length}</span><h1>Day ${d.day} · ${esc(d.title)}</h1></div>
+    <section class="stage-shell">
+      <div class="obj-wrap">
+        <div class="obj-box">
+          <h2>🎯 By the end of today you'll be able to</h2>
+          <ul class="obj-list">${d.objectives.map((o) => `<li>${esc(o)}</li>`).join("")}</ul>
         </div>
-      </aside>
-    </div>`;
+        <div class="obj-cols">
+          <div class="obj-box obj-navy"><h2>📘 The Lesson</h2><ul class="outline">${outline(d.topics.slice(0, half))}</ul></div>
+          <div class="obj-box"><h2>📘 The Lesson, continued</h2><ul class="outline">${outline(d.topics.slice(half))}</ul><h2 style="margin-top:8px">🧭 Today's Modules</h2><ul class="outline">${mods}</ul></div>
+        </div>
+      </div>
+      <div class="stage-bar">
+        <button class="btn btn-white" onclick="goto('dashboard')">← Dashboard</button>
+        <span class="mono">Objectives</span>
+        <button class="btn btn-primary" onclick="openDay(${d.day})">${resume ? "Continue" : "Start"} Day ${d.day} →</button>
+      </div>
+    </section>`;
 }
+function openDay(n){
+  const d = dayByNum(n), p = dayProg(d), last = stepsOf(d).length - 1;
+  state.dayNum = n;
+  state.step = !state.isAdmin && p.step && !p.done ? Math.min(p.step, last) : 0;
+  goto("player");
+}
+function stepTo(i){
+  const d = dayByNum(state.dayNum), steps = stepsOf(d);
+  i = Math.max(0, Math.min(steps.length - 1, i));
+  if(i === state.step) return;
+  recordStep(d, state.step, i);
+  state.step = i;
+  goto("player");
+}
+function showSlideMap(){
+  const d = dayByNum(state.dayNum);
+  overlay(`<div class="mh-day">Day ${d.day} · Slide Map</div><div class="mh-title">${esc(d.title)}</div>`,
+    `<ol class="topic-list map-list">${stepsOf(d).map((s, i) => `<li><button class="${i === state.step ? "on" : ""}" onclick="closeOverlay();stepTo(${i})"><b>${esc(s.title)}</b>${s.type === "module" && !state.isAdmin && moduleDone(s.module) ? " <span>✓ done</span>" : ""}</button></li>`).join("")}</ol>`);
+}
+function stageFullScreen(){ const el = document.querySelector(".stage"); if(el && el.requestFullscreen) el.requestFullscreen().catch(() => {}); }
+
+// The day's steps, one at a time, in the CM course's player: the stage, Previous · Slide Map · Step n of N · Next, and the
+// side panel (the day, Objectives, Full screen).
+function viewPlayer(){
+  const d = dayByNum(state.dayNum), steps = stepsOf(d);
+  const i = Math.max(0, Math.min(steps.length - 1, state.step || 0)), s = steps[i];
+  let head = "", banner = "", chip = "", chipExtra = "", body = "";
+  if(s.type === "agenda"){
+    head = "Lien Negotiator Training"; banner = `Day ${d.day} · Training Agenda`; chip = "📅 Training Agenda";
+    body = `<div class="agenda-theme"><span class="theme-tag">${esc(d.theme)}</span><p>${esc(d.objectives.join("; "))}.</p></div>
+      <div class="agenda-grid">${d.topics.map((t, k) => `<div class="agenda-item"><span class="agenda-n">${String(k + 1).padStart(2, "0")}</span><div><b>${esc(t.h)}</b><small>📚 slides ${esc(t.slides)}</small></div></div>`).join("")}</div>
+`;
+    chipExtra = `<div class="agenda-mods">${d.modules.map((m, j) => `<span class="agenda-mod">${KIND[m.kind].icon} Module ${j + 1}: ${esc(KIND[m.kind].label)}${m.slides ? ` · ${m.slides} slides` : ""}</span>`).join("")}</div>`;
+  } else if(s.type === "module"){
+    const m = s.module, link = linkOf(m), src = lnEmbed.embed(m.kind, link), page = lnEmbed.page(m.kind, link);
+    head = m.title; banner = `Day ${d.day} · Module ${s.n} · ${KIND[m.kind].label}`; chip = KIND[m.kind].chip;
+    body = src
+      ? `<div class="frame"><iframe src="${esc(src)}" title="${esc(m.title)}: ${esc(KIND[m.kind].label)}" allow="autoplay; fullscreen" allowfullscreen loading="lazy" referrerpolicy="strict-origin-when-cross-origin"></iframe></div>
+         <p class="frame-note">${m.kind === "video" ? "The session plays from Google Drive. If it asks you to sign in, use your legalsupporthelp.com Google account." : "Use the arrows under the slides, or the slides' own full-screen button, to page through the deck."} <a href="${esc(page)}" target="_blank" rel="noopener">Open in a new tab ↗</a></p>`
+      : `<div class="empty">This module isn't set up yet. ${state.isAdmin ? "Add its address in Admin → Course links." : "Please tell your trainer."}</div>`;
+  } else {
+    const all = d.modules.every((m) => moduleDone(Object.assign({ day: d.day }, m)));
+    const next = dayByNum(d.day + 1);
+    head = "Day Complete"; banner = `Day ${d.day} · ${esc(d.title)}`; chip = "🏁 Wrap-up";
+    body = `<div class="done-box">
+      <div class="done-icon">${state.isAdmin || all ? "🎉" : "🧭"}</div>
+      <h2>${state.isAdmin ? "End of the day's steps" : all ? `Day ${d.day} is complete` : "Almost there"}</h2>
+      <p>${state.isAdmin ? "Trainees reach this step after both modules; their day is recorded as complete here." : all ? "Both modules are done and your progress is saved to your account." : "Go through every module first: a module counts as done once you move on from it with Next."}</p>
+      <ul class="outline">${d.modules.map((m, j) => `<li>${!state.isAdmin && moduleDone(Object.assign({ day: d.day }, m)) ? "✅" : KIND[m.kind].icon} <b>Module ${j + 1}: ${esc(KIND[m.kind].label)}</b></li>`).join("")}</ul>
+      <div class="done-actions"><button class="btn btn-ghost" onclick="goto('dashboard')">Back to the Dashboard</button>${next ? `<button class="btn btn-primary" onclick="goto('day',${next.day})">Day ${next.day} →</button>` : ""}</div>
+    </div>`;
+  }
+  return `<div class="player">
+    <div class="player-main">
+      <section class="stage stage-${s.type}">
+        <span class="corner tl"></span><span class="corner tr"></span><span class="corner bl"></span><span class="corner br"></span>
+        <h1 class="stage-title">${esc(head)}</h1>
+        <div class="stage-banner">${esc(banner)}</div>
+        <div class="stage-chiprow"><span class="stage-chip">${esc(chip)}</span>${chipExtra}</div>
+        <div class="stage-body">${body}</div>
+      </section>
+      <div class="player-bar">
+        <button class="btn btn-ghost" ${i === 0 ? "disabled" : ""} onclick="stepTo(${i - 1})">← Previous</button>
+        <button class="btn btn-orange" onclick="showSlideMap()">🗺 Slide Map</button>
+        <span class="mono step-count">Step ${i + 1} of ${steps.length}</span>
+        ${i < steps.length - 1 ? `<button class="btn btn-primary next-btn" onclick="stepTo(${i + 1})">Next →</button>` : `<button class="btn btn-primary next-btn" onclick="goto('dashboard')">Finish →</button>`}
+      </div>
+    </div>
+    <aside class="player-side">
+      <span class="mono side-day">Day ${d.day} of ${COURSE.days.length}</span>
+      <h2>Day ${d.day} · ${esc(d.title)}</h2>
+      <button class="side-btn" onclick="goto('day',${d.day})">📋 Objectives</button>
+      <button class="side-btn side-dark" onclick="stageFullScreen()">⛶ Full screen</button>
+      <p class="side-tip">Tip: use ← → keys to move between steps.</p>
+    </aside>
+  </div>`;
+}
+document.addEventListener("keydown", (e) => {
+  if(state.view !== "player" || document.getElementById("overlay") || /INPUT|TEXTAREA|SELECT/.test((e.target && e.target.tagName) || "")) return;
+  if(e.key === "ArrowRight") stepTo((state.step || 0) + 1);
+  if(e.key === "ArrowLeft") stepTo((state.step || 0) - 1);
+});
 
 /* ---------- Admin: trainees and their progress, and the course links ---------- */
 async function loadAdmin(){
@@ -513,7 +650,7 @@ function render(){
   else if(state.view === "pendingApproval") main = viewPending();
   else if(state.view === "admin" && state.isAdmin) main = viewAdmin();
   else if(state.view === "day" && dayByNum(state.dayNum)) main = viewDay();
-  else if(state.view === "module" && moduleById(state.moduleId)) main = viewModule();
+  else if(state.view === "player" && dayByNum(state.dayNum)) main = viewPlayer();
   else { state.view = "dashboard"; main = viewDashboard(); }
   app.innerHTML = (state.view === "pendingApproval" ? "" : topbar()) + `<main>${main}</main>` + footer();
 }
