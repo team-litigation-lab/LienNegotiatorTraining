@@ -1,5 +1,5 @@
 // Smoke test in a browser, against .github/scripts/server.mjs started with MASTER_ADMIN_PASSWORD=ci-admin and
-// PORTAL_SSO_SECRET=ci-portal: a trainee arriving from the Portal lands on the dashboard's Day cards; a day opens on its
+// PORTAL_SSO_SECRET=ci-portal: a trainee arriving from the Portal lands on the dashboard (the banner, with its completion ribbon and Roadmap, over the Day cards); a day opens on its
 // Objectives page; Start plays the day's steps (Training Agenda, each module's Canva deck or Drive video, Day complete);
 // finishing the steps completes the day and is saved; the Topics pop-up and the Slide Map work;
 // a direct visit shows the admin sign-in; the admin password opens Admin with the trainee listed. Every view at desktop and
@@ -39,6 +39,12 @@ const DECK = /^https:\/\/www\.canva\.com\/design\/[\w-]+\/[\w-]+\/view\?embed$/,
     assert.match(await p.textContent('.topbar .who'), /Ada Lovelace/);
     // The Portal sign-in's "Opening your training…" cover is lifted as soon as the dashboard is drawn (not after its 10 s fallback).
     await p.waitForFunction(() => ![].some.call(document.documentElement.children, (el) => el.style && el.style.zIndex === '2147483000'), null, { timeout: 2000 });
+    // The banner, as in the CM course: the completion ribbon, the title, and 🗺 Roadmap with every day.
+    assert.match(await p.textContent('.dash-top h1'), /Lien Negotiator Professional Development Workshop/);
+    assert.match(await p.getAttribute('.completion-ribbon', 'aria-label'), /^0% /);
+    await p.click('.dash-roadmap-btn');
+    assert.equal(await p.locator('#overlay .or-day').count(), 2, 'the Roadmap shows every day');
+    await p.click('#overlay .btn');
     assert.deepEqual(await p.$$eval('.day-card .mh-title', (els) => els.map((e) => e.textContent.trim().split(' · ')[0])), ['Day 1', 'Day 2'], 'the dashboard is Day cards');
     await noSideScroll(p, `${tag} dashboard`);
 
@@ -79,6 +85,7 @@ const DECK = /^https:\/\/www\.canva\.com\/design\/[\w-]+\/[\w-]+\/view\?embed$/,
     await p.reload();
     await p.waitForSelector('.day-card');
     assert.equal(await p.locator('.day-card.mc-done').count(), 2, `${tag}: both days saved as complete`);
+    assert.match(await p.getAttribute('.completion-ribbon', 'aria-label'), /^100% /, 'the ribbon shows the program complete');
     await p.context().close();
   }
 

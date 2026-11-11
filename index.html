@@ -103,6 +103,40 @@ main{flex:1;max-width:1400px;margin:0 auto;padding:24px 20px 40px;width:100%;}
 .page-hero p.lead{color:#C9CDE3;font-size:15px;line-height:1.6;max-width:72ch;margin:0;font-weight:500;}
 
 
+/* ---------- the dashboard banner (the CM course's: the completion ribbon, the eyebrow and title, Continue and Roadmap) ---------- */
+.dash-top{position:relative;overflow:hidden;border-radius:20px;padding:18px 30px 12px;margin-bottom:16px;color:#fff;
+  background:radial-gradient(900px 320px at 85% -20%, rgba(219,132,55,.28), transparent 60%),
+             radial-gradient(600px 300px at -5% 120%, rgba(120,132,190,.25), transparent 60%),
+             linear-gradient(135deg, #1F2440 0%, #2B3158 55%, #353C68 100%);
+  box-shadow:0 18px 40px -22px rgba(20,24,48,.65);}
+.dash-top::after{content:"";position:absolute;inset:0;pointer-events:none;opacity:.07;
+  background-image:linear-gradient(rgba(255,255,255,.9) 1px, transparent 1px),linear-gradient(90deg, rgba(255,255,255,.9) 1px, transparent 1px);background-size:28px 28px;
+  -webkit-mask-image:linear-gradient(90deg, transparent 0%, #000 55%, transparent 100%);mask-image:linear-gradient(90deg, transparent 0%, #000 55%, transparent 100%);}
+.dash-top > *{position:relative;z-index:1;}
+.dash-hero{display:grid;grid-template-columns:90px minmax(0,1fr);gap:24px;align-items:center;}
+.dash-hero-ribbon{display:flex;justify-content:center;}
+.dash-hero-ribbon svg{max-width:78px;height:auto;filter:drop-shadow(0 8px 14px rgba(0,0,0,.35));}
+.dash-top .eyebrow{display:inline-block;margin:0 0 8px;padding:5px 12px;border-radius:999px;background:rgba(219,132,55,.16);border:1px solid rgba(240,192,138,.45);color:#F5C99A;font-size:11.5px;letter-spacing:.14em;font-weight:700;}
+.dash-hero h1{color:#fff;font-size:clamp(22px, 2.3vw, 32px);line-height:1.18;letter-spacing:-.01em;margin:0;font-weight:700;}
+.hero-spark{display:inline-block;width:.62em;height:.62em;margin-left:.28em;vertical-align:.08em;animation:heroSpark 3.2s ease-in-out infinite;transform-origin:50% 50%;}
+.hero-spark-lead{margin-left:0;margin-right:.28em;transform:scaleX(-1);animation-name:heroSparkLead;}
+@keyframes heroSpark{0%,100%{transform:scale(1) rotate(0);opacity:1;}50%{transform:scale(.82) rotate(12deg);opacity:.75;}}
+@keyframes heroSparkLead{0%,100%{transform:scaleX(-1) scale(1) rotate(0);opacity:1;}50%{transform:scaleX(-1) scale(.82) rotate(12deg);opacity:.75;}}
+@media (prefers-reduced-motion: reduce){.hero-spark{animation:none;}}
+.dash-hero-row{display:flex;justify-content:center;align-items:center;gap:10px;flex-wrap:wrap;padding:10px 0 2px;margin-top:10px;border-top:1px solid rgba(255,255,255,.12);}
+.dash-resume-btn{display:flex;align-items:baseline;gap:8px;min-width:0;max-width:100%;border:0;border-radius:999px;background:#DB8437;color:#fff;padding:7px 16px;font:inherit;font-size:13.5px;font-weight:800;box-shadow:0 4px 12px rgba(219,132,55,.45);white-space:nowrap;}
+.dash-resume-btn span{font-size:12px;font-weight:600;opacity:.92;overflow:hidden;text-overflow:ellipsis;min-width:0;}
+.dash-resume-btn span::before{content:"· ";}
+.dash-resume-btn:hover{background:#B5651F;}
+.dash-roadmap-btn{flex:0 0 auto;border:1px solid rgba(255,255,255,.35);background:rgba(255,255,255,.1);color:#fff;border-radius:999px;padding:6px 14px;font:inherit;font-size:12.5px;font-weight:800;}
+.dash-roadmap-btn:hover{background:#E8833A;border-color:#E8833A;}
+@media(max-width:760px){.dash-top{padding:16px 16px 10px;border-radius:16px;} .dash-hero{grid-template-columns:1fr;gap:10px;text-align:center;} .dash-resume-btn{white-space:normal;}}
+.or-days{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;}
+.or-day{background:#fff;border:1px solid var(--line);border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:4px;}
+.or-day:nth-child(odd){border-top:4px solid var(--navy);} .or-day:nth-child(even){border-top:4px solid var(--orange);}
+.or-day span{font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:700;color:var(--orange-deep);} .or-day b{font-size:14px;color:var(--navy);line-height:1.3;} .or-day em{font-style:normal;font-size:11.5px;color:var(--ink-soft);}
+.or-foot{font-size:13.5px;color:var(--ink-soft);margin:14px 0 0;font-weight:500;}
+
 /* ---------- Day cards (the CM course's dashboard cards) ---------- */
 .module-grid{display:grid;grid-template-columns:repeat(auto-fill, minmax(250px, 300px));gap:16px;align-items:stretch;}
 .module-card{position:relative;border:1px solid rgba(255,255,255,.7);border-radius:16px;overflow:hidden;box-shadow:var(--shadow);display:flex;flex-direction:column;min-height:300px;padding:6px;}
@@ -125,7 +159,7 @@ main{flex:1;max-width:1400px;margin:0 auto;padding:24px 20px 40px;width:100%;}
 
 /* ---------- pop-ups (Topics, Slide Map) ---------- */
 .overlay{position:fixed;inset:0;z-index:120;background:rgba(15,19,36,.55);display:flex;align-items:center;justify-content:center;padding:16px;}
-.overlay-card{width:min(560px,100%);max-height:85vh;display:flex;flex-direction:column;background:#fff !important;overflow:hidden;}
+.overlay-card{width:min(760px,100%);max-height:85vh;display:flex;flex-direction:column;background:#fff !important;overflow:hidden;}
 .overlay-card .module-head{background:var(--g-navy);border:0;}
 .overlay-card .mh-title{color:#fff;}
 .overlay-card .mh-day{color:#F5C99A;}
@@ -284,7 +318,7 @@ body::before{opacity:.40;}
    repo) expects of an engine: state, render(), goto(), authStatus(), logout(), setAdminToken(),
    setTraineeToken(), submitLogin() and resumeWhereLeftOff().
    ============================================================ */
-const APP_BUILD = "2026.11.11-3";
+const APP_BUILD = "2026.11.11-4";
 const PORTAL_HOME = "https://cm-training-activity.pages.dev/";
 const LOGO_FULL_SRC = "/logo.svg";
 const COURSE = window.LN_COURSE;
@@ -437,10 +471,69 @@ function topbar(){
 }
 function footer(){ return `<div class="footer-note">LSH Lien Negotiator Training · Internal Training Portal · <span class="mono">build ${APP_BUILD}</span></div>`; }
 
+// The dashboard banner, as the CM course draws it: the completion ribbon (its completionRibbonSvg), the eyebrow and the
+// title between two sparks, then ▶ Continue where you left off and 🗺 Roadmap.
+function completionRibbonSvg(pct){
+  const points = 14, r1 = 48, r2 = 41, cx = 60, cy = 52;
+  let path = "";
+  for(let i = 0; i < points * 2; i++){
+    const ang = (Math.PI * 2 * i) / (points * 2) - Math.PI / 2, rr = i % 2 === 0 ? r1 : r2;
+    path += (i === 0 ? "M" : "L") + (cx + rr * Math.cos(ang)).toFixed(2) + "," + (cy + rr * Math.sin(ang)).toFixed(2) + " ";
+  }
+  path += "Z";
+  return `<svg class="seal completion-ribbon" viewBox="0 0 120 160" role="img" aria-label="${pct}% of program complete">
+    <defs>
+      <linearGradient id="crStar" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#F7E08A"/><stop offset=".5" stop-color="#D4AF37"/><stop offset="1" stop-color="#A8841F"/></linearGradient>
+      <radialGradient id="crFace" cx=".38" cy=".32" r=".75"><stop offset="0" stop-color="#FFF4C4"/><stop offset=".55" stop-color="#E7C458"/><stop offset="1" stop-color="#B8911F"/></radialGradient>
+      <linearGradient id="crTailL" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#E9C95A"/><stop offset="1" stop-color="#B08A22"/></linearGradient>
+      <linearGradient id="crTailR" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#D4AF37"/><stop offset="1" stop-color="#8F6E14"/></linearGradient>
+    </defs>
+    <path d="M38,82 L22,152 L40,140 L50,158 L62,92 Z" fill="url(#crTailL)"/>
+    <path d="M82,82 L98,152 L80,140 L70,158 L58,92 Z" fill="url(#crTailR)"/>
+    <path d="${path}" fill="url(#crStar)" stroke="#8A6A12" stroke-width="1.2"/>
+    <circle cx="${cx}" cy="${cy}" r="35" fill="url(#crFace)" stroke="#8A6A12" stroke-width="1"/>
+    <circle cx="${cx}" cy="${cy}" r="30" fill="none" stroke="#FFF6CF" stroke-width="1.1" opacity=".85"/>
+    <text x="${cx}" y="${cy + 4}" text-anchor="middle" font-family="Fraunces" font-weight="700" font-size="${String(pct).length > 2 ? 19 : 23}" fill="#3A2A05">${pct}%</text>
+    <text x="${cx}" y="${cy + 16}" text-anchor="middle" font-family="IBM Plex Mono" font-weight="700" font-size="7" letter-spacing=".4" fill="#3A2A05" opacity=".85">${pct >= 100 ? "DONE" : "COMPLETE"}</text>
+  </svg>`;
+}
+const SPARK = (lead) => `<svg class="hero-spark${lead ? " hero-spark-lead" : ""}" viewBox="0 0 40 40" aria-hidden="true"><path d="M20 2 L24.5 15.5 L38 20 L24.5 24.5 L20 38 L15.5 24.5 L2 20 L15.5 15.5 Z" fill="#F0C08A"/><path d="M33 3 L34.6 7.4 L39 9 L34.6 10.6 L33 15 L31.4 10.6 L27 9 L31.4 7.4 Z" fill="#fff"/><circle cx="6" cy="33" r="2.4" fill="#B5651F"/></svg>`;
+// Where the trainee left off: the first day that isn't done and has been started, at its saved step.
+function resumeTarget(){
+  if(state.isAdmin) return null;
+  const d = COURSE.days.find((x) => { const p = dayProg(x); return !p.done && (p.step || dayCount(x)); });
+  if(!d) return null;
+  const steps = stepsOf(d), i = Math.max(0, Math.min(steps.length - 1, dayProg(d).step || 0));
+  return { day: d.day, step: i, label: `Day ${d.day} · ${steps[i].title}` };
+}
+function resumeDay(){ const r = resumeTarget(); if(r){ state.dayNum = r.day; state.step = r.step; goto("player"); } }
+function dashBanner(){
+  const done = state.isAdmin ? 0 : COURSE.days.filter((d) => dayProg(d).done).length;
+  const pct = Math.round(done / COURSE.days.length * 100), r = resumeTarget();
+  return `<div class="dash-top">
+    <div class="dash-hero">
+      <div class="dash-hero-ribbon">${completionRibbonSvg(pct)}</div>
+      <div class="dash-hero-text">
+        <p class="eyebrow">LIEN NEGOTIATION ACCELERATOR</p>
+        <h1>${SPARK(true)}Lien Negotiator Professional Development Workshop${SPARK(false)}</h1>
+      </div>
+    </div>
+    <div class="dash-hero-row">${r ? `<button type="button" class="dash-resume-btn" onclick="resumeDay()" title="Back to ${esc(r.label)}">▶ Continue where you left off<span>${esc(r.label)}</span></button>` : ""}<button type="button" class="dash-roadmap-btn" onclick="openRoadmap()" title="See all ${COURSE.days.length} days at a glance">🗺 Roadmap</button></div>
+  </div>`;
+}
+// 🗺 Roadmap: every day at a glance, and where the trainee is on it.
+function openRoadmap(){
+  const next = COURSE.days.find((d) => !dayProg(d).done);
+  const tile = (d) => { const st = state.isAdmin ? `${d.modules.length} modules` : dayProg(d).done ? "✓ Completed" : d === next ? "▶ You're here" : "Open";
+    return `<div class="or-day"><span>Day ${d.day}</span><b>${esc(d.title)}</b><em>${esc(d.theme)} · ${d.topics.length} topics · ${st}</em></div>`; };
+  overlay(`<div class="mh-day">${COURSE.days.length}-day roadmap</div><div class="mh-title">🗺 Your Roadmap</div>`,
+    `<div class="or-days">${COURSE.days.map(tile).join("")}</div><p class="or-foot">Each day is its slide deck and its recorded session; each builds on the one before.</p>`);
+}
+
 // The dashboard: one Day card per day, as the CM course draws them (Day n · title in the head, the icon and the theme
 // in the middle, Start, then ☰ Topics).
 function viewDashboard(){
-  return `<div class="module-grid day-grid">${COURSE.days.map((d) => {
+  return dashBanner() + `<div class="module-grid day-grid">${COURSE.days.map((d) => {
     const st = state.isAdmin ? "new" : dayStatus(d);
     return `<article class="module-card day-card mc-${st}" id="day-${d.day}">
       <div class="module-head"><div class="mh-title">Day ${d.day} · ${esc(d.title)}</div>${st === "done" ? `<div class="mh-day">✓ Completed</div>` : ""}</div>
