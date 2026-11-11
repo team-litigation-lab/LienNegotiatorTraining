@@ -1,0 +1,6 @@
+worker.js
+wrangler.json
+.assetsignore
+*.md
+.github
+.git
