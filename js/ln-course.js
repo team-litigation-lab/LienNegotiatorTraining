@@ -135,7 +135,7 @@ window.LN_COURSE = {
           "Discussion folder: https://drive.google.com/drive/folders/1sQRjiWureRoEK1eyS2t6rG5SCb91QL2w"
         ],
         "d3-demo": ["Send the Demo Guide's reminders and instructions in the training GC, with the two folders (reference materials, and the completed sample outputs)."],
-        "d3-v-reduction": ["Communicate with the shadow buddy and give them the list of attendees, with the number of Filipino and Latin American trainees. Remind trainees in the training GC of their shadowing time and to set To-Do: Shadowing Lien Negotiator Role (Mario). If no shadowing buddy is available, these recorded shadowing videos stand in for it."],
+        "d3-shadowing": ["Communicate with the shadow buddy and give them the list of attendees, with the number of Filipino and Latin American trainees. Remind trainees in the training GC of their shadowing time and to set To-Do: Shadowing Lien Negotiator Role (Mario). If no shadowing buddy is available, these recorded shadowing videos stand in for it."],
         "done": [
           "Facilitator's Reference for the Demo (Reduction Request, Settlement Release Forms and Closing Statement). Activity 1.1, Francesse: https://drive.google.com/file/d/1Mtwe--GLG9DbvXzVCMFICvC5mzEVmm6d/view · Activity 1.2, La'norris: https://drive.google.com/file/d/1Vnlead_ANzvmm2XjF0H-cIR6-oBqsBv7/view",
           "Materials for the demo: https://drive.google.com/drive/folders/1sljuF-iV-HRf_i7hLcck8iNBq6TnfHES",
@@ -198,20 +198,21 @@ window.LN_COURSE = {
           ] },
         { id: "d3-lab", kind: "lab", stage: "day3", title: "Your Case: Updated Bills, Reductions and the Closing Statement", label: "Case Activity", group: "Live Demo · Your Case",
           note: "Continue your case, step by step, just like the demo: request updated bills and payoffs where the file is out of date (the provider sends the corrected bill), send your Reduction Requests, finalize the Net Sheet, draft the Closing Statement, and send it with the Settlement Release Form(s) to the client." },
-        { id: "d3-v-reduction", kind: "video", title: "Reduction & Disbursement Training", label: "Training Video", group: "PM · Shadowing and Training Video Viewing",
-          link: "https://drive.google.com/file/d/1rv1Vwatczu3JVegzpEA_pAMxwXsO0EIl/view" },
-        { id: "d3-v-recording", kind: "video", title: "Lien Negotiator Recording", label: "Training Video", group: "PM · Shadowing and Training Video Viewing",
-          link: "https://drive.google.com/file/d/1stDohvUe3okRlq7HB8qU5uTfgD6e3I6h/view" },
-        { id: "d3-v-kenneth27", kind: "video", title: "Kenneth, September 27", label: "Shadowing Video", group: "PM · Shadowing and Training Video Viewing",
-          link: "https://drive.google.com/file/d/1q0J7C0Fz1G7OsPooJLK_1bRg8VaHl-6p/view" },
-        { id: "d3-r-kenneth28", kind: "video", title: "Kenneth, September 28", label: "Shadowing Video", group: "Materials for Additional Reference",
-          link: "https://drive.google.com/file/d/16VEGXqkzxDVLcwadQXNbfWhUPicZweHP/view" },
-        { id: "d3-r-discussion", kind: "video", title: "Discussion with Kenneth", label: "Shadowing Video", group: "Materials for Additional Reference",
-          link: "https://drive.google.com/file/d/1CMfB9tqOFrWamJfm-VZGtRX8wELiWXFa/view" },
-        { id: "d3-r-gilda", kind: "video", title: "Lien Negotiator Recording of Gilda Marie Anagap", label: "Shadowing Video", group: "Materials for Additional Reference",
-          link: "https://drive.google.com/file/d/1stDohvUe3okRlq7HB8qU5uTfgD6e3I6h/view" },
-        { id: "d3-r-bill", kind: "video", title: "Bill, August 25, with William Allanigue (more in Tagalog)", label: "Shadowing Video", group: "Materials for Additional Reference",
-          link: "https://drive.google.com/file/d/1Nq9oXyPmxcll2Yob4PKz3MZ4yNvGCTUh/view" }
+        { id: "d3-shadowing", kind: "videos", title: "Shadowing and Training Video Viewing", label: "Training & Shadowing Videos", group: "PM · Shadowing and Training Video Viewing",
+          note: "Please go over these videos for your next task.",
+          items: [
+            { title: "Reduction & Disbursement Training", label: "Training Video", link: "https://drive.google.com/file/d/1rv1Vwatczu3JVegzpEA_pAMxwXsO0EIl/view" },
+            { title: "Lien Negotiator Recording", label: "Training Video", link: "https://drive.google.com/file/d/1stDohvUe3okRlq7HB8qU5uTfgD6e3I6h/view" },
+            { title: "Kenneth, September 27", label: "Shadowing Video", link: "https://drive.google.com/file/d/1q0J7C0Fz1G7OsPooJLK_1bRg8VaHl-6p/view" }
+          ] },
+        { id: "d3-reference", kind: "videos", title: "Materials for Additional Reference", label: "Reference Videos", group: "Materials for Additional Reference",
+          note: "Shadowing videos for additional reference.",
+          items: [
+            { title: "Kenneth, September 28", label: "Shadowing Video", link: "https://drive.google.com/file/d/16VEGXqkzxDVLcwadQXNbfWhUPicZweHP/view" },
+            { title: "Discussion with Kenneth", label: "Shadowing Video", link: "https://drive.google.com/file/d/1CMfB9tqOFrWamJfm-VZGtRX8wELiWXFa/view" },
+            { title: "Lien Negotiator Recording of Gilda Marie Anagap", label: "Shadowing Video", link: "https://drive.google.com/file/d/1stDohvUe3okRlq7HB8qU5uTfgD6e3I6h/view" },
+            { title: "Bill, August 25, with William Allanigue (more in Tagalog)", label: "Shadowing Video", link: "https://drive.google.com/file/d/1Nq9oXyPmxcll2Yob4PKz3MZ4yNvGCTUh/view" }
+          ] }
       ]
     }
   ]

@@ -73,6 +73,13 @@ const DECK = /^https:\/\/www\.canva\.com\/design\/[\w-]+\/[\w-]+\/view\?embed$/,
           await p.click('.doc-tabs button:nth-child(2)');
           assert.match(await p.getAttribute('.doc-tabs button.on', 'aria-selected'), /true/);
         }
+        if (await p.locator('.vcard').count()) {
+          // the Standard's video cards: a click plays it in the pop-out viewer
+          await p.locator('.vcard').first().click();
+          await p.waitForSelector('#lecture-viewer-pane.open');
+          assert.match(await p.getAttribute('#lecture-viewer-body iframe', 'src'), VIDEO, what + ' viewer');
+          await p.click('#lecture-viewer-close');
+        }
         if (await p.locator('.qa-list textarea').count()) {
           await p.fill('.qa-list li:nth-child(1) textarea', `Answer from ${tag}`);
           assert.match(await p.textContent('.qa-count'), /^1\//);

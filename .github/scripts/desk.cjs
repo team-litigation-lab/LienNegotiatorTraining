@@ -25,8 +25,9 @@ const ticket = (t) => { const p = b64u(JSON.stringify(t)); return `${p}.${b64u(c
   await p.waitForSelector('.ld-head');
   assert.match(await p.textContent('.ld-case h1'), /Sarah Miller/);
   await p.click('button:has-text("Watch the demo recording")');
-  assert.match(await p.getAttribute('#overlay iframe', 'src'), /drive\.google\.com\/file\/d\/1EcVjtKuR-cYQ-K3QomaADzBiJ05Apu6X\/preview/);
-  await p.click('#overlay .btn');
+  await p.waitForSelector('#lecture-viewer-pane.open');
+  assert.match(await p.getAttribute('#lecture-viewer-body iframe', 'src'), /drive\.google\.com\/file\/d\/1EcVjtKuR-cYQ-K3QomaADzBiJ05Apu6X\/preview/);
+  await p.click('#lecture-viewer-close');
 
   const tab = (name) => p.click(`.ld-tabs button:has-text("${name}")`);
   const tasksOk = (stage) => p.evaluate((s) => LNDesk.tasks(s).map((t) => t.ok), stage);

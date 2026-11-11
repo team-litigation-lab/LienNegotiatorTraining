@@ -293,6 +293,24 @@ main.main-wide{max-width:1600px;}
 .lab-tasks{list-style:none;margin:0 0 10px;padding:0;font-size:14px}.lab-tasks li{padding:5px 0;border-bottom:1px solid var(--line)}.lab-tasks li.ok{color:var(--success)}
 .lab-foot{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
 
+/* ---------- videos, as in the Standard Foundational Training: cards that play in the pop-out viewer (js/ln-viewer.js),
+   and the action row under a deck or video (⛶ Full screen · ⧉ Pop out · Open ↗) ---------- */
+.frame-actions{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-top:8px;font-size:12.5px;color:#C9CDE3;font-weight:600;}
+.frame-btns{display:flex;gap:6px;flex-wrap:wrap;}
+.frame-actions .btn-ghost{background:rgba(255,255,255,.92);color:var(--navy);border-color:transparent;}
+.frame:fullscreen{border-radius:0;}
+.vc-note{color:#C9CDE3;font-size:13.5px;font-weight:600;margin:0 0 10px;}
+.vcards{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px;align-content:start;}
+.vcard{display:flex;flex-direction:column;gap:6px;min-width:0;padding:8px 8px 10px;border:1px solid #E3E6EE;border-radius:12px;background:#fff;color:var(--ink);text-decoration:none;box-shadow:0 1px 3px rgba(30,35,64,.08);transition:box-shadow .15s,transform .15s;}
+.vcard:hover{box-shadow:0 6px 18px rgba(30,35,64,.16);transform:translateY(-2px);}
+.vcard-pic{position:relative;display:block;aspect-ratio:16/9;border-radius:8px;overflow:hidden;background:#1E2340;}
+.vcard-pic iframe{position:absolute;inset:0;width:100%;height:100%;border:0;pointer-events:none;}
+.vcard-play{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:48px;height:48px;border-radius:50%;background:rgba(201,116,43,.92);color:#fff;font-size:20px;line-height:48px;text-align:center;padding-left:3px;box-sizing:border-box;box-shadow:0 2px 8px rgba(0,0,0,.35);transition:transform .15s;}
+.vcard:hover .vcard-play{transform:translate(-50%,-50%) scale(1.12);}
+.vcard b{font-size:14.5px;line-height:1.3;color:var(--navy);}
+.vcard small{font-size:12px;font-weight:700;color:var(--orange-deep);}
+.stage-module:has(.vcards) .stage-body{overflow-y:auto;}
+
 /* ---------- admin ---------- */
 .admin-table{width:100%;border-collapse:collapse;font-size:13.5px;}
 .admin-table th{text-align:left;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-soft);padding:10px 12px;border-bottom:1px solid var(--line);}
@@ -304,7 +322,7 @@ main.main-wide{max-width:1600px;}
 .sec{padding:20px 22px;margin-bottom:18px;}
 .sec h2{margin:0 0 4px;font-size:20px;color:var(--navy);}
 .sec > p{margin:0 0 14px;font-size:13.5px;color:var(--ink-soft);font-weight:500;}
-@media(max-width:760px){.page-hero{padding:20px 16px;border-radius:16px;} main{padding:20px 16px 40px;} 
+@media(max-width:760px){.page-hero{padding:20px 16px;border-radius:16px;} main{padding:20px 16px 40px;}}
 /* ============================================================================
    The LSH standard page style — the see-through surfaces every LSH site shares.
    A vendored copy of the block at the end of the CM course's <style> (itself a copy of the Training Portal's
@@ -348,6 +366,37 @@ body::before{opacity:.40;}
 @media print{
   .topbar,.btn-primary,.btn-navy{background-image:none;box-shadow:none;}
 }
+
+/* ============================================================================
+   The day's pages fill the window, as in the CM course: on a laptop or desktop the
+   Objectives page and the player take the full width (no 1400px cap) and the full
+   height, down to the Previous / Next bar. A slide deck or video is the largest
+   16:9 that fits the room left (container units); a list, a document or the
+   questions stretch to the height and scroll inside. A phone keeps the normal flow.
+   ========================================================================= */
+.frame-box{width:100%;}
+@media (min-width:1001px) and (min-height:560px){
+  #app:has(main.main-player){height:100vh;min-height:0;}
+  main.main-player{max-width:none;flex:1;min-height:0;display:flex;flex-direction:column;padding:16px 24px 10px;}
+  main.main-player > .player{flex:1;min-height:0;align-items:stretch;grid-template-columns:minmax(0,1fr) 270px;}
+  .player-main{display:flex;flex-direction:column;min-height:0;}
+  .player-main > .stage{flex:1;min-height:0;display:flex;flex-direction:column;}
+  .stage-body{flex:1;min-height:0;display:flex;flex-direction:column;}
+  .stage-agenda .stage-body,.stage-done .stage-body{overflow-y:auto;}
+  .frame-box{flex:1;min-height:0;container-type:size;display:flex;align-items:center;justify-content:center;}
+  .stage .frame-box .frame{width:min(100cqw, calc(100cqh * 16 / 9));min-width:0;margin:0;}
+  .doc-frame{flex:1;height:auto;min-height:0;}
+  .qa-list,.guide,.lab-box{flex:1;max-height:none;min-height:0;}
+  .stage-done .done-box{flex:1;max-height:none;min-height:0;}
+  .agenda-grid{grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:10px;}
+  .agenda-item{padding:10px 12px;}
+  .agenda-item b{font-size:14px;}
+  main.main-player > .day-headline{flex:0 0 auto;}
+  main.main-player > .stage-shell{flex:1;min-height:0;display:flex;flex-direction:column;}
+  main.main-player .obj-wrap{flex:1;max-height:none;min-height:0;}
+  main.main-player .obj-list li,main.main-player .outline{font-size:14.5px;}
+  main.main-player ~ .footer-note{padding:6px 24px 10px;}
+}
 </style>
 <script src="/js/portal-gate.js?v=2026.10.23-dashboard"></script>
 <script src="/js/ln-course.js?v=2026.11.11"></script>
@@ -365,7 +414,7 @@ body::before{opacity:.40;}
    repo) expects of an engine: state, render(), goto(), authStatus(), logout(), setAdminToken(),
    setTraineeToken(), submitLogin() and resumeWhereLeftOff().
    ============================================================ */
-const APP_BUILD = "2026.11.12-1";
+const APP_BUILD = "2026.11.12-3";
 const PORTAL_HOME = "https://cm-training-activity.pages.dev/";
 const LOGO_FULL_SRC = "/logo.svg";
 const COURSE = window.LN_COURSE;
@@ -489,7 +538,8 @@ const KIND = {
   files: { icon: "📄", label: "Handouts", chip: "📄 The Handouts" },
   questions: { icon: "✍️", label: "Process Questions", chip: "✍️ Your Answers" },
   guide: { icon: "🧭", label: "Guide", chip: "🧭 The Guide" },
-  lab: { icon: "🗂", label: "Case Activity", chip: "🗂 The Lien Desk" }
+  lab: { icon: "🗂", label: "Case Activity", chip: "🗂 The Lien Desk" },
+  videos: { icon: "🎬", label: "Videos", chip: "🎬 The Videos" }
 };
 // A module's own label (Live Demo, Shadowing Video …), else its kind's.
 function modLabel(m){ return m.label || KIND[m.kind].label; }
@@ -672,6 +722,7 @@ function showSlideMap(){
   overlay(`<div class="mh-day">Day ${d.day} · Slide Map</div><div class="mh-title">${esc(d.title)}</div>`,
     `<ol class="topic-list map-list">${stepsOf(d).map((s, i) => `<li><button class="${i === state.step ? "on" : ""}" onclick="closeOverlay();stepTo(${i})"><b>${esc(s.title)}</b>${s.type === "module" && !state.isAdmin && moduleDone(s.module) ? " <span>✓ done</span>" : ""}</button></li>`).join("")}</ol>`);
 }
+function frameFull(id){ const el = document.getElementById(id), req = el && (el.requestFullscreen || el.webkitRequestFullscreen); if(req) try{ const r = req.call(el); if(r && r.catch) r.catch(() => {}); }catch(e){} }
 function stageFullScreen(){ const el = document.querySelector(".stage"); if(el && el.requestFullscreen) el.requestFullscreen().catch(() => {}); }
 
 // The day's steps, one at a time, in the CM course's player: the stage, Previous · Slide Map · Step n of N · Next, and the
@@ -745,8 +796,15 @@ function moduleBody(m){
   if(m.kind === "deck" || m.kind === "video"){
     const link = linkOf(m), src = lnEmbed.embed(m.kind, link), page = lnEmbed.page(m.kind, link);
     if(!src) return `<div class="empty">This module isn't set up yet. ${state.isAdmin ? "Add its address in Admin → Course links." : "Please tell your trainer."}</div>`;
-    return `<div class="frame"><iframe src="${esc(src)}" title="${esc(m.title)}" allow="autoplay; fullscreen" allowfullscreen loading="lazy" referrerpolicy="strict-origin-when-cross-origin"></iframe></div>`
-      + frameNote((m.kind === "video" ? "The video plays from Google Drive. If it asks you to sign in, use your legalsupporthelp.com Google account." : "Use the arrows under the slides, or the slides' own full-screen button, to page through the deck."), page);
+    const fid = "fr-" + m.id;
+    return `<div class="frame-box"><div class="frame" id="${fid}"><iframe src="${esc(src)}" title="${esc(m.title)}" allow="autoplay; fullscreen" allowfullscreen loading="lazy" referrerpolicy="strict-origin-when-cross-origin"></iframe></div></div>
+      <div class="frame-actions"><span>${m.kind === "video" ? "🎬 " + esc(m.title) + " · plays from Google Drive (sign in with your legalsupporthelp.com account if it asks)" : "📚 Use the arrows under the slides to page through the deck."}</span>
+        <span class="frame-btns"><button class="btn btn-sm btn-ghost" type="button" onclick="frameFull('${fid}')">⛶ Full screen</button>${m.kind === "video" ? `<a class="btn btn-sm btn-ghost viewer-link" data-kind="video" data-title="${esc(m.title)}" href="${esc(page)}">⧉ Pop out</a>` : ""}<a class="btn btn-sm btn-ghost" href="${esc(page)}" target="_blank" rel="noopener">${m.kind === "video" ? "Open in Drive" : "Open in Canva"} ↗</a></span></div>`;
+  }
+  if(m.kind === "videos"){
+    return `${m.note ? `<p class="vc-note">${esc(m.note)}</p>` : ""}<div class="vcards">${m.items.map((it) => `<a class="vcard viewer-link" data-kind="video" data-title="${esc(it.title)}" href="${esc(lnEmbed.page("video", it.link))}">
+        <span class="vcard-pic"><iframe loading="lazy" tabindex="-1" aria-hidden="true" src="${esc(lnEmbed.video(it.link))}"></iframe><span class="vcard-play" aria-hidden="true">▶</span></span>
+        <b>${esc(it.title)}</b><small>${esc(it.label || "Video")} · click to play</small></a>`).join("")}</div>`;
   }
   if(m.kind === "files"){
     const k = Math.max(0, Math.min(m.items.length - 1, (state.sub[m.id] || 0))), it = m.items[k];
@@ -937,7 +995,7 @@ function render(){
   else if(state.view === "player" && dayByNum(state.dayNum)) main = viewPlayer();
   else if(state.view === "desk") main = LNDesk.view();
   else { state.view = "dashboard"; main = viewDashboard(); }
-  app.innerHTML = (state.view === "pendingApproval" ? "" : topbar()) + `<main class="${state.view === "desk" ? "main-wide" : ""}">${main}</main>` + footer();
+  app.innerHTML = (state.view === "pendingApproval" ? "" : topbar()) + `<main class="${state.view === "desk" ? "main-wide" : state.view === "player" || state.view === "day" ? "main-player" : ""}">${main}</main>` + footer();
   if(state.view === "desk") LNDesk.after();
 }
 
@@ -967,6 +1025,7 @@ function render(){
   if(state.view !== "login") setTimeout(() => { [].forEach.call(document.documentElement.children, (el) => { if(el.tagName === "DIV" && el.style.zIndex === "2147483000") el.remove(); }); }, 150);
 })();
 </script>
+<script src="/js/ln-viewer.js?v=2026.11.12"></script>
 <script src="/js/ln-desk.js?v=2026.11.12"></script>
 </body>
 </html>

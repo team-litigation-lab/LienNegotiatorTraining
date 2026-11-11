@@ -1,4 +1,4 @@
-// Every step fits on one screen, as in the CM course: at 1366×768, 1920×1080 and 1280×720, each day's Objectives page
+// Every step fits on one screen and fills it, as in the CM course (the stage takes the window's width and height): at 1366×768, 1920×1080 and 1280×720, each day's Objectives page
 // ends with its Start bar inside the window, and every step of the day (the Training Agenda, each module, Day complete)
 // ends with its Previous / Next bar inside the window. The deck and video frames are stubbed.
 // Usage: node .github/scripts/fit.cjs http://localhost:8787/   (server.mjs with PORTAL_SSO_SECRET=ci-portal)
@@ -27,6 +27,10 @@ const bottom = (p, sel) => p.evaluate((s) => document.querySelector(s).getBoundi
       const total = Number((await p.textContent('.step-count')).match(/of (\d+)/)[1]);
       for (let i = 1; i <= total; i++) {
         if ((await bottom(p, '.player-bar')) > vp.height) fail.push(`${vp.width}×${vp.height} Day ${n} step ${i}: the Previous / Next bar is below the window`);
+        const fillW = await p.evaluate(() => document.querySelector('.stage').getBoundingClientRect().width / window.innerWidth);
+        const gap = vp.height - (await bottom(p, '.player-bar'));
+        if (fillW < 0.7) fail.push(`${vp.width}×${vp.height} Day ${n} step ${i}: the stage is only ${Math.round(fillW * 100)}% of the window's width`);
+        if (gap > 70) fail.push(`${vp.width}×${vp.height} Day ${n} step ${i}: ${Math.round(gap)}px left empty under the player (it should fill the window)`);
         if (i < total) await p.click('.next-btn');
       }
       await p.click('.nav button:has-text("Dashboard")');

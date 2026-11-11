@@ -14,6 +14,11 @@ for (const f of walk(ROOT).filter((f) => /\.(c?js)$/.test(f))) {
 }
 const html = fs.readFileSync(path.join(ROOT, 'index.html'), 'utf8');
 [...html.matchAll(/<script>([\s\S]*?)<\/script>/g)].forEach((m, i) => { try { new vm.Script(m[1]); } catch (e) { fail.push(`index.html inline script ${i + 1}: ${e.message}`); } });
+// every <style> block's braces balance: one missing brace silently drops every rule after it
+[...html.matchAll(/<style>([\s\S]*?)<\/style>/g)].forEach((m, i) => {
+  let d = 0, low = 0; for (const ch of m[1].replace(/\/\*[\s\S]*?\*\//g, '')) { if (ch === '{') d++; if (ch === '}') d--; low = Math.min(low, d); }
+  if (d !== 0 || low < 0) fail.push(`index.html <style> block ${i + 1}: the braces don't balance (${d > 0 ? d + ' unclosed' : 'an extra }'}); the rules after the slip are ignored`);
+});
 const refs = [...html.matchAll(/(?:src|href)="(\/?[^"#:]+?)(?:\?[^"]*)?"/g)].map((m) => m[1]).filter((r) => !r.startsWith("//") && !r.includes("${"));
 for (const r of new Set(refs)) if (!fs.existsSync(path.join(ROOT, r.replace(/^\//, '')))) fail.push(`index.html loads ${r}, which doesn't exist`);
 JSON.parse(fs.readFileSync(path.join(ROOT, 'wrangler.json'), 'utf8'));
@@ -32,7 +37,8 @@ for (const d of LN_COURSE.days) {
     n++;
     if (ids.has(m.id)) fail.push(`js/ln-course.js: module id ${m.id} repeats`);
     ids.add(m.id);
-    if (!['deck', 'video', 'files', 'questions', 'guide', 'lab'].includes(m.kind)) fail.push(`js/ln-course.js: ${m.id} kind must be deck, video, files, questions, guide or lab`);
+    if (!['deck', 'video', 'files', 'questions', 'guide', 'lab', 'videos'].includes(m.kind)) fail.push(`js/ln-course.js: ${m.id} kind must be deck, video, files, questions, guide or lab`);
+    if (m.kind === 'videos' && (!Array.isArray(m.items) || !m.items.length || m.items.some((x) => !x.title || !lnEmbed.video(x.link)))) fail.push(`js/ln-course.js: ${m.id} needs items, each a title and a drive.google.com/file/d/… link`);
     if (m.kind === 'lab' && !['day2', 'day3'].includes(m.stage)) fail.push(`js/ln-course.js: ${m.id} (lab) needs stage "day2" or "day3"`);
     else if ((m.kind === 'deck' || m.kind === 'video') && !lnEmbed.embed(m.kind, m.link)) fail.push(`js/ln-course.js: ${m.id} is not a ${m.kind === 'video' ? 'drive.google.com/file/d/…' : 'canva.com/design/…'} link: ${m.link}`);
     if (m.kind === 'files' && (!Array.isArray(m.items) || !m.items.length || m.items.some((x) => !x.title || !lnEmbed.video(x.link)))) fail.push(`js/ln-course.js: ${m.id} needs items, each a title and a drive.google.com/file/d/… link`);

@@ -559,8 +559,8 @@ window.LNDesk = {
   // the reference video: the Day 3 Tutorial Demo Recording (its address can be replaced in Admin → Course links)
   demo(){
     const m = (window.ALL_MODULES || []).find((x) => x.id === "d3-demo"); if(!m) return;
-    const src = window.lnEmbed.video(window.linkOf ? window.linkOf(m) : m.link);
-    window.overlay(`<div class="mh-day">Reference video</div><div class="mh-title">${E(m.title)}</div>`, `<div class="ld-ov"><div class="frame" style="position:relative;aspect-ratio:16/9"><iframe src="${E(src)}" title="${E(m.title)}" allow="autoplay; fullscreen" allowfullscreen style="position:absolute;inset:0;width:100%;height:100%;border:0"></iframe></div></div>`);
+    // the Standard's pop-out viewer (js/ln-viewer.js): it stays open beside the desk while the trainee works
+    window.lvOpen({ title: "Tutorial Demo: " + m.title, url: window.linkOf ? window.linkOf(m) : m.link });
   },
   field(e, k){
     const w = W(), el = e.target, d = k === "cs" ? (w.drafts.cs = w.drafts.cs || {}) : (w.drafts.rr[k.slice(3)] = w.drafts.rr[k.slice(3)] || {});
