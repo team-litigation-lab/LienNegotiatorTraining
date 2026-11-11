@@ -33,13 +33,14 @@ const todayStr = () => { const d = new Date(); return `${String(d.getMonth() + 1
 
 /* ---------- the case's numbers ---------- */
 const keyOf = (p) => low(p.name).split(/[\s—–,-]+/).filter((w) => w && !["the", "of"].includes(w))[0];
-function charges(p){ return p.lien ? (p.onFile && p.onFile.amount != null ? p.onFile.amount : p.amount) : r2(p.lines.reduce((s, l) => s + l.amount, 0)); }
-function chargesNow(p){ return p.lien ? p.amount : charges(p); }
+// a bill on file can carry lines the corrected bill takes out (a duplicate, a pre-accident visit, an unrelated charge)
+const linesOf = (p, corrected) => p.lines.concat(!corrected && p.onFile && p.onFile.extraLines ? p.onFile.extraLines : []);
+function charges(p, corrected){ return p.lien ? (!corrected && p.onFile && p.onFile.amount != null ? p.onFile.amount : p.amount) : r2(linesOf(p, corrected).reduce((s, l) => s + l.amount, 0)); }
 // what the file says now (corrected = the trainee has the corrected bill / updated payoff)
 function figures(p, corrected){
   if(p.lien){ const amt = corrected || !p.onFile ? p.amount : p.onFile.amount; return { charges: amt, pip: 0, health: 0, adj: 0, balance: amt }; }
-  const o = !corrected && p.onFile ? p.onFile : p;
-  const c = charges(p);
+  const o = !corrected && p.onFile ? Object.assign({ pip: p.pip, health: p.health, adj: p.adj }, p.onFile) : p;
+  const c = charges(p, corrected);
   return { charges: c, pip: o.pip || 0, health: o.health || 0, adj: o.adj || 0, balance: r2(c - (o.pip || 0) - (o.health || 0) - (o.adj || 0)) };
 }
 const gross = (c) => r2(c.settlements.reduce((s, x) => s + x.amount, 0));
@@ -99,7 +100,7 @@ function docBill(c, p, corrected){
   return wrap(`${p.name} statement`, `${org(p)}<h1>${corrected ? "Updated Itemized Statement" : "Itemized Statement"}</h1>
   <table class="meta"><tr><td><b>Patient:</b> ${E(clientLF(c))}</td><td><b>DOB:</b> ${E(c.client.dob)}</td><td><b>Statement date:</b> ${E(asOf)}</td></tr>
   <tr><td><b>Account:</b> ${E(p.id.toUpperCase())}-${E(c.caseNo.slice(-6))}</td><td><b>Date of injury:</b> ${E(c.dol)}</td><td><b>Dates of service:</b> ${E(p.dos)}</td></tr></table>
-  <table><tr><th>Date</th><th>Code</th><th>Description</th><th class="m">Charge</th></tr>${p.lines.map((l) => `<tr><td>${E(l.date)}</td><td>${E(l.code)}</td><td>${E(l.desc)}</td><td class="m">${money(l.amount)}</td></tr>`).join("")}
+  <table><tr><th>Date</th><th>Code</th><th>Description</th><th class="m">Charge</th></tr>${linesOf(p, corrected).map((l) => `<tr><td>${E(l.date)}</td><td>${E(l.code)}</td><td>${E(l.desc)}</td><td class="m">${money(l.amount)}</td></tr>`).join("")}
   <tr class="tot"><td colspan="3">Total charges</td><td class="m">${money(f.charges)}</td></tr>
   <tr><td colspan="3">PIP payments</td><td class="m">${f.pip ? "–" + money(f.pip).slice(1) : "$0.00"}</td></tr>
   <tr><td colspan="3">Health insurance payments</td><td class="m">${f.health ? "–" + money(f.health).slice(1) : "$0.00"}</td></tr>
@@ -110,14 +111,16 @@ function docBill(c, p, corrected){
 }
 function docLien(c, p, updated){
   const f = figures(p, updated), asOf = updated ? todayStr() : (p.onFile ? p.onFile.asOf : "09/22/2026");
-  const funding = /funding/i.test(p.type);
-  return wrap(`${p.name}`, `${org(p)}<h1>${funding ? (updated ? "Updated Payoff Letter" : "Payoff Letter") : "Notice of Lien and Right of Reimbursement"}</h1>
+  const funding = /funding/i.test(p.type), health = /health|medicare|medicaid/i.test(p.type);
+  const title = funding ? (updated ? "Updated Payoff Letter" : "Payoff Letter") : /child support/i.test(p.type) ? "Notice of Child Support Lien" : /medicare/i.test(p.name) ? (updated ? "Final Demand" : "Conditional Payment Letter") : (updated && p.onFile ? "Updated Lien Itemization" : "Notice of Lien and Right of Reimbursement");
+  return wrap(`${p.name}`, `${org(p)}<h1>${title}</h1>
   <table class="meta"><tr><td><b>Re:</b> ${E(clientLF(c))}</td><td><b>Date of loss:</b> ${E(c.dol)}</td><td><b>Date:</b> ${E(asOf)}</td></tr><tr><td colspan="3"><b>Attorney:</b> ${E(F.attorney)}, ${E(F.name)}</td></tr></table>
   <p>${E(p.notice || "")}</p>
   ${p.plan ? `<div class="box"><b>Plan information:</b> ${E(p.plan)}</div>` : ""}
   ${funding ? `<table><tr><th>Payoff</th><th class="m">Amount</th></tr><tr><td>Payoff amount, good through ${E(updated ? "30 days from " + asOf : p.onFile ? p.onFile.asOf : asOf)}</td><td class="m">${money(f.balance)}</td></tr></table>
     <p class="note">This payoff is valid only through the date stated. After that date, request an updated payoff before disbursement. Our payoff is contractual under the funding agreement.</p>`
-    : `<table><tr><th>Provider paid</th><th>Dates of service</th><th class="m">Amount paid</th></tr>${c.payees.filter((x) => !x.lien && x.health).map((x) => `<tr><td>${E(x.name)}</td><td>${E(x.dos)}</td><td class="m">${money(x.health)}</td></tr>`).join("")}<tr class="tot"><td colspan="2">Total lien asserted</td><td class="m">${money(f.balance)}</td></tr></table>`}`);
+    : health ? `<table><tr><th>Provider paid</th><th>Dates of service</th><th class="m">Amount paid</th></tr>${c.payees.filter((x) => !x.lien && x.health).map((x) => `<tr><td>${E(x.name)}</td><td>${E(x.dos)}</td><td class="m">${money(x.health)}</td></tr>`).join("")}${!updated && p.onFile && p.onFile.extra ? p.onFile.extra.map((x) => `<tr class="hl"><td>${E(x.desc)}</td><td>${E(x.date)}</td><td class="m">${money(x.amount)}</td></tr>`).join("") : ""}<tr class="tot"><td colspan="2">Total lien asserted</td><td class="m">${money(f.balance)}</td></tr></table>`
+    : `<table><tr><th>Lien</th><th class="m">Amount</th></tr><tr><td>${E(p.type)}</td><td class="m">${money(f.balance)}</td></tr></table>`}`);
 }
 function docPip(c){
   return wrap("PIP payment log", `<div class="org">${E(c.pip.carrier)}</div><div class="orgsub">Personal Injury Protection · Claim for ${E(clientLF(c))} · DOL ${E(c.dol)} · Limit ${money(c.pip.limit)}</div><h1>PIP Payment Log</h1>
@@ -138,7 +141,7 @@ function docRetainer(c){
 function docSettlement(c, s){
   return wrap(`${s.carrier} settlement`, `<div class="org">${E(s.carrier)}</div><div class="orgsub">Claims Department · Adjuster ${E(s.adjuster)}</div><h1>Settlement Confirmation</h1>
   <table class="meta"><tr><td><b>To:</b> ${E(F.attorney)}, ${E(F.name)}</td><td><b>Date:</b> ${E(s.date)}</td></tr><tr><td><b>Claimant:</b> ${E(clientLF(c))}</td><td><b>Claim No.:</b> ${E(s.claimNo)}</td></tr><tr><td><b>Our insured:</b> ${E(s.insured)}</td><td><b>Date of loss:</b> ${E(c.dol)}</td></tr></table>
-  <p>This confirms our agreement to resolve the ${s.type === "UM" ? "uninsured/underinsured motorist" : "bodily injury"} claim for the total sum of <b>${E(money(s.amount))}</b>. Payment will issue upon receipt of the fully executed Release of All Claims. Please have your client sign and notarize the enclosed release and return it to our office.</p>`);
+  <p>This confirms our agreement to resolve the ${s.type === "UM" ? "uninsured/underinsured motorist" : "bodily injury"} claim for the total sum of <b>${E(money(s.amount))}</b>.${s.note ? ` ${E(s.note)}` : ""} Payment will issue upon receipt of the fully executed Release of All Claims. Please have your client sign and notarize the enclosed release and return it to our office.</p>`);
 }
 // every document in the case file, the ones that came by email included
 function docs(c, w){
@@ -242,7 +245,7 @@ function checkSheet(stage){
     if(!r && y.want === 0) return;
     items.push({ what: `${y.p.name}${stage === "initial" ? " · balance" : " · amount to pay"}`, got, want: y.want, missing: !r,
       why: stage === "initial" ? (y.p.lien ? "The lien or payoff amount on the letter on file." : "Total charges less the payments and write-offs on the statement on file.")
-        : (y.want === 0 ? "A $0.00 balance: nothing is paid." : reducible(y.p) && w.got.approved[y.p.id] != null ? "The amount the payee approved in writing (its reply)." : y.p.reduce && y.p.reduce.policy === "contract" ? "The updated payoff: funding companies don't reduce." : "Its current balance (no reduction approved).") });
+        : (y.want === 0 ? "A $0.00 balance: nothing is paid." : reducible(y.p) && w.got.approved[y.p.id] != null ? "The amount the payee approved in writing (its reply)." : y.p.reduce && y.p.reduce.policy === "contract" ? "The updated payoff: funding companies don't reduce." : y.p.reduce && y.p.reduce.policy === "statute" ? "A statutory lien: paid in full." : y.p.onFile ? "Its current balance, from the corrected bill or updated letter (no reduction approved)." : "Its current balance (no reduction approved).") });
   });
   items.push({ what: stage === "initial" ? "Total liens & balances (before reductions)" : "Total liens (reduced)", got: stage === "initial" ? o.I44 : o.L44, want: x.total, why: "The sum of the rows." });
   items.push({ what: x.netLabel, got: stage === "initial" ? o.N0 : o.L52, want: x.net, why: "Gross – fee – expenses – liens." });
@@ -360,6 +363,7 @@ function respond(c, w, out){
     if(!p.reduce || p.reduce.floor == null){
       const zero = cur.balance <= 0;
       deliver(w, Object.assign({ subject: re, body: zero ? `Good day,\n\nThis account has a $0.00 balance: it was paid by the patient's health insurance with the contractual adjustment applied. Nothing is owed from the settlement.` + sig("Billing Department", p.name)
+        : p.reduce.policy === "statute" ? `Good day,\n\nThis is a statutory lien for unpaid child support. It is not subject to reduction. Please remit ${money(cur.balance)} from the settlement proceeds, payable as stated on the notice.` + sig("Enforcement Unit", p.name)
         : `Good day,\n\nWe are unable to reduce this amount: our payoff is contractual under the funding agreement the client signed. The payoff of ${money(cur.balance)} is good for 30 days from today. Please remit from the settlement proceeds.` + sig("Payoff Department", p.name) }, from));
       return;
     }
@@ -496,7 +500,7 @@ function vDrafts(c, w){
   } else {
     const p = cur.p, d = w.drafts.rr[p.id] = w.drafts.rr[p.id] || {};
     issues = d.file ? rrValid(c, w, p) : [];
-    form = `<p class="ld-muted">${p.reduce && p.reduce.floor == null ? (p.reduce.policy === "zero" ? "Check the statement first: is anything owed?" : "Funding companies rarely reduce: their payoff is contractual. You can still ask.") : ""}</p>
+    form = `<p class="ld-muted">${p.reduce && p.reduce.floor == null ? (p.reduce.policy === "zero" ? "Check the statement first: is anything owed?" : p.reduce.policy === "statute" ? "A statutory lien: check the notice before you ask." : "Funding companies rarely reduce: their payoff is contractual. You can still ask.") : ""}</p>
       <label>File name<input data-d="file" value="${E(d.file || "")}" placeholder="MED - ${E(p.name.split(" —")[0])} - Reduction Request (your first name)"></label>
       <label>Date<input data-d="date" value="${E(d.date || todayStr())}"></label>
       <label>Patient (LAST, FIRST)<input data-d="client" value="${E(d.client || "")}" placeholder="${E(clientLF(c))}"></label><label>Date of loss<input data-d="dol" value="${E(d.dol || "")}" placeholder="mm/dd/yyyy"></label>

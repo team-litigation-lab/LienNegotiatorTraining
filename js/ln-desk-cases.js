@@ -32,6 +32,12 @@
                     notice   for a lienholder: its lien letter's text
                     reduce.policy  "zero"     a provider whose balance is $0.00 (paid by health insurance): nothing to request
                                    "contract" a funding company: the payoff is contractual, it won't reduce
+                                   "statute"  a statutory lien (child support): paid in full
+                    onFile.extraLines   a provider bill on file with lines the corrected bill takes out (a duplicate,
+                                        a pre-accident visit, an unrelated charge)
+                    onFile.extra        a health lien itemization on file with unrelated charges ({date, desc, amount});
+                                        its onFile.amount includes them, and the updated itemization drops them
+     settlements[].note  anything else the settlement letter says (e.g. property damage paid separately)
      challenges   what the trainee has to catch (shown to a trainer only)
    ============================================================ */
 window.LN_FIRM = {

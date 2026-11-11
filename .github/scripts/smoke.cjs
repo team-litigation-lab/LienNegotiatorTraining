@@ -85,7 +85,7 @@ const DECK = /^https:\/\/www\.canva\.com\/design\/[\w-]+\/[\w-]+\/view\?embed$/,
       // (.github/scripts/desk.cjs plays the case itself). Day 1 completes on its steps alone.
       const hasLab = day !== 1;
       assert.match(await p.textContent('.done-box h2'), hasLab ? /Almost there/ : new RegExp(`Day ${day} is complete`));
-      if (day === 3) assert.match(await p.textContent('.wrap-box'), /Litigation Training/);
+      assert.equal(await p.locator('.wrap-box').count(), 0, 'no role-request instructions');
       assert.equal(await p.locator('.trainer-notes').count(), 0, 'a trainee never sees trainer notes');
       await p.click('.next-btn');   // Finish → the dashboard
       await p.waitForSelector('.day-card');

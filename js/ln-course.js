@@ -212,21 +212,7 @@ window.LN_COURSE = {
           link: "https://drive.google.com/file/d/1stDohvUe3okRlq7HB8qU5uTfgD6e3I6h/view" },
         { id: "d3-r-bill", kind: "video", title: "Bill, August 25, with William Allanigue (more in Tagalog)", label: "Shadowing Video", group: "Materials for Additional Reference",
           link: "https://drive.google.com/file/d/1Nq9oXyPmxcll2Yob4PKz3MZ4yNvGCTUh/view" }
-      ],
-      // The Day Complete step's "Before you go".
-      wrapUp: {
-        h: "Next: Litigation Training",
-        p: "Free Communication Upskill for 1 to 1½ hours. Then, before you request your new role, save every link and material you'll need: once Sir Matt approves the request, you are removed from this GC.",
-        steps: [
-          "Go to the #set-up-guide channel and select your role: ADVANCED TRAINING.",
-          "Go to the #training-reaction-roles channel, where the role selection options are.",
-          "Click the first option, the LSH BOT, to choose your training channel.",
-          "Select \"Litigation Training\". This sends a request to be added to the Litigation Training group.",
-          "Wait for approval. Once Sir Matt approves it, you're added to the Litigation Training GC automatically.",
-          "From then on there's no need to clock in or stamp your auxes here: you'll do that in your Litigation Training GC from tomorrow."
-        ],
-        note: "Check your calendar regularly for your scheduled demo, starting tomorrow. If you don't see your schedule, follow up."
-      }
+      ]
     }
   ]
 };

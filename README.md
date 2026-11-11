@@ -28,7 +28,7 @@ Days 1 and 2's objectives and topics were written from the decks' own slides (th
 | PM · Shadowing and Training Video Viewing | **▶** Reduction & Disbursement Training · Lien Negotiator Recording · Kenneth, September 27 |
 | Materials for Additional Reference | **▶** Kenneth, September 28 · Discussion with Kenneth · Lien Negotiator Recording of Gilda Marie Anagap · Bill, August 25, with William Allanigue (more in Tagalog) |
 
-Every video is embedded in full (its own step, a full-size Drive player). Day Complete ends with **Next: Litigation Training** (the role-request steps, and the reminder to check the calendar for the demo).
+Every video is embedded in full (its own step, a full-size Drive player).
 
 - **Trainer notes** (the facilitator's notes: which five questions to use when time is short, what to send in the GC and when, the shadow buddy, the demo activity files) show in the side panel **to a trainer only**. This page and this repository are public, so the **demo answer keys are deliberately not in it**; the checks refuse an answer key in `js/ln-course.js`. Keep them with the trainers.
 - **Trainees' answers** are in `progress:<id>` (`{ answers: { "d3-questions": [ … ] } }`); Admin → Trainees → **✍️ Answers** shows them.
