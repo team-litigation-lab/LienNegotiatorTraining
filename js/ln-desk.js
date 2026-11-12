@@ -60,7 +60,7 @@ function caseId(){
   return CASES[h % CASES.length].id;
 }
 const CASE = () => CASES.find((c) => c.id === caseId()) || CASES[0];
-function W(){ const d = prog(), id = caseId(); d.caseId = id; d.cases[id] = d.cases[id] || { mail: [], viewed: {}, sheet: { cells: { C11: "" } }, checks: {}, got: { corrected: {}, approved: {}, answered: {} }, drafts: { rr: {}, cs: {} } }; return d.cases[id]; }
+function W(){ const d = prog(), id = caseId(); d.caseId = id; d.cases[id] = d.cases[id] || { mail: [], viewed: {}, sheet: { cells: {} }, checks: {}, got: { corrected: {}, approved: {}, answered: {} }, drafts: { rr: {}, cs: {} } }; return d.cases[id]; }
 function save(){ if(typeof window.saveProgress === "function") window.saveProgress(); }
 const traineeFirst = () => { const t = window.state.trainee || {}; return String(t.firstName || String(t.name || "").split(/\s+/)[0] || "").trim(); };
 const traineeName = () => String((window.state.trainee || {}).name || "").trim();
@@ -85,14 +85,14 @@ const org = (p) => `<div class="org">${E(p.name)}</div><div class="orgsub">${E(p
 const clientLF = (c) => `${c.client.last.toUpperCase()}, ${c.client.first.toUpperCase()}`;
 
 function docRelease(c, s, signed){
-  const cl = `${c.client.first} ${c.client.last}`;
+  const cl = `${c.client.first} ${c.client.last}` + (c.client.spouse ? ` and ${c.client.spouse}` : "");
   return wrap(`Release ${s.type}`, `${letterhead()}<h1>Release of All Claims (${s.type === "UM" ? "Uninsured/Underinsured Motorist" : "Bodily Injury"})</h1>
   <p>FOR AND IN CONSIDERATION of the sum of <b>${E(money(s.amount))}</b>, the receipt and sufficiency of which is hereby acknowledged, the undersigned, <b>${E(cl)}</b> ("Releasor"), hereby releases and forever discharges <b>${E(s.insured)}</b> ("Releasee") and their insurance carrier, <b>${E(s.carrier)}</b> (Claim No. ${E(s.claimNo)}), from any and all claims, demands, damages, actions, or causes of action of every kind and nature, specifically including any claims for ${s.type === "UM" ? "uninsured/underinsured motorist benefits" : "BODILY INJURY"} arising out of an accident which occurred on or about <b>${E(c.dol)}</b>.</p>
   <h2>1. Scope of release</h2><p>This release is intended to be a full and final settlement of all claims related to bodily injuries, medical expenses, and pain and suffering. It does not include claims for Property Damage.</p>
   <h2>2. No admission of liability</h2><p>It is understood and agreed that this settlement is the compromise of a doubtful and disputed claim, and that the payment made is not to be construed as an admission of liability on the part of the party or parties hereby released.</p>
   <h2>3. Liens and indemnification</h2><p>Releasor agrees to pay and satisfy all medical liens, subrogation claims, hospital liens and pre-settlement funding advances from the proceeds of this settlement, and to indemnify and hold harmless the Releasee from any further claims made by any third party for medical services rendered.</p>
   <div class="sig"><div>${signed ? `<div class="signed">${E(cl)}</div>` : "<br>"}RELEASOR SIGNATURE · Date: ${signed ? E(s.signedOn || todayStr()) : "________________"}</div><div>${signed ? `<div class="signed">${E(s.adjuster)}</div>` : "<br>"}FOR ${E(s.carrier.toUpperCase())}</div></div>
-  <div class="box"><b>NOTARY ACKNOWLEDGMENT.</b> State of Texas, County of Collin. Subscribed and sworn to before me ${signed ? `on <b>${E(s.signedOn || todayStr())}</b>. <span class="stamp">NOTARIZED</span> <span class="signed" style="font-size:18px">K. Alvarado</span>` : "this ____ day of ________, 20__."}</div>
+  <div class="box"><b>NOTARY ACKNOWLEDGMENT.</b> State of ${E((c.venue || {}).state || "Texas")}, County of ${E((c.venue || {}).county || "Collin")}. Subscribed and sworn to before me ${signed ? `on <b>${E(s.signedOn || todayStr())}</b>. <span class="stamp">NOTARIZED</span> <span class="signed" style="font-size:18px">K. Alvarado</span>` : "this ____ day of ________, 20__."}</div>
   ${signed ? `<p class="note"><b>FULLY EXECUTED.</b> Signed by the Releasor and the Releasee's carrier, and notarized.</p>` : `<p class="note">Settlement Release Form · ${E(s.type)} · for the client's review and signature.</p>`}`);
 }
 function docBill(c, p, corrected){
@@ -134,7 +134,7 @@ function docCosts(c){
 }
 function docRetainer(c){
   return wrap("Retainer", `${letterhead()}<h1>Contingency Fee Agreement (excerpt)</h1><p>Client <b>${E(c.client.first)} ${E(c.client.last)}</b> retains ${E(F.name)} for claims arising from the accident of <b>${E(c.dol)}</b>.</p>
-  <h2>Attorney's fee</h2><p>33⅓% (one-third) of the gross recovery if the matter resolves before a lawsuit is filed; 40% of the gross recovery once a lawsuit has been filed.</p>
+  <h2>Attorney's fee</h2><p>${E(c.fee.retainer || "33⅓% (one-third) of the gross recovery if the matter resolves before a lawsuit is filed; 40% of the gross recovery once a lawsuit has been filed.")}</p>
   <h2>Case expenses</h2><p>Advanced case expenses are reimbursed to the firm from the client's share, in addition to the fee. Medical bills, liens, subrogation claims and pre-settlement funding advances are paid from the settlement before the client's net disbursement.</p>
   <div class="box"><b>File status:</b> ${E(c.fee.why)}</div>`);
 }
@@ -172,36 +172,59 @@ function attDoc(c, w, a){
 }
 
 /* ---------- drafts: the Reduction Request and the Closing Statement ---------- */
+// The firm's own BILL REDUCTION REQUEST letter (the demo's "MED - Medview Inc. - Reduction Request (Michelle)").
 function docRR(c, p, d){
-  const f = figures(p, true);
+  const req = d.requested === "" || d.requested == null ? null : num(d.requested), bal = num(d.balance);
+  const waive = req === 0;
   return wrap(d.file || "Reduction Request", `${letterhead()}<p>${E(d.date || todayStr())}</p>
-  <p><b>${E(p.name)}</b><br>${E(p.address || "")}<br>Attn: Billing / Accounts Receivable</p>
-  <p><b>Re:</b> Billing Reduction Request · Patient: ${E(d.client || clientLF(c))} · Date of loss: ${E(d.dol || c.dol)} · Dates of service: ${E(p.dos || "—")}</p>
-  <p>Dear Billing Department,</p>
-  <p>We sincerely appreciate the quality care and treatment provided to our client. Our client's claim has resolved for a limited settlement of ${E(money(gross(c)))}, from which attorney's fees, case expenses and all outstanding medical bills and liens must be paid.</p>
-  <table><tr><th>Account</th><th class="m">Amount</th></tr><tr><td>Total charges</td><td class="m">${E(money(num(d.charges)))}</td></tr><tr><td>Payments and adjustments</td><td class="m">${E(money(num(d.paid)))}</td></tr><tr class="tot"><td>Current balance</td><td class="m">${E(money(num(d.balance)))}</td></tr><tr class="tot"><td>Requested reduced amount, as payment in full</td><td class="m">${E(money(num(d.requested)))}</td></tr></table>
-  ${d.reasons && d.reasons.length ? `<p>We ask for your consideration because:</p><ul>${d.reasons.map((x) => `<li>${E(x)}</li>`).join("")}</ul>` : ""}
-  ${d.note ? `<p>${E(d.note)}</p>` : ""}
-  <p>We respectfully request that you accept <b>${E(money(num(d.requested)))}</b> as payment in full of this account. Upon your written acceptance, payment will be issued from the settlement proceeds.</p>
-  <p>Hoping for your kind consideration. Thank you.</p><p>Best regards,<br>${E(d.signer || traineeName() || "[your name]")}<br>Lien Negotiator, ${E(F.name)}<br>${E(F.email)} · ${E(F.phone)}</p>`);
+  <p><b>${E(d.via || "VIA EMAIL: " + p.email)}</b></p>
+  <p><b>${E(p.name)}</b><br>${E(p.address || "")}</p>
+  <table class="meta"><tr><td style="width:120px"><b>RE:</b></td><td colspan="3"><b>BILL REDUCTION REQUEST</b></td></tr>
+    <tr><td></td><td>Client/Patient:</td><td colspan="2"><b>${E(d.client || "")}</b></td></tr>
+    <tr><td></td><td>PIP Payment(s):</td><td colspan="2">${E(money(num(d.pip)))}</td></tr>
+    <tr><td></td><td>Date of Birth:</td><td>${E(d.dob || "")}</td><td>Date of Loss: ${E(d.dol || "")} · Balance Due: <b>${E(money(bal))}</b></td></tr></table>
+  <p>DEAR BILLING:</p>
+  <p>As you may know, this firm represents ${E(d.client || "our client")}, concerning injuries sustained on the above-referenced date. We would like to take the opportunity to thank you for the excellent medical care and treatment that you provided to our client. At this time, we have been offered a proposed settlement. Please allow this letter to serve as a request for a reduction of the medical bills.</p>
+  <p>In order to process this settlement, we ask that you ${waive ? "waive" : "reduce"} the outstanding balance from <b>${E(money(bal))}</b> to <b>${E(money(req || 0))}</b>. If this reduction is acceptable, please sign and date below, and return this letter to my office by fax or email, as soon as possible.</p>
+  <p>If this reduction is accepted, please choose from the following options how you would prefer to receive your check:</p>
+  <p>☐ FedEx Overnight Services: Please provide your FedEx account number: ____________________.<br>☐ Carrier Pick up: Please provide your carrier's full name: ________________________. <i>The carrier must present a picture ID at the time of pick up.</i><br>☐ USPS Regular mail. Please provide best mailing address: ______________________________.</p>
+  <div class="sig"><div><br>Signature · Date</div><div><br>Printed Name – Title · Tax ID #</div></div>
+  <p>Thank you in advance for your cooperation concerning this matter.</p><p>Very truly yours,<br><b>${E(d.signer || traineeName() || "[your name]")}</b><br>Lien Negotiator, ${E(F.name)}<br>${E(F.email)} · ${E(F.phone)}</p>`);
 }
+const nonMed = (p) => !!(p.lien && /funding|child support|prior attorney/i.test(p.type));
+const clientNames = (c) => `${c.client.first} ${c.client.last}`.toUpperCase() + (c.client.spouse ? ` & ${c.client.spouse.toUpperCase()}` : "");
+// The firm's SETTLEMENT CLOSING STATEMENT AND INSTRUCTION FOR DISTRIBUTION, built from the trainee's own figures.
 function docCS(c, d, signed){
-  const rows = c.payees.map((p) => ({ p, amt: num((d.pay || {})[p.id]) })).filter((x) => x.amt);
-  return wrap(d.file || "Closing Statement", `${letterhead()}<h1>Closing Statement · Settlement Disbursement</h1>
-  <table class="meta"><tr><td><b>Client:</b> ${E(c.client.first)} ${E(c.client.last)}</td><td><b>Date:</b> ${E(d.date || todayStr())}</td></tr><tr><td><b>Date of loss:</b> ${E(c.dol)}</td><td><b>Claim No(s).:</b> ${E(c.settlements.map((s) => s.claimNo).join(", "))}</td></tr></table>
-  <table><tr><th>Description</th><th class="m">Credit (+)</th><th class="m">Debit (–)</th></tr>
-  ${c.settlements.map((s) => `<tr><td>Settlement · ${E(s.type)} · ${E(s.carrier)}</td><td class="m"></td><td class="m"></td></tr>`).join("")}
-  <tr class="tot"><td>GROSS SETTLEMENT AMOUNT</td><td class="m">${E(money(num(d.gross)))}</td><td class="m"></td></tr>
-  <tr><td>Attorney's fees (${E(d.feePct || "")})</td><td class="m"></td><td class="m">(${E(money(num(d.fee)))})</td></tr>
-  <tr><td>Advanced case expenses</td><td class="m"></td><td class="m">(${E(money(num(d.costs)))})</td></tr>
-  <tr><td colspan="3"><b>MEDICAL BILLS, LIENS & REIMBURSEMENTS</b></td></tr>
-  ${rows.map((x) => `<tr><td>${E(x.p.name)}</td><td class="m"></td><td class="m">(${E(money(x.amt))})</td></tr>`).join("")}
-  <tr class="tot"><td>NET RECOVERY TO CLIENT</td><td class="m">${E(money(num(d.net)))}</td><td class="m"></td></tr></table>
-  <div class="box"><b>ACKNOWLEDGMENT:</b> I have reviewed the above statement and authorize the disbursement of funds as indicated. I understand that once these payments are made, no further funds will be available to me from this settlement.</div>
-  <div class="sig"><div>${signed ? `<div class="signed">${E(c.client.first)} ${E(c.client.last)}</div>` : "<br>"}CLIENT SIGNATURE · Date: ${signed ? E(todayStr()) : "________"}</div><div><br>ATTORNEY SIGNATURE · ${E(F.attorney)}</div></div>`);
+  const w = W(), cells = w.sheet.cells, o = sheetCalc(cells);
+  const carriers = c.settlements.map((s) => s.carrier.split(" (")[0]);
+  const fac = (p) => { const r = rowFor(cells, p); const g = (k) => r ? num(cells[r.k + r.i + k]) : 0;
+    // only what the trainee entered: a facility not on their Net Sheet shows no figures (the case's own never leak here)
+    const raw = (d.pay || {})[p.id], set = raw != null && String(raw).trim() !== "", amt = num(raw), bal = r ? (r.k === "M" ? o["M" + r.i + "bal"] : g("bal")) : 0;
+    const word = !set ? "" : amt === 0 ? "Waived" : amt < bal ? "Reduced" : "Paid in full";
+    return { p, amt, bal, word, ch: g("c"), pip: g("pip"), med: g("med"), hea: g("hea"), adj: g("adj") }; };
+  const med = c.payees.filter((p) => !nonMed(p)).map(fac), non = c.payees.filter(nonMed).map(fac);
+  const sb = (x) => `<tr><td colspan="2">Facility: <b>${E(x.p.name)}</b><br><span class="note">(Total charges: ${money(x.ch)})${x.pip ? ` (PIP Payments: ${money(x.pip)})` : ""}${x.med ? ` (Med Payments: ${money(x.med)})` : ""}${x.hea ? ` (Health Payments: ${money(x.hea)})` : ""}${x.adj ? ` (Adjustments: ${money(x.adj)})` : ""} (Balance: ${money(x.bal)})</span></td><td>${x.word ? "(" + x.word + ")" : ""}</td><td class="m">${x.word ? money(x.amt) : "______"}</td></tr>`;
+  const exp = Array.from({ length: 8 }, (_, i) => i + 1).filter((i) => num(cells["X" + i + "a"])).map((i) => `<tr><td colspan="3">${E(cells["X" + i + "l"] || "Expense")}</td><td class="m">${money(num(cells["X" + i + "a"]))}</td></tr>`).join("");
+  const names = clientNames(c);
+  return wrap(d.file || "Closing Statement", `${letterhead()}<h1>Settlement Closing Statement and Instruction for Distribution</h1>
+  <p><b>Re:</b> ${E(`${c.client.first} ${c.client.last}`.toUpperCase())} v. ${E(carriers.join(" and ").toUpperCase())}<br><b>Claim No.(s):</b> ${E(c.settlements.map((s) => s.claimNo).join(" and "))}</p>
+  <p>An offer for settlement from ${c.settlements.map((s) => `${E(s.carrier.split(" (")[0])} (Claim No. ${E(s.claimNo)}) for (${money(s.amount)})`).join(" and ")} to ${E(c.client.first)} ${E(c.client.last)}, which ${c.client.he || "the client"} is fully aware of and accepts. The proceeds are as follows:</p>
+  <table>${c.settlements.map((s) => `<tr><td colspan="3">${E(s.carrier.split(" (")[0].toUpperCase())}</td><td class="m">${money(s.amount)}</td></tr>`).join("")}
+    <tr class="tot"><td colspan="3">TOTAL GROSS SETTLEMENT</td><td class="m">${money(num(d.gross))}</td></tr>
+    <tr><td colspan="4"><b>Less:</b></td></tr><tr><td colspan="3">Attorney Fees (${E(d.feePct || "")})</td><td class="m">${money(num(d.fee))}</td></tr>
+    <tr><td colspan="4"><b>Costs and Expenses:</b></td></tr>${exp}<tr class="tot"><td colspan="3">Total Costs and Expenses</td><td class="m">${money(num(d.costs))}</td></tr>
+    <tr><td colspan="4"><b>Medical Bills:</b></td></tr>${med.map(sb).join("")}
+    <tr class="tot"><td colspan="2">Total Medical Bills: ${money(r2(med.reduce((s, x) => s + x.bal, 0)))}</td><td>(after reduction)</td><td class="m">${money(r2(med.reduce((s, x) => s + x.amt, 0)))}</td></tr>
+    ${non.length ? `<tr><td colspan="4"><b>Non-Medical:</b></td></tr>${non.map((x) => `<tr><td colspan="2">${E(x.p.type)}: <b>${E(x.p.name)}</b> <span class="note">(Balance owed: ${money(x.bal)})</span></td><td>${x.word ? "(" + x.word + ")" : ""}</td><td class="m">${x.word ? money(x.amt) : "______"}</td></tr>`).join("")}` : ""}
+    <tr class="tot"><td colspan="3">TOTAL NET SETTLEMENT</td><td class="m">${money(num(d.net))}</td></tr></table>
+  <p>The settlement proceeds in the amount of <b>${money(num(d.net))}</b> is to be paid by check to <b>${E(names)}</b>${c.client.spouse ? " (as husband and wife)" : ""}, according to the terms and agreements of the client attorney retainer agreement and I agree to this full final payment.</p>
+  <p>I understand that I am responsible for any outstanding liens, assignments, debts and monies owed for medical bills, hospitals, and otherwise, as the result of an accident which occurred on ${E(c.dol)}, or about. I further agree to release my attorney, ${E(F.attorney)} and ${E(F.name)}, from payment of any medical, doctor and/or hospital bills as result of this accident. In the event there are any outstanding liens, I agree that I shall be fully responsible for the payment of said lien, and further I agree to reimburse said lien holder. By signing this document, I agree to all the terms of this closing statement.</p>
+  <div class="sig"><div>${signed ? `<div class="signed">${E(c.client.first)} ${E(c.client.last)}</div>` : "<br>"}${E(`${c.client.first} ${c.client.last}`.toUpperCase())} · DATE ${signed ? E(todayStr()) : ""}</div>${c.client.spouse ? `<div>${signed ? `<div class="signed">${E(c.client.spouse)}</div>` : "<br>"}${E(c.client.spouse.toUpperCase())} (Spouse) · DATE ${signed ? E(todayStr()) : ""}</div>` : ""}</div>`);
 }
 
 /* ---------- what the case expects (from the trainee's own negotiation) ---------- */
+// the figures a trainee works from at the start: the bill on file, or (reconcile) the bill squared with the PIP log
+const startFigures = (p) => figures(p, !p.onFile || !!p.onFile.reconcile);
 function finalAmount(c, w, p){
   const f = figures(p, true);
   if(f.balance <= 0) return 0;
@@ -210,45 +233,53 @@ function finalAmount(c, w, p){
 }
 function expected(c, w, stage){
   const g = gross(c), fee = feeOf(c), costs = costsOf(c);
-  if(stage === "initial"){
-    const rows = c.payees.map((p) => ({ p, want: figures(p, false).balance, col: "I" }));
-    const tot = r2(rows.reduce((s, x) => s + x.want, 0));
-    return { gross: g, fee, costs, rows, total: tot, net: r2(g - fee - costs - tot), netLabel: "Net before reductions" };
-  }
-  const rows = c.payees.map((p) => ({ p, want: finalAmount(c, w, p), col: "L" }));
+  const rows = c.payees.map((p) => ({ p, want: stage === "initial" ? startFigures(p).balance : finalAmount(c, w, p) }));
   const tot = r2(rows.reduce((s, x) => s + x.want, 0));
-  return { gross: g, fee, costs, rows, total: tot, net: r2(g - fee - costs - tot), netLabel: "Net client disbursement" };
+  return { gross: g, fee, costs, rows, total: tot, net: r2(g - fee - costs - tot), netLabel: stage === "initial" ? "Net to client before reductions" : "Total net settlement" };
 }
 
-/* ---------- the Net Sheet (the LSH Net Sheet's sections) ---------- */
-const COST_ROWS = [12, 13, 14, 15, 16, 17, 18, 19];
-const LEDGER_ROWS = () => Array.from({ length: Math.max(8, CASE().payees.length + 2) }, (_, i) => 25 + i);
+/* ---------- the Net Sheet, in the firm's layout (the demo's "Net Sheet - John Test Doe") ----------
+   Settlement(s) · Atty fees · Expense log · MEDICAL BILLS (Total charges, PIP, Med, Health payments, Adjustments,
+   Balance owed, Agreed reduction, Max offer) · NON MEDICAL (Pre-Settlement Funding, Prior Attorney, Child Support:
+   Balance owed, Agreed reduction) · TOTAL NET SETTLEMENT. */
+const EXP_LABELS = ["Filing fees & Summons", "Process Server", "Mediation", "CME Videographer", "Deposition", "Postage", "Medical records/bills req.", "File Storage fee"];
+const MED_ROWS = () => Math.max(8, CASE().payees.filter((p) => !nonMed(p)).length + 2), NON_ROWS = 4;
 function sheetCalc(cells){
   const g = (k) => num(cells[k]), o = {};
-  o.L7 = g("L7"); o.L11 = r2(o.L7 * rate(cells.C11)); o.L20 = r2(COST_ROWS.reduce((s, r) => s + g("L" + r), 0)); o.L21 = r2(o.L11 + o.L20);
-  LEDGER_ROWS().forEach((r) => { o["I" + r] = r2(g("D" + r) - g("E" + r) - g("F" + r) - g("G" + r)); o["L" + r] = g("L" + r); });
-  o.I44 = r2(LEDGER_ROWS().reduce((s, r) => s + o["I" + r], 0)); o.L44 = r2(LEDGER_ROWS().reduce((s, r) => s + o["L" + r], 0));
-  o.N0 = r2(o.L7 - o.L11 - o.L20 - o.I44); o.L52 = r2(o.L7 - o.L11 - o.L20 - o.L44);
+  o.gross = r2([1, 2, 3].reduce((s, i) => s + g("S" + i + "a"), 0));
+  o.fee = r2(o.gross * rate(cells.FEE));
+  o.exp = r2(Array.from({ length: 8 }, (_, i) => g("X" + (i + 1) + "a")).reduce((s, x) => s + x, 0));
+  let mb = 0, mr = 0, nb = 0, nr = 0;
+  for(let i = 1; i <= MED_ROWS(); i++){ const b = r2(g("M" + i + "c") - g("M" + i + "pip") - g("M" + i + "med") - g("M" + i + "hea") - g("M" + i + "adj")); o["M" + i + "bal"] = b; mb += b; mr += g("M" + i + "red"); }
+  for(let i = 1; i <= NON_ROWS; i++){ nb += g("N" + i + "bal"); nr += g("N" + i + "red"); }
+  Object.assign(o, { medBal: r2(mb), medRed: r2(mr), nonBal: r2(nb), nonRed: r2(nr) });
+  o.netBefore = r2(o.gross - o.fee - o.exp - o.medBal - o.nonBal);
+  o.net = r2(o.gross - o.fee - o.exp - o.medRed - o.nonRed);
   return o;
 }
-// the row the trainee put a payee on (by its name)
-function rowFor(cells, p){ const k = keyOf(p); return LEDGER_ROWS().find((r) => low(cells["C" + r]).includes(k)); }
+// the row the trainee put a payee on (by its name): {k: "M" | "N", i}
+function rowFor(cells, p){
+  const k = keyOf(p), sec = nonMed(p) ? "N" : "M", n = sec === "M" ? MED_ROWS() : NON_ROWS;
+  for(let i = 1; i <= n; i++) if(low(cells[sec + i + "p"]).includes(k)) return { k: sec, i };
+  return null;
+}
 function checkSheet(stage){
   const c = CASE(), w = W(), cells = w.sheet.cells, o = sheetCalc(cells), x = expected(c, w, stage);
   const items = [
-    { what: "Gross settlement", got: o.L7, want: x.gross, why: `${c.settlements.map((s) => `${s.type} ${money(s.amount)}`).join(" + ")}. PIP is not recovery.` },
-    { what: "Attorney's fee", got: o.L11, want: x.fee, why: `${c.fee.pct} of the gross. ${c.fee.why} Type 33⅓% (or 1/3), not 33.33%.` },
-    { what: "Advanced case expenses", got: o.L20, want: x.costs, why: "Every receipted cost on the Case Cost Ledger." }
+    { what: "Settlement amount", got: o.gross, want: x.gross, why: `${c.settlements.map((s) => `${s.type} ${money(s.amount)}`).join(" + ")}. PIP is not recovery.` },
+    { what: "Attorney fees", got: o.fee, want: x.fee, why: `${c.fee.pct} of the settlement. ${c.fee.why} For one-third, type 33⅓% or 1/3 (33.33% gives a different figure).` },
+    { what: "Total expenses", got: o.exp, want: x.costs, why: "Every cost on the Case Cost Ledger." }
   ];
   x.rows.forEach((y) => {
-    const r = rowFor(cells, y.p), got = r ? (stage === "initial" ? o["I" + r] : o["L" + r]) : 0;
+    const r = rowFor(cells, y.p);
+    const got = !r ? 0 : stage === "initial" ? (r.k === "M" ? o["M" + r.i + "bal"] : num(cells["N" + r.i + "bal"])) : num(cells[r.k + r.i + "red"]);
     if(!r && y.want === 0) return;
-    items.push({ what: `${y.p.name}${stage === "initial" ? " · balance" : " · amount to pay"}`, got, want: y.want, missing: !r,
-      why: stage === "initial" ? (y.p.lien ? "The lien or payoff amount on the letter on file." : "Total charges less the payments and write-offs on the statement on file.")
-        : (y.want === 0 ? "A $0.00 balance: nothing is paid." : reducible(y.p) && w.got.approved[y.p.id] != null ? "The amount the payee approved in writing (its reply)." : y.p.reduce && y.p.reduce.policy === "contract" ? "The updated payoff: funding companies don't reduce." : y.p.reduce && y.p.reduce.policy === "statute" ? "A statutory lien: paid in full." : y.p.onFile ? "Its current balance, from the corrected bill or updated letter (no reduction approved)." : "Its current balance (no reduction approved).") });
+    items.push({ what: `${y.p.name}${stage === "initial" ? " · balance owed" : " · agreed reduction"}`, got, want: y.want, missing: !r,
+      why: stage === "initial" ? (y.p.lien ? "The lien or payoff on the letter on file." : y.p.onFile && y.p.onFile.reconcile ? "Total charges less the PIP payments on the PIP log (the provider's ledger hasn't posted them all) and any adjustments." : "Total charges less the payments and adjustments on the bill on file.")
+        : (y.want === 0 ? "$0.00: waived, or nothing is owed." : reducible(y.p) && w.got.approved[y.p.id] != null ? "The amount the payee agreed to in writing (its reply)." : y.p.reduce && y.p.reduce.policy === "contract" ? "The updated payoff: funding companies don't reduce." : y.p.reduce && y.p.reduce.policy === "statute" ? "A statutory lien: paid in full." : "Its current balance (no reduction agreed).") });
   });
-  items.push({ what: stage === "initial" ? "Total liens & balances (before reductions)" : "Total liens (reduced)", got: stage === "initial" ? o.I44 : o.L44, want: x.total, why: "The sum of the rows." });
-  items.push({ what: x.netLabel, got: stage === "initial" ? o.N0 : o.L52, want: x.net, why: "Gross – fee – expenses – liens." });
+  items.push({ what: stage === "initial" ? "Total balances owed (medical + non-medical)" : "Total agreed (medical + non-medical)", got: stage === "initial" ? r2(o.medBal + o.nonBal) : r2(o.medRed + o.nonRed), want: x.total, why: "The sum of the rows." });
+  items.push({ what: x.netLabel, got: stage === "initial" ? o.netBefore : o.net, want: x.net, why: "Settlement – fees – expenses – medical – non-medical." });
   items.forEach((i) => { i.ok = !i.missing && Math.abs(i.got - i.want) < 0.005; });
   w.checks[stage] = { at: new Date().toISOString(), passed: items.filter((i) => i.ok).length, total: items.length, ok: items.every((i) => i.ok) };
   save();
@@ -256,25 +287,28 @@ function checkSheet(stage){
 }
 
 /* ---------- the tasks, by day ---------- */
+const hasAsk = (d) => d && d.requested !== undefined && d.requested !== null && String(d.requested).trim() !== "";
 function rrValid(c, w, p){
-  const d = w.drafts.rr[p.id] || {}, f = figures(p, !!w.got.corrected[p.id] || !p.onFile);
+  const d = w.drafts.rr[p.id] || {}, f = figures(p, !!w.got.corrected[p.id] || !p.onFile || !!p.onFile.reconcile);
   const fm = /^MED\s*-\s*(.+?)\s*-\s*Reduction Request\s*\((.+)\)\s*$/i.exec(String(d.file || "").trim());
   const issues = [];
   if(!fm) issues.push("File name: MED - Provider's name - Reduction Request (your first name only)");
   else { if(!low(fm[1]).includes(keyOf(p))) issues.push(`File name: the provider's name (${p.name}) goes in the middle`); if(traineeFirst() && low(fm[2]).trim() !== low(traineeFirst())) issues.push(`File name: your first name only in the brackets (${traineeFirst()})`); }
-  if(Math.abs(num(d.balance) - f.balance) >= 0.005) issues.push(`Current balance: ${money(num(d.balance))} isn't the balance on the ${w.got.corrected[p.id] || !p.onFile ? "current" : "statement on file"} (${money(f.balance)})`);
-  if(!(num(d.requested) > 0 && num(d.requested) < f.balance)) issues.push("Requested amount: more than $0.00 and less than the current balance");
-  if(!d.client || !low(d.client).includes(low(c.client.last))) issues.push("Patient: LAST NAME, FIRST NAME of the client");
+  if(Math.abs(num(d.balance) - f.balance) >= 0.005) issues.push(`Balance Due: ${money(num(d.balance))} isn't the current balance (${money(f.balance)})`);
+  if(!p.lien && Math.abs(num(d.pip) - f.pip) >= 0.005) issues.push(`PIP Payment(s): ${money(num(d.pip))}; the PIP log shows ${money(f.pip)} paid to this provider`);
+  if(!hasAsk(d) || !(num(d.requested) >= 0 && num(d.requested) < f.balance)) issues.push("The reduced amount: $0.00 (waive) up to less than the balance");
+  if(!d.client || !low(d.client).includes(low(c.client.last))) issues.push("Client/Patient: the client's full name");
+  if(String(d.dol || "").trim() !== c.dol) issues.push(`Date of Loss: ${c.dol}`);
   return issues;
 }
 function csIssues(c, w){
   const d = w.drafts.cs || {}, x = expected(c, w, "final"), issues = [];
   const fm = /^(.+?)\s*[–-]\s*Closing Statement\s*\((.+)\)\s*$/i.exec(String(d.file || "").trim());
   if(!fm || !low(fm[1]).includes(low(c.client.first)) || !low(fm[1]).includes(low(c.client.last))) issues.push("File name: Client's Name – Closing Statement (your name)");
-  [["gross", x.gross, "Gross settlement"], ["fee", x.fee, "Attorney's fee"], ["costs", x.costs, "Case expenses"], ["net", x.net, "Net to client"]].forEach(([k, want, label]) => { if(Math.abs(num(d[k]) - want) >= 0.005) issues.push(`${label}: ${money(num(d[k]))} doesn't match the final figures (${money(want)})`); });
+  [["gross", x.gross, "Total gross settlement"], ["fee", x.fee, "Attorney fees"], ["costs", x.costs, "Total costs and expenses"], ["net", x.net, "Total net settlement"]].forEach(([k, want, label]) => { if(Math.abs(num(d[k]) - want) >= 0.005) issues.push(`${label}: ${money(num(d[k]))} doesn't match the final figures (${money(want)})`); });
   x.rows.forEach((y) => { if(Math.abs(num((d.pay || {})[y.p.id]) - y.want) >= 0.005) issues.push(`${y.p.name}: ${money(num((d.pay || {})[y.p.id]))}, the final figure is ${money(y.want)}`); });
   const o = sheetCalc(w.sheet.cells);
-  if(Math.abs(o.L52 - num(d.net)) >= 0.005) issues.push(`The net must match your Net Sheet exactly (your sheet: ${money(o.L52)})`);
+  if(Math.abs(o.net - num(d.net)) >= 0.005) issues.push(`The net must match your Net Sheet exactly (your sheet: ${money(o.net)})`);
   return issues;
 }
 function tasks(stage){
@@ -284,8 +318,8 @@ function tasks(stage){
     { t: "Open the Settlement Release Form(s) in the Case File", ok: c.settlements.every((s) => w.viewed["release-" + s.type]) },
     { t: "Email the Settlement Release(s) to your trainer", ok: !!w.got.releaseSent },
     { t: "Receive the fully executed release", ok: !!w.got.exec },
-    { t: "Draft the initial Net Sheet (the bills and liens as on file)", ok: !!(w.checks.initial && w.checks.initial.ok) },
-    { t: `Draft the Reduction Request${red.length > 1 ? "s" : ""} (${red.length}), ready to send`, ok: red.every((p) => w.drafts.rr[p.id] && w.drafts.rr[p.id].file && num(w.drafts.rr[p.id].requested) > 0) }
+    { t: "Draft the initial Net Sheet (each balance squared with the PIP log)", ok: !!(w.checks.initial && w.checks.initial.ok) },
+    { t: `Draft the Reduction Request${red.length > 1 ? "s" : ""} (${red.length}), ready to send`, ok: red.every((p) => w.drafts.rr[p.id] && w.drafts.rr[p.id].file && hasAsk(w.drafts.rr[p.id])) }
   ];
   return [
     { t: "Request updated bills and payoffs where the file is out of date", ok: outdated(c).every((p) => w.got.corrected[p.id]) },
@@ -373,7 +407,7 @@ function respond(c, w, out){
       <table><tr><th>Account</th><th class="m">Amount</th></tr><tr><td>Current balance</td><td class="m">${money(cur.balance)}</td></tr><tr><td>Amount requested</td><td class="m">${money(ask)}</td></tr><tr class="tot"><td>APPROVED AS PAYMENT IN FULL</td><td class="m">${money(approved)}</td></tr></table>
       <p>${E(p.reduce.why || "")}</p><p>This approval is valid for 30 days. Upon receipt of ${money(approved)}, the account will be considered paid in full and closed.</p>`);
     deliver(w, Object.assign({ subject: re, body: ask >= floor
-      ? `Good day,\n\nThank you for your request. We accept ${money(approved)} as payment in full for ${lf}'s account (balance ${money(cur.balance)}). Our written approval is attached.` + sig(p.lien ? "Recovery Department" : "Billing Department", p.name)
+      ? (approved === 0 ? `Good day,\n\nThank you for your request. We agree to waive the outstanding balance of ${money(cur.balance)} on ${lf}'s account: $0.00 is due. Our signed acceptance is attached.` : `Good day,\n\nThank you for your request. We accept ${money(approved)} as payment in full for ${lf}'s account (balance ${money(cur.balance)}). Our signed acceptance is attached.`) + sig(p.lien ? "Recovery Department" : "Billing Department", p.name)
       : `Good day,\n\nThank you for your request. We are unable to accept ${money(ask)}. The lowest we can accept is ${money(floor)} as payment in full for ${lf}'s account (balance ${money(cur.balance)}). Our written offer is attached; please use this figure.` + sig(p.lien ? "Recovery Department" : "Billing Department", p.name),
       att: [{ kind: "reply", ref: "approval-" + p.id, name: `${ask >= floor ? "Reduction Approval" : "Counter-Offer"} · ${p.name}`, html: letter }] }, from), 2600);
     return;
@@ -467,46 +501,50 @@ function vMail(c, w){
 }
 function vSheet(c, w){
   const cells = w.sheet.cells, o = sheetCalc(cells);
-  const inp = (k, cls) => `<input class="ld-in ${cls || ""}" data-k="${k}" value="${E(cells[k] != null ? cells[k] : "")}">`;
+  const inp = (k, cls, ph) => `<input class="ld-in ${cls || ""}" data-k="${k}" value="${E(cells[k] != null ? cells[k] : "")}"${ph ? ` placeholder="${E(ph)}"` : ""}>`;
   const out = (k) => `<output data-o="${k}">${money(o[k])}</output>`;
-  const res = (stage) => { const r = UI.checks[stage]; return r ? `<div class="ld-check"><b>${r.every((i) => i.ok) ? "✓ Your sheet ties out" : `${r.filter((i) => i.ok).length} of ${r.length} tie out`}</b><ul>${r.map((i) => `<li class="${i.ok ? "ok" : "miss"}">${i.ok ? "✓" : "✗"} ${E(i.what)}: ${i.ok ? money(i.want) : i.missing ? `no row for it (put the name in Provider Name)` : `${money(i.got)}, the file says ${money(i.want)}`}${i.ok ? "" : ` <small>${E(i.why)}</small>`}</li>`).join("")}</ul></div>` : (w.checks[stage] ? `<p class="ld-muted">Last check (${stage}): ${w.checks[stage].passed}/${w.checks[stage].total}</p>` : ""); };
+  const res = (stage) => { const r = UI.checks[stage]; return r ? `<div class="ld-check"><b>${r.every((i) => i.ok) ? "✓ Your sheet ties out" : `${r.filter((i) => i.ok).length} of ${r.length} tie out`}</b><ul>${r.map((i) => `<li class="${i.ok ? "ok" : "miss"}">${i.ok ? "✓" : "✗"} ${E(i.what)}: ${i.ok ? money(i.want) : i.missing ? `no row for it (put the name in the Provider / Entity column)` : `${money(i.got)}, the file says ${money(i.want)}`}${i.ok ? "" : ` <small>${E(i.why)}</small>`}</li>`).join("")}</ul></div>` : (w.checks[stage] ? `<p class="ld-muted">Last check (${stage}): ${w.checks[stage].passed}/${w.checks[stage].total}</p>` : ""); };
+  const med = Array.from({ length: MED_ROWS() }, (_, j) => j + 1), non = Array.from({ length: NON_ROWS }, (_, j) => j + 1);
   return `<div class="ld-card ld-sheet">
-    <div class="ld-row"><h2 style="margin:0;flex:1">LSH Net Sheet · ${E(c.client.first)} ${E(c.client.last)}</h2><button class="btn btn-sm btn-navy" onclick="LNDesk.check('initial')">✓ Check initial sheet (Day 2)</button><button class="btn btn-sm btn-primary" onclick="LNDesk.check('final')">✓ Check final sheet (Day 3)</button></div>
+    <div class="ld-row"><h2 style="margin:0;flex:1">NET SETTLEMENT CALCULATIONS · ${E(clientLF(c))}</h2><button class="btn btn-sm btn-navy" onclick="LNDesk.check('initial')">✓ Check initial sheet (Day 2)</button><button class="btn btn-sm btn-primary" onclick="LNDesk.check('final')">✓ Check final sheet (Day 3)</button></div>
     ${res("initial")}${res("final")}
-    <h3>1. Settlement Recovery Summary</h3><table class="ld-t"><tr><th>Description</th><th>Reference</th><th class="m">Amount</th></tr><tr><td>Gross Settlement</td><td>${inp("C7", "wide")}</td><td class="m">${inp("L7")}</td></tr></table>
-    <h3>2. Attorney Fees &amp; Advanced Case Expenses</h3><table class="ld-t"><tr><th>Expense</th><th>Details</th><th class="m">Amount</th></tr>
-      <tr><td>Attorney Fees</td><td>${inp("C11", "pct")} <small>of the gross (33⅓% pre-suit, 40% once suit is filed)</small></td><td class="m">${out("L11")}</td></tr>
-      ${COST_ROWS.map((r) => `<tr><td>${inp("B" + r)}</td><td>${inp("C" + r, "wide")}</td><td class="m">${inp("L" + r)}</td></tr>`).join("")}
-      <tr class="tot"><td colspan="2">Total Advanced Case Expenses</td><td class="m">${out("L20")}</td></tr><tr class="tot"><td colspan="2">Total Fees &amp; Costs</td><td class="m">${out("L21")}</td></tr></table>
-    <h3>3. Medical Provider Ledger &amp; Liens</h3><div class="ld-scroll"><table class="ld-t"><tr><th>Type</th><th>Provider / Lienholder Name</th><th class="m">Total Charges</th><th class="m">PIP Payments</th><th class="m">Health Payments</th><th class="m">Adjustments</th><th class="m">Balance Owed</th><th class="m">Reduced / Final</th></tr>
-      ${LEDGER_ROWS().map((r) => `<tr><td>${inp("B" + r)}</td><td>${inp("C" + r, "wide")}</td>${["D", "E", "F", "G"].map((k) => `<td class="m">${inp(k + r)}</td>`).join("")}<td class="m">${out("I" + r)}</td><td class="m">${inp("L" + r)}</td></tr>`).join("")}
-      <tr class="tot"><td colspan="6">Total</td><td class="m">${out("I44")}</td><td class="m">${out("L44")}</td></tr></table></div>
-    <h3>4. Final Client Disbursement</h3><table class="ld-t"><tr><td>Gross Settlement – Fees – Expenses – Balances (before reductions)</td><td class="m">${out("N0")}</td></tr><tr class="tot"><td>NET CLIENT DISBURSEMENT (with the reduced / final amounts)</td><td class="m">${out("L52")}</td></tr></table>
+    <h3>Settlement amount</h3><table class="ld-t"><tr><th>Insurance</th><th>Claim #</th><th class="m">Offer / Settlement</th></tr>
+      ${[1, 2, 3].map((i) => `<tr><td>${inp("S" + i + "c", "wide", i === 1 ? "Insurance company" : "")}</td><td>${inp("S" + i + "n", "wide")}</td><td class="m">${inp("S" + i + "a")}</td></tr>`).join("")}
+      <tr class="tot"><td colspan="2">SETTLEMENT AMOUNT</td><td class="m">${out("gross")}</td></tr>
+      <tr><td>ATTY FEES</td><td>${inp("FEE", "pct", "33⅓%")} <small>from the retainer</small></td><td class="m">${out("fee")}</td></tr></table>
+    <h3>Expense log</h3><table class="ld-t"><tr><th>Expense</th><th class="m">Amount</th></tr>
+      ${EXP_LABELS.map((l, j) => `<tr><td>${inp("X" + (j + 1) + "l", "wide", l)}</td><td class="m">${inp("X" + (j + 1) + "a")}</td></tr>`).join("")}
+      <tr class="tot"><td>TOTAL EXPENSES</td><td class="m">${out("exp")}</td></tr></table>
+    <h3>Medical bills</h3><div class="ld-scroll"><table class="ld-t"><tr><th>Type</th><th>Med Provider</th><th class="m">Total Charges</th><th class="m">PIP Payments</th><th class="m">Med Payments</th><th class="m">Health Payments</th><th class="m">Adjustments</th><th class="m">Balance Owed</th><th class="m">Agreed Reduction</th><th class="m">Max Offer</th></tr>
+      ${med.map((i) => `<tr><td>${inp("M" + i + "t")}</td><td>${inp("M" + i + "p", "wide")}</td>${["c", "pip", "med", "hea", "adj"].map((k) => `<td class="m">${inp("M" + i + k)}</td>`).join("")}<td class="m">${out("M" + i + "bal")}</td><td class="m">${inp("M" + i + "red")}</td><td class="m">${inp("M" + i + "max")}</td></tr>`).join("")}
+      <tr class="tot"><td colspan="7">TOTAL MEDICAL</td><td class="m">${out("medBal")}</td><td class="m">${out("medRed")}</td><td></td></tr></table></div>
+    <h3>Non medical</h3><table class="ld-t"><tr><th>Type</th><th>Entity</th><th class="m">Balance Owed</th><th class="m">Agreed Reduction</th></tr>
+      ${non.map((i) => `<tr><td>${inp("N" + i + "t", "", ["Pre-Settlement Funding", "Prior Attorney", "Child Support", ""][i - 1])}</td><td>${inp("N" + i + "p", "wide")}</td><td class="m">${inp("N" + i + "bal")}</td><td class="m">${inp("N" + i + "red")}</td></tr>`).join("")}
+      <tr class="tot"><td colspan="2">NON MEDICAL TOTAL OWED</td><td class="m">${out("nonBal")}</td><td class="m">${out("nonRed")}</td></tr></table>
+    <h3>Total net settlement</h3><table class="ld-t"><tr><td>Before reductions (settlement – fees – expenses – balances owed)</td><td class="m">${out("netBefore")}</td></tr><tr class="tot"><td>TOTAL NET SETTLEMENT (with the agreed reductions)</td><td class="m">${out("net")}</td></tr></table>
   </div>`;
 }
 function vDrafts(c, w){
   const kinds = c.payees.map((p) => ({ k: "rr:" + p.id, label: `Reduction Request · ${p.name}`, p })).concat([{ k: "cs", label: "Closing Statement" }]);
   const cur = kinds.find((x) => x.k === UI.draft) || kinds[0];
+  const fld = (d, k, label, ph) => `<label>${label}<input data-d="${k}" value="${E(d[k] != null ? d[k] : "")}"${ph ? ` placeholder="${E(ph)}"` : ""}></label>`;
   let form, preview, issues = [];
   if(cur.k === "cs"){
     const d = w.drafts.cs = w.drafts.cs || {};
     issues = d.file ? csIssues(c, w) : [];
-    form = `<label>File name<input data-d="file" value="${E(d.file || "")}" placeholder="${E(c.client.first)} ${E(c.client.last)} – Closing Statement (your name)"></label>
-      <label>Date<input data-d="date" value="${E(d.date || todayStr())}"></label>
-      <label>Gross settlement<input data-d="gross" value="${E(d.gross || "")}"></label><label>Fee %<input data-d="feePct" value="${E(d.feePct || "")}" placeholder="33⅓%"></label><label>Attorney's fee<input data-d="fee" value="${E(d.fee || "")}"></label><label>Case expenses<input data-d="costs" value="${E(d.costs || "")}"></label>
-      <fieldset><legend>Paid from the settlement</legend>${c.payees.map((p) => `<label>${E(p.name)}<input data-p="${p.id}" value="${E((d.pay || {})[p.id] || "")}" placeholder="0.00 if nothing is owed"></label>`).join("")}</fieldset>
-      <label>Net to client<input data-d="net" value="${E(d.net || "")}"></label>`;
+    form = `${fld(d, "file", "File name", `${c.client.first} ${c.client.last} – Closing Statement (your name)`)}${fld(d, "date", "Date", todayStr())}
+      ${fld(d, "gross", "Total gross settlement")}${fld(d, "feePct", "Attorney fees %", "33.33%")}${fld(d, "fee", "Attorney fees")}${fld(d, "costs", "Total costs and expenses")}
+      <p class="ld-muted">The facilities' charges, payments and balances come from your Net Sheet.</p>
+      <fieldset><legend>Paid from the settlement (reduced, waived or in full)</legend>${c.payees.map((p) => `<label>${E(p.name)}<input data-p="${p.id}" value="${E((d.pay || {})[p.id] != null ? d.pay[p.id] : "")}" placeholder="0.00 if waived or nothing is owed"></label>`).join("")}</fieldset>
+      ${fld(d, "net", "Total net settlement")}`;
     preview = { html: () => docCS(c, d, false) };
   } else {
     const p = cur.p, d = w.drafts.rr[p.id] = w.drafts.rr[p.id] || {};
     issues = d.file ? rrValid(c, w, p) : [];
-    form = `<p class="ld-muted">${p.reduce && p.reduce.floor == null ? (p.reduce.policy === "zero" ? "Check the statement first: is anything owed?" : p.reduce.policy === "statute" ? "A statutory lien: check the notice before you ask." : "Funding companies rarely reduce: their payoff is contractual. You can still ask.") : ""}</p>
-      <label>File name<input data-d="file" value="${E(d.file || "")}" placeholder="MED - ${E(p.name.split(" —")[0])} - Reduction Request (your first name)"></label>
-      <label>Date<input data-d="date" value="${E(d.date || todayStr())}"></label>
-      <label>Patient (LAST, FIRST)<input data-d="client" value="${E(d.client || "")}" placeholder="${E(clientLF(c))}"></label><label>Date of loss<input data-d="dol" value="${E(d.dol || "")}" placeholder="mm/dd/yyyy"></label>
-      <label>Total charges<input data-d="charges" value="${E(d.charges || "")}"></label><label>Payments &amp; adjustments<input data-d="paid" value="${E(d.paid || "")}"></label><label>Current balance<input data-d="balance" value="${E(d.balance || "")}"></label><label>Requested amount (payment in full)<input data-d="requested" value="${E(d.requested || "")}"></label>
-      <fieldset><legend>Persuasive documentation</legend>${["The settlement is limited to the available policy limits.", "Total medical bills and liens exceed what the settlement can pay in full.", "Our client faces financial hardship from the injuries and lost time from work.", "The firm is reducing its own fee and costs so the client receives a fair recovery."].map((t) => `<label class="ld-chk"><input type="checkbox" data-r="${E(t)}" ${(d.reasons || []).includes(t) ? "checked" : ""}> ${E(t)}</label>`).join("")}</fieldset>
-      <label>Note (optional)<textarea data-d="note" rows="2">${E(d.note || "")}</textarea></label>`;
+    form = `<p class="ld-muted">${p.reduce && p.reduce.floor == null ? (p.reduce.policy === "zero" ? "Check the bill first: is anything owed?" : p.reduce.policy === "statute" ? "A statutory lien: check the notice before you ask." : "Funding companies rarely reduce: their payoff is contractual. You can still ask.") : "Waive the balance (to $0.00) or reduce it."}</p>
+      ${fld(d, "file", "File name", `MED - ${p.name.split(" —")[0]} - Reduction Request (your first name)`)}${fld(d, "date", "Date", todayStr())}${fld(d, "via", "Via", "VIA EMAIL: " + p.email)}
+      ${fld(d, "client", "Client/Patient", `${c.client.first} ${c.client.last}`.toUpperCase())}${p.lien ? "" : fld(d, "pip", "PIP Payment(s)", "from the PIP log")}${fld(d, "dob", "Date of Birth")}${fld(d, "dol", "Date of Loss", "mm/dd/yyyy")}
+      ${fld(d, "balance", "Balance Due")}${fld(d, "requested", "Reduce the balance to (0.00 to waive)")}`;
     preview = { html: () => docRR(c, p, d) };
   }
   return `<div class="ld-split"><nav class="ld-list">${kinds.map((x) => `<button class="${x.k === cur.k ? "on" : ""}" onclick="LNDesk.draft('${x.k}')">${E(x.label)}</button>`).join("")}</nav>

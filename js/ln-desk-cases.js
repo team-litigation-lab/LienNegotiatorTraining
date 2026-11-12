@@ -37,6 +37,12 @@
                                         a pre-accident visit, an unrelated charge)
                     onFile.extra        a health lien itemization on file with unrelated charges ({date, desc, amount});
                                         its onFile.amount includes them, and the updated itemization drops them
+     client.spouse       a spouse who joins the release (loss of consortium): the closing statement is paid to both
+     source              the original activity a case is rewritten from (Jane / John / James Doe)
+     onFile.reconcile    the provider's own ledger lags the PIP log: the trainee squares the bill with the PIP log
+                         (the initial Net Sheet expects the PIP-log figures), and the updated bill confirms them
+     fee.retainer        the retainer's fee terms, when they aren't the standard pre-suit / suit tiers
+     venue {state, county}  where the release is notarized
      settlements[].note  anything else the settlement letter says (e.g. property damage paid separately)
      challenges   what the trainee has to catch (shown to a trainer only)
    ============================================================ */
@@ -50,6 +56,235 @@ window.LN_FIRM = {
 };
 
 window.LN_CASES = [
+  {
+    id: "johndoe",
+    source: "The demo's case (Activity 1.2 and the closing statement activity, La'norris Campbell: the demo's John Test Doe)",
+    client: { first: "John", last: "Doe", spouse: "Mary Doe", he: "he", dob: "08/13/1990", phone: "(239) 555-0144", email: "john.doe@mail.example", address: "4419 Palm Tree Blvd, Cape Coral, FL 33904" },
+    venue: { state: "Florida", county: "Lee" },
+    dol: "07/01/2025", caseNo: "LSH-2025-MVA-070122",
+    facts: "Motor vehicle accident in Fort Myers, FL. His wife, Mary Doe, joins the release (loss of consortium).",
+    injury: "Neck and back sprain/strain; chiropractic and therapy, MRI.",
+    settlements: [
+      { type: "BI", carrier: "Gulfline Casualty Company", insured: "Renee Starling", claimNo: "8678440420-2", amount: 10000, date: "04/13/2026", adjuster: "Harold Hines", note: "BI release, single person: John Doe and Mary Doe both sign it." }
+    ],
+    fee: { pct: "33⅓%", why: "Settled before suit: one-third (the demo's net sheet: I3/3)." },
+    costs: [
+      { label: "Filing fees & Summons", amount: 414 },
+      { label: "Postage", amount: 28.48 },
+      { label: "File Storage fee", amount: 250 }
+    ],
+    pip: { carrier: "Gulfline Casualty Company (PIP)", limit: 10000, payments: [
+      { to: "MediVista, Inc.", date: "12/29/2025", amount: 194.48 }, { to: "MediVista, Inc.", date: "12/29/2025", amount: 261.97 },
+      { to: "Shreeve MRI (S. Viroja, P.A.)", date: "12/22/2025", amount: 2974.62 },
+      { to: "Colonnade Post Rehab Center", date: "12/29/2025", amount: 405.52 }, { to: "Colonnade Post Rehab Center", date: "12/29/2025", amount: 3665.87 },
+      { to: "Colonnade Post Rehab Center", date: "12/29/2025", amount: 1072.5 }, { to: "Colonnade Post Rehab Center", date: "12/29/2025", amount: 652.32 },
+      { to: "Colonnade Post Rehab Center", date: "12/29/2025", amount: 201.65 }, { to: "Colonnade Post Rehab Center", date: "01/03/2026", amount: 274.8 }
+    ] },
+    payees: [
+      { id: "colonnade", type: "Chiro", name: "Colonnade Post Rehab Center", email: "billing@colonnaderehab.example",
+        address: "2160 Winkler Ave, Ste 3, Fort Myers, FL 33901", dos: "07/11/2025 – 11/22/2025",
+        lines: [
+          { date: "07/11/2025 – 07/12/2025", code: "99203/98941/97535", desc: "New patient exam, adjustment, therapy", amount: 1101.42 },
+          { date: "07/12/2025 – 07/28/2025", code: "97110/97112/97530/98941", desc: "Chiropractic & therapy visits", amount: 6420.04 },
+          { date: "09/26/2025 – 10/18/2025", code: "97110/98941", desc: "Chiropractic & therapy visits", amount: 1681.94 },
+          { date: "10/27/2025 – 11/03/2025", code: "97110/98941", desc: "Chiropractic & therapy visits", amount: 1022.48 },
+          { date: "11/08/2025 – 11/22/2025", code: "97110/98941", desc: "Chiropractic & therapy visits", amount: 793.21 },
+          { date: "07/13/2025 – 08/29/2025", code: "97012/97014/97035", desc: "Modalities (traction, e-stim, ultrasound)", amount: 3111.70 }
+        ],
+        pip: 6272.66, health: 0, adj: 0,
+        onFile: { asOf: "05/08/2026", pip: 6286.2, reconcile: true },
+        reduce: { floor: 700 } },
+      { id: "shreeve", type: "MRI", name: "Shreeve MRI (S. Viroja, P.A.)", email: "billing@shreevemri.example",
+        address: "9400 Gladiolus Dr, Ste 140, Fort Myers, FL 33908", dos: "09/08/2025",
+        lines: [
+          { date: "09/08/2025", code: "72141", desc: "MRI cervical spine without contrast", amount: 2700 },
+          { date: "09/08/2025", code: "72148", desc: "MRI lumbar spine without contrast", amount: 2700 }
+        ],
+        pip: 2974.62, health: 0, adj: 1681.73, reduce: { floor: 250 } },
+      { id: "medivista", type: "EMC", name: "MediVista, Inc.", email: "billing@medivista.example",
+        address: "78 NE 5th Avenue, Delray Beach, FL 33483", dos: "08/04/2025",
+        lines: [
+          { date: "08/04/2025", code: "99203", desc: "Emergency medical condition evaluation", amount: 375 },
+          { date: "08/04/2025", code: "99070", desc: "Supplies", amount: 250 }
+        ],
+        pip: 456.45, health: 0, adj: 0, reduce: { floor: 0 } },
+      { id: "palmetto", type: "Urgent care (health insurance)", name: "Palmetto Urgent Care", email: "billing@palmettourgentcare.example",
+        address: "13691 Metro Pkwy, Fort Myers, FL 33912", dos: "07/02/2025",
+        lines: [{ date: "07/02/2025", code: "99204", desc: "Urgent care visit, X-rays", amount: 480 }],
+        pip: 0, health: 312, adj: 168, reduce: { floor: null, policy: "zero" } },
+      { id: "sunshine", type: "Health subrogation lien", lien: true, name: "Sunshine Health Plan — Recovery", email: "recovery@sunshinehealthplan.example",
+        address: "PO Box 459087, Fort Lauderdale, FL 33345", amount: 312,
+        plan: "Fully insured group plan (Mary's employer). Not self-funded: Florida law, so the common-fund (procurement cost) reduction applies.",
+        notice: "Sunshine Health Plan paid $312.00 to Palmetto Urgent Care for care related to the 07/01/2025 accident and asserts its right of reimbursement.",
+        reduce: { floor: 208, why: "Pro-rata procurement costs: one-third off $312.00." } },
+      { id: "harbor", type: "Pre-settlement funding", lien: true, name: "Harbor Pre-Settlement Funding", email: "payoffs@harborpsf.example",
+        address: "1515 Broadway, Ste 300, Fort Myers, FL 33901", amount: 1315,
+        onFile: { asOf: "03/31/2026", amount: 1240 },
+        notice: "Harbor Pre-Settlement Funding advanced $900.00 to John Doe on 11/10/2025. The payoff grows monthly and is good only through the date stated on it.",
+        reduce: { floor: null, policy: "contract" } }
+    ],
+    challenges: [
+      "Colonnade's ledger posts $6,286.20 in payments, but the PIP log shows $6,272.66 paid to it: square the bill with the PIP log (balance $7,858.13), as the demo does. Its updated bill confirms it.",
+      "Shreeve MRI: $5,400.00 – PIP $2,974.62 – adjustment $1,681.73 = $743.65 (reduced to $250.00). MediVista: $168.55, waived to $0.00.",
+      "Mary Doe joins the release: the closing statement is paid to JOHN DOE & MARY DOE (as husband and wife), and both sign it.",
+      "Sunshine Health paid Palmetto's visit ($312.00): Palmetto has nothing owed; the plan's lien reduces by one-third to $208.00.",
+      "Harbor's payoff on file expired 03/31/2026: updated payoff $1,315.00."
+    ]
+  },
+  {
+    id: "janedoe",
+    source: "Activity 1.1 (Francesse)",
+    client: { first: "Jane", last: "Doe", he: "she", dob: "04/19/1990", phone: "(407) 555-0162", email: "jane.doe@mail.example", address: "1180 Lake Underhill Rd, Orlando, FL 32803" },
+    venue: { state: "Florida", county: "Orange" },
+    dol: "01/23/2026", caseNo: "LSH-2026-UMB-012323",
+    facts: "Motor vehicle accident; UM bodily injury claim under the family's auto policy (named insured Marie Doe). A suit was filed before it settled.",
+    injury: "Neck and back injuries; chiropractic and rehab, MRI.",
+    settlements: [
+      { type: "UM", carrier: "Marquis Indemnity Company of America", insured: "Marie Doe (named insured)", claimNo: "FLPA-00096397", amount: 10000, date: "07/25/2026", adjuster: "Cynthia Rowe", note: "For payment resulting from your UMBI claim of 01/23/2026." }
+    ],
+    fee: { pct: "40%", why: "A lawsuit was filed (the process server is on the ledger): the retainer's 40% tier (the activity's net sheet: 0.4)." },
+    costs: [
+      { label: "Process Server", amount: 135.55 },
+      { label: "Medical records/bills req.", amount: 69.64 },
+      { label: "File Storage fee", amount: 250 }
+    ],
+    pip: { carrier: "Marquis Indemnity Company of America (PIP)", limit: 10000, payments: [
+      { to: "Brightcare Rehab & Wellness, Inc.", date: "03/08/2026", amount: 2500 }, { to: "Brightcare Rehab & Wellness, Inc.", date: "04/22/2026", amount: 230.28 },
+      { to: "Brightcare Rehab & Wellness, Inc.", date: "04/22/2026", amount: 460.56 }, { to: "Brightcare Rehab & Wellness, Inc.", date: "05/01/2026", amount: 548.43 },
+      { to: "Brightcare Rehab & Wellness, Inc.", date: "05/01/2026", amount: 689.48 }, { to: "Brightcare Rehab & Wellness, Inc.", date: "06/12/2026", amount: 618.14 },
+      { to: "Brightcare Rehab & Wellness, Inc.", date: "06/15/2026", amount: 309.07 }, { to: "Brightcare Rehab & Wellness, Inc.", date: "06/15/2026", amount: 309.07 },
+      { to: "Brightcare Rehab & Wellness, Inc.", date: "07/06/2026", amount: 1193.63 }, { to: "Brightcare Rehab & Wellness, Inc.", date: "08/01/2026", amount: 309.07 },
+      { to: "HighView Mobile MRI", date: "03/02/2026", amount: 1831.74 },
+      { to: "Good Hope Health, Inc.", date: "06/21/2026", amount: 266.61 }
+    ] },
+    payees: [
+      { id: "brightcare", type: "Chiro", name: "Brightcare Rehab & Wellness, Inc.", email: "billing@brightcarerehab.example",
+        address: "885 N. Powers Dr, Ste B, Orlando, FL 32818", dos: "01/23/2026 – 08/09/2026",
+        lines: [
+          { date: "01/23/2026", code: "99213/L0637/E0730", desc: "Evaluation, lumbar support, TENS unit", amount: 3637.17 },
+          { date: "01/25/2026 – 03/23/2026", code: "98941/97110/97112/97530", desc: "Chiropractic & rehab visits", amount: 5410.62 },
+          { date: "04/10/2026 – 05/22/2026", code: "98941/97110/97112/97530", desc: "Chiropractic & rehab visits", amount: 4313.21 },
+          { date: "07/03/2026 – 08/09/2026", code: "98941/97110/97112/97530", desc: "Chiropractic & rehab visits", amount: 2460.57 }
+        ],
+        pip: 7167.73, health: 0, adj: 0,
+        onFile: { asOf: "08/23/2026", pip: 6858.66, reconcile: true },
+        reduce: { floor: 500 } },
+      { id: "highview", type: "MRI", name: "HighView Mobile MRI", email: "billing@highviewmri.example",
+        address: "8927 Hypoluxo Rd, Ste A4, Lake Worth, FL 33467", dos: "02/12/2026",
+        lines: [
+          { date: "02/12/2026", code: "72141", desc: "MRI neck, cervical spine without dye", amount: 1900 },
+          { date: "02/12/2026", code: "72148", desc: "MRI lumbar spine without dye", amount: 1950 }
+        ],
+        pip: 1831.74, health: 0, adj: 0,
+        onFile: { asOf: "05/10/2026", pip: 1657.84, reconcile: true },
+        reduce: { floor: 900 } },
+      { id: "goodhope", type: "EMC", name: "Good Hope Health, Inc.", email: "billing@goodhopehealth.example",
+        address: "6150 Metrowest Blvd, Ste 202, Orlando, FL 32835", dos: "03/22/2026",
+        lines: [{ date: "03/22/2026", code: "99204", desc: "Office/outpatient visit", amount: 450 }],
+        pip: 266.61, health: 0, adj: 116.74, reduce: { floor: 0 } },
+      { id: "conway", type: "Urgent care (health insurance)", name: "Conway Walk-In Clinic", email: "billing@conwaywalkin.example",
+        address: "4400 Curry Ford Rd, Orlando, FL 32812", dos: "01/24/2026",
+        lines: [{ date: "01/24/2026", code: "99203", desc: "Walk-in visit", amount: 390 }],
+        pip: 0, health: 245, adj: 145, reduce: { floor: null, policy: "zero" } },
+      { id: "floridian", type: "Health subrogation lien", lien: true, name: "Floridian Health Plans — Subrogation", email: "subro@floridianhealth.example",
+        address: "PO Box 2810, Tampa, FL 33601", amount: 245,
+        plan: "Fully insured individual plan (Florida). The common-fund reduction applies, at the fee actually charged (40%).",
+        notice: "Floridian Health Plans paid $245.00 to Conway Walk-In Clinic for care related to the 01/23/2026 accident and asserts its right of reimbursement.",
+        reduce: { floor: 147, why: "Pro-rata procurement costs at the 40% fee charged: $98.00 off $245.00." } },
+      { id: "keel", type: "Pre-settlement funding", lien: true, name: "Keel Pre-Settlement Funding", email: "payoffs@keelfunding.example",
+        address: "200 S. Orange Ave, Ste 1900, Orlando, FL 32801", amount: 925,
+        onFile: { asOf: "06/30/2026", amount: 860 },
+        notice: "Keel Pre-Settlement Funding advanced $600.00 to Jane Doe on 03/15/2026. The payoff grows monthly and is good only through the date stated on it.",
+        reduce: { floor: null, policy: "contract" } }
+    ],
+    challenges: [
+      "Brightcare's ledger posts $6,858.66 of PIP payments; the PIP log shows $7,167.73 paid to it (ten payments). Total charges $15,821.57 – $7,167.73 = $8,653.84 owed (reduced to $500.00).",
+      "HighView MRI's statement shows a $1,657.84 insurance payment; the PIP log shows $1,831.74. Balance $2,018.26, not $2,192.16 (reduced to $900.00).",
+      "Good Hope: $450.00 – PIP $266.61 – provider discount $116.74 = $66.65, waived to $0.00.",
+      "The fee is 40% (suit filed). PIP paid $9,266.08 in all against the $10,000.00 limit, after the $500.00 deductible.",
+      "Floridian's lien reduces at the 40% fee charged: $147.00. Keel's payoff on file expired 06/30/2026: updated payoff $925.00."
+    ]
+  },
+  {
+    id: "jamesdoe",
+    source: "Activity 2 (Maniram)",
+    client: { first: "James", last: "Doe", he: "he", dob: "02/11/1979", phone: "(239) 555-0117", email: "james.doe@mail.example", address: "516 Williams Ave, Lehigh Acres, FL 33972" },
+    venue: { state: "Florida", county: "Lee" },
+    dol: "05/10/2025", caseNo: "LSH-2025-MVA-051022",
+    facts: "Motor vehicle accident. BI settled at the at-fault driver's limits; the UM/UIM claim settled after suit was filed, with a dismissal with prejudice.",
+    injury: "Cervical and lumbar disc displacement, facet syndrome; therapy, orthopedics, MRI, chiropractic.",
+    settlements: [
+      { type: "BI", carrier: "Paramount American Insurance Company", insured: "Derek Hale", claimNo: "226286023", amount: 10000, date: "03/21/2026", adjuster: "Paula Grant", note: "Full and final settlement of all bodily injury claims (Liability to Others, Bodily Injury)." },
+      { type: "UM", carrier: "Paramount American Insurance Company", insured: "James Doe (own UM/UIM policy)", claimNo: "22-2993042", amount: 25000, date: "07/18/2026", adjuster: "Natalie Price", note: "Settled for a fully executed release, dismissal with prejudice, and an indefinite extension of time to respond to the complaint." }
+    ],
+    fee: { pct: "33⅓%", retainer: "33⅓% (one-third) of the gross recovery, whether or not a lawsuit is filed.", why: "This retainer is a flat one-third, suit or no suit (the activity's net sheet: 0.3333)." },
+    costs: [
+      { label: "Filing fees & Summons", amount: 402 },
+      { label: "Process Server", amount: 85 },
+      { label: "Postage", amount: 31.62 },
+      { label: "File Storage fee", amount: 250 }
+    ],
+    pip: { carrier: "Paramount American Insurance Company (PIP)", limit: 10000, payments: [
+      { to: "Triad Lakes Medical Center", date: "08/23/2025", amount: 1037.42 }, { to: "Triad Lakes Medical Center", date: "08/23/2025", amount: 152.11 },
+      { to: "Triad Lakes Medical Center", date: "08/23/2025", amount: 2878.66 }, { to: "Triad Lakes Medical Center", date: "08/23/2025", amount: 962.14 },
+      { to: "Triad Lakes Medical Center", date: "09/15/2025", amount: 1315.97 }, { to: "Triad Lakes Medical Center", date: "09/26/2025", amount: 1551.06 },
+      { to: "Spinewell Orthopedic Specialists", date: "09/26/2025", amount: 190.35 },
+      { to: "Allied Portable Diagnostic Imaging", date: "08/23/2025", amount: 1937.06 }
+    ] },
+    payees: [
+      { id: "triad", type: "PT", name: "Triad Lakes Medical Center", email: "billing@triadlakesmed.example",
+        address: "2180 Maravilla Ln, Unit 2, Fort Myers, FL 33901", dos: "05/24/2025 – 10/19/2025",
+        lines: [
+          { date: "05/24/2025", code: "99203/97535/97112/97110/97140", desc: "New patient exam & therapy", amount: 776 },
+          { date: "05/25/2025 – 07/29/2025", code: "97110/97112/97140/G0283", desc: "Therapy visits", amount: 8215.34 },
+          { date: "08/04/2025 – 10/19/2025", code: "97110/97112/97140/G0283", desc: "Therapy visits", amount: 6423.6 }
+        ],
+        pip: 7897.36, health: 0, adj: 0,
+        onFile: { asOf: "10/20/2025", pip: 6353.94, reconcile: true },
+        reduce: { floor: 3200 } },
+      { id: "spinewell", type: "Orthopedic", name: "Spinewell Orthopedic Specialists", email: "billing@spinewellortho.example",
+        address: "2090 Palm Beach Lakes Blvd, Ste 202, West Palm Beach, FL 33409", dos: "08/15/2025",
+        lines: [{ date: "08/15/2025", code: "99203", desc: "Office/outpatient visit, new (Dr. Elena Trinidad)", amount: 750 }],
+        pip: 190.35, health: 0, adj: 0,
+        onFile: { asOf: "09/22/2025", pip: 0, reconcile: true },
+        reduce: { floor: 375 } },
+      { id: "allied", type: "MRI", name: "Allied Portable Diagnostic Imaging", email: "billing@alliedportable.example",
+        address: "1700 Forum Pl, Ste 4, West Palm Beach, FL 33401", dos: "08/03/2025",
+        lines: [
+          { date: "08/03/2025", code: "72141", desc: "MRI cervical spine without contrast", amount: 1775 },
+          { date: "08/03/2025", code: "72148", desc: "MRI lumbar spine without contrast", amount: 1775 }
+        ],
+        pip: 1937.06, health: 0, adj: 0,
+        onFile: { asOf: "08/03/2025", pip: 0, reconcile: true },
+        reduce: { floor: 800 } },
+      { id: "pagewood", type: "Chiro", name: "Pagewood Chiropractic, P.A.", email: "billing@pagewoodchiro.example",
+        address: "3420 Lee Blvd, Lehigh Acres, FL 33971", dos: "05/23/2025",
+        lines: [{ date: "05/23/2025", code: "99203/98941/97010/G0283/97035/97012/97140/99072", desc: "Exam, adjustment and modalities (applied to the PIP deductible)", amount: 536.42 }],
+        pip: 0, health: 0, adj: 0, reduce: { floor: 268.21 } },
+      { id: "lehigh", type: "Walk-in (health insurance)", name: "Lehigh Walk-In Clinic", email: "billing@lehighwalkin.example",
+        address: "1251 Homestead Rd N, Lehigh Acres, FL 33936", dos: "05/11/2025",
+        lines: [{ date: "05/11/2025", code: "99204", desc: "Walk-in visit", amount: 520 }],
+        pip: 0, health: 338, adj: 182, reduce: { floor: null, policy: "zero" } },
+      { id: "seminole", type: "Health subrogation lien", lien: true, name: "Seminole Health Partners", email: "recovery@seminolehealth.example",
+        address: "PO Box 31045, Tampa, FL 33631", amount: 338,
+        plan: "Fully insured group plan (James's employer). Florida law: the common-fund reduction applies.",
+        notice: "Seminole Health Partners paid $338.00 to Lehigh Walk-In Clinic for care related to the 05/10/2025 accident and asserts its right of reimbursement.",
+        reduce: { floor: 225.33, why: "Pro-rata procurement costs: one-third off $338.00." } },
+      { id: "sable", type: "Pre-settlement funding", lien: true, name: "Sable Point Legal Funding", email: "payoffs@sablepointfunding.example",
+        address: "2400 First St, Ste 500, Fort Myers, FL 33901", amount: 2560,
+        onFile: { asOf: "06/30/2026", amount: 2410 },
+        notice: "Sable Point Legal Funding advanced $1,800.00 to James Doe on 12/01/2025. The payoff grows monthly and is good only through the date stated on it.",
+        reduce: { floor: null, policy: "contract" } }
+    ],
+    challenges: [
+      "Two settlements from one carrier, two releases: BI $10,000.00 and UM/UIM $25,000.00 = $35,000.00 gross.",
+      "PIP is exhausted ($10,000.00, $1,000.00 deductible): Pagewood's whole $536.42 went to the deductible, so it's owed in full.",
+      "Spinewell's statement shows $750.00 due with no payment; the PIP log shows $190.35 paid: $559.65. Allied's ledger shows $3,550.00 with no payment; PIP paid $1,937.06: $1,612.94.",
+      "Triad Lakes' ledger posts $6,353.94; the PIP log shows $7,897.36 paid (with interest): $7,517.58 owed, not $9,061.00.",
+      "Sable Point's payoff on file expired 06/30/2026: updated payoff $2,560.00."
+    ]
+  }
+,
   {
     id: "miller",
     client: { first: "Sarah", last: "Miller", dob: "06/14/1996", phone: "(214) 555-0187", email: "sarah.miller@mail.example", address: "2218 Juniper Lane, Dallas, TX 75204" },

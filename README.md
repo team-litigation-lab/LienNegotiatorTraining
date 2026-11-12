@@ -42,6 +42,23 @@ Every video is embedded in full (its own step, a full-size Drive player).
 | `worker.js` | The Worker: the CM Worker's sign-in (tokens, admin password, Portal tickets, Batch IDs) unchanged, plus progress storage and the automatic Time In. |
 | `wrangler.json` | The Worker's name (`liennegotiatortraining`) and its `LSH_KV` binding. |
 
+## 🗂 The Lien Desk (the case activity, Days 2 and 3)
+
+Each trainee works one settled case, step by step like the demo (`js/ln-desk.js`, the cases in `js/ln-desk-cases.js`): **Case File** (crisp documents on LSH Law Firm letterhead: the release(s), the settlement letter, itemized bills and ledgers, the PIP log, lien notices and payoff letters, the cost ledger, the retainer), **Email** (an inbox with scripted replies: the trainer returns the fully executed release; providers send corrected bills and answer reduction requests, approving, countering below their floor, or waiving; a funding company won't reduce; the client returns the signed closing statement; a missing name or DOL, or a wrong subject line, gets a realistic reply), **Net Sheet** (the firm's NET SETTLEMENT CALCULATIONS: settlement, atty fees, expense log, medical bills with PIP / Med / Health payments, adjustments, balance owed, agreed reduction and max offer, non-medical liens, total net settlement), and **Drafts** (the firm's **BILL REDUCTION REQUEST** letter and **SETTLEMENT CLOSING STATEMENT AND INSTRUCTION FOR DISTRIBUTION**, with the naming conventions checked).
+
+- **Day 2:** download the Settlement Release(s) → email them to the trainer → the fully executed release comes back (or the trainer uploads a real one: Admin → 🗂 Lien Desk) → the initial Net Sheet, each balance squared with the PIP log → the Reduction Request(s), ready to send.
+- **Day 3:** request updated bills and payoffs → send the Reduction Requests → finalize the Net Sheet with the agreed amounts → the Closing Statement (it must match the Net Sheet exactly) → send it with the Settlement Release Form(s) to the client → the client signs.
+
+**12 cases.** Three are the original activities, rewritten (new names, LSH Law Firm, every scanned document recreated), with their figures checked against the answer keys:
+
+| Case | From | The original's figures |
+|---|---|---|
+| **John Doe** (& Mary Doe, spouse) | the demo's case (Activity 1.2 and the closing statement activity) | Colonnade $7,858.13 → $700, Shreeve MRI $743.65 → $250, MediVista $168.55 → waived; net $5,024.19 before the two liens added |
+| **Jane Doe** | Activity 1.1 | 40% fee; Brightcare $8,653.84 → $500, HighView MRI $2,018.26 → $900, Good Hope $66.65 → waived; net $4,144.81 before the two liens added |
+| **James Doe** | Activity 2 | BI $10,000 + UM $25,000; PIP exhausted; Spinewell, Allied and Triad Lakes squared with the PIP log; Pagewood's bill went to the deductible |
+
+and nine more from the CM course's mock PI cases (Sarah Miller, David Chen, Elena Rodriguez, Mark Thompson, Gladys Winslow, JT Taylor, Sophie Vane, Robert Lee, Bradley Peterson). Every case has a health subrogation lien and a pre-settlement funding lien. Provider and insurer names are made up, and every email address ends in `.example`. The answer keys themselves are not in this public repository.
+
 ## 🔐 Sign in on the Main Portal only
 
 The same as the CM course. Trainees sign in once, on the LSH Training Portal, and open this program from there. The Portal sends them here with a signed, short-lived ticket (`?ticket=…`); `js/portal-gate.js` posts it to `/api/auth/portal`, and the Worker signs the trainee in and approves them (the Portal's approval is the only trainee approval). Someone who opens this site's link directly gets the *Admin* sign-in, where an admin types the admin password (`MASTER_ADMIN_PASSWORD`); a name + batch typed here is refused (403 `portal-required`).

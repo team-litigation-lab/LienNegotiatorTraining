@@ -68,7 +68,7 @@ for (const c of CASES) {
     const bal = p.lien ? p.amount : p.lines.reduce((s, l) => s + l.amount, 0) - (p.pip || 0) - (p.health || 0) - (p.adj || 0);
     if (!(bal >= 0)) fail.push(`${at} ${p.id}: the balance is below zero`);
     if (!/\.example$/.test(p.email || '')) fail.push(`${at} ${p.id}: emails end in .example (nothing can be sent)`);
-    if (p.reduce && p.reduce.floor != null && !(p.reduce.floor > 0 && p.reduce.floor < bal)) fail.push(`${at} ${p.id}: the reduction floor must be above $0 and below the current balance (${bal})`);
+    if (p.reduce && p.reduce.floor != null && !(p.reduce.floor >= 0 && p.reduce.floor < bal)) fail.push(`${at} ${p.id}: the reduction floor must be $0 (a waiver) or more, and below the current balance (${bal})`);
     if (/pre-settlement funding/i.test(p.type) && !(p.onFile && p.onFile.amount < p.amount)) fail.push(`${at} ${p.id}: a funding lien's payoff on file must be out of date (onFile.amount below the current payoff)`);
     if (/health subrogation/i.test(p.type) && Math.abs(p.amount - ps.filter((x) => !x.lien).reduce((s, x) => s + (x.health || 0), 0)) > 0.005) fail.push(`${at} ${p.id}: the health lien must equal what the plan paid on the providers' bills`);
   }
@@ -83,7 +83,8 @@ for (const c of CASES) {
     ini += bi; fin += bn <= 0 ? 0 : p.reduce && p.reduce.floor != null ? p.reduce.floor : bn;
     if (p.onFile && !p.lien && !p.onFile.extraLines && ['pip', 'health', 'adj'].every((k) => (p.onFile[k] || 0) === (p[k] || 0))) fail.push(`${at} ${p.id}: onFile changes nothing (the bill on file must differ from the corrected one)`);
   }
-  if (!(gross - fee - costs - ini > 0) || !(gross - fee - costs - fin > 0)) fail.push(`${at}: the net to the client must be above $0.00 before and after reductions`);
+  // (before reductions the net can be below zero: that's why the reductions are needed, as in the demo's own case)
+  if (!(gross - fee - costs - fin > 0)) fail.push(`${at}: the net to the client must be above $0.00 after the reductions`);
   if (!ps.some((p) => p.onFile && !p.lien)) fail.push(`${at}: needs at least one provider bill on file that is out of date (a corrected bill to request)`);
 }
 if (/answer key/i.test(JSON.stringify(LN_COURSE).replace(/answer keys are not on this page/i, ''))) fail.push('js/ln-course.js mentions an answer key: keep answer keys off this public page');
