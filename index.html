@@ -311,6 +311,76 @@ main.main-wide{max-width:1600px;}
 .vcard small{font-size:12px;font-weight:700;color:var(--orange-deep);}
 .stage-module:has(.vcards) .stage-body{overflow-y:auto;}
 
+
+/* ============================================================================
+   Big, bold and high-contrast. Every text is at least 13px and most 15px or more, headings heavier, and every
+   colour on its background clears WCAG AA (4.5:1; 3:1 for large text): the deep orange (#B5651F) reaches only
+   4.4:1 on white, so small orange lettering is #8F4A12 (6.6:1). .github/scripts/contrast.cjs checks it.
+   ========================================================================= */
+:root{--orange-text:#8F4A12;}
+.mnum,.side-day,.day-headline .mono,.lab-case .mono,.topic-list li span,.module-body .mnum{color:var(--orange-text) !important;}
+.nav button,.nav a{font-size:14.5px;font-weight:700;}
+.brand-text b{font-size:17px;}
+.mh-title{font-size:17.5px;font-weight:800;}
+.module-theme{font-size:16.5px;font-weight:700;}
+.module-start-btn{font-size:17px;font-weight:800;}
+.module-topics-btn,.mc-count{font-size:14px;font-weight:700;}
+.stage-title{font-size:clamp(26px,2.6vw,34px) !important;}
+.stage-banner{font-size:16px;}
+.stage-chip{font-size:18px !important;}
+.agenda-theme p{font-size:15px !important;}
+.agenda-item b{font-size:16px !important;}
+.agenda-item small{font-size:13.5px;color:#E3E6F2;}
+.agenda-mod{font-size:14px;}
+.obj-box h2{font-size:19px !important;}
+.obj-list li{font-size:16.5px !important;font-weight:700;}
+.outline{font-size:15.5px !important;}
+.outline li span{font-size:13.5px !important;}
+.frame-actions{font-size:14px;color:#E3E6F2;}
+.vc-note{font-size:16px;color:#E3E6F2;}
+.vcard b{font-size:16.5px;}
+.vcard small{font-size:13.5px;color:var(--orange-text);}
+.qa-head{font-size:14.5px;color:#E3E6F2;}
+.qa-list li p{font-size:16px !important;font-weight:700;}
+.qa-list textarea{font-size:15px !important;}
+.guide-sec h3{font-size:18px !important;}
+.guide-sec p,.guide-rows td,.guide-pre pre{font-size:15px !important;}
+.guide-rows th{font-size:13.5px !important;color:var(--ink-soft);}
+.lab-tasks{font-size:16px !important;}
+.lab-note,.lab-case p{font-size:15px !important;}
+.side-tip{font-size:14px;}
+.player-side h2{font-size:21px;}
+.side-btn{font-size:15px;font-weight:700;}
+.footer-note{font-size:13px;}
+.done-box p{font-size:16px !important;}
+/* Know Your Tools */
+.tools-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:12px;}
+.tool-card{display:flex;gap:12px;align-items:flex-start;background:#fff;color:var(--ink);border-radius:12px;padding:14px 16px;border-top:4px solid var(--orange);}
+.tool-card:nth-child(2n){border-top-color:var(--navy);}
+.tool-ic{font-size:30px;line-height:1;}
+.tool-card b{display:block;font-size:18px;color:var(--navy);margin-bottom:4px;}
+.tool-card p{margin:0 0 6px;font-size:15px;font-weight:600;line-height:1.45;}
+.tool-card small{display:block;font-size:13.5px;color:var(--orange-text);font-weight:700;margin-bottom:8px;}
+.stage-module:has(.tools-grid) .stage-body,.stage-module:has(.ns-embed) .stage-body{overflow-y:auto;}
+/* the Net Sheet embedded in a step */
+.ns-embed-head{display:flex;gap:12px;align-items:center;flex-wrap:wrap;color:#E3E6F2;font-size:15px;font-weight:600;margin-bottom:10px;}
+.ns-embed-head > span:first-child{flex:1 1 400px;}
+.ns-embed-head .btn-ghost{background:#fff;color:var(--navy);}
+.ns-embed .ld-sheet{margin:0;}
+/* the process questions' grader */
+.qa-grade{background:#fff;color:var(--navy);border-radius:10px;padding:8px 12px;margin:0 0 8px;font-size:15px;font-weight:700;}
+.qa-fb{font-size:13.5px;font-weight:700;color:#8F4A12;margin:0 0 6px;}
+.qa-fb.ok{color:var(--success);}
+/* a light card on the dark stage (the embedded Net Sheet, the score card) takes dark text, not the stage's white */
+.stage .ld-card,.stage .ld-grade,.stage .tool-card{color:var(--ink);}
+/* white on the brand orange is 2.85:1: the orange buttons carry dark text, hovered too */
+.btn-orange,.btn-orange:hover{color:#241304;}
+/* the Case Activity step: its tasks and its score read as one page that scrolls, not a squeezed box */
+.stage-module:has(.lab-box) .stage-body{overflow-y:auto;}
+.stage-module .lab-box{flex:0 0 auto !important;max-height:none !important;overflow:visible;}
+.stage-module .lab-box + .ld-grade{margin-top:10px;}
+.btn-primary:hover,.btn-primary:not([disabled]):hover{color:#241304;background-color:var(--orange);background-image:var(--g-accent);}   /* hovered: the same light gradient, with the glow (dark text on the deep orange was 4.1:1) */
+
 /* ---------- admin ---------- */
 .admin-table{width:100%;border-collapse:collapse;font-size:13.5px;}
 .admin-table th{text-align:left;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-soft);padding:10px 12px;border-bottom:1px solid var(--line);}
@@ -414,7 +484,7 @@ body::before{opacity:.40;}
    repo) expects of an engine: state, render(), goto(), authStatus(), logout(), setAdminToken(),
    setTraineeToken(), submitLogin() and resumeWhereLeftOff().
    ============================================================ */
-const APP_BUILD = "2026.11.12-3";
+const APP_BUILD = "2026.11.12-4";
 const PORTAL_HOME = "https://cm-training-activity.pages.dev/";
 const LOGO_FULL_SRC = "/logo.svg";
 const COURSE = window.LN_COURSE;
@@ -539,7 +609,9 @@ const KIND = {
   questions: { icon: "✍️", label: "Process Questions", chip: "✍️ Your Answers" },
   guide: { icon: "🧭", label: "Guide", chip: "🧭 The Guide" },
   lab: { icon: "🗂", label: "Case Activity", chip: "🗂 The Lien Desk" },
-  videos: { icon: "🎬", label: "Videos", chip: "🎬 The Videos" }
+  videos: { icon: "🎬", label: "Videos", chip: "🎬 The Videos" },
+  tools: { icon: "🧰", label: "Know Your Tools", chip: "🧰 Know Your Tools" },
+  netsheet: { icon: "🧮", label: "Net Sheet", chip: "🧮 Your Net Sheet" }
 };
 // A module's own label (Live Demo, Shadowing Video …), else its kind's.
 function modLabel(m){ return m.label || KIND[m.kind].label; }
@@ -563,7 +635,7 @@ function recordStep(d, from, to){
   if(state.isAdmin || !state.trainee) return;
   const steps = stepsOf(d), dp = state.trainee.dayProgress;
   const p = Object.assign({}, dp[d.day] || {}); p.modules = Object.assign({}, p.modules || {});
-  if(to > from && steps[from] && steps[from].type === "module"){ const m = steps[from].module; if(m.kind !== "lab" || LNDesk.stageDone(m.stage)) p.modules[m.id] = true; }
+  if(to > from && steps[from] && steps[from].type === "module"){ const m = steps[from].module; if((m.kind !== "lab" || LNDesk.stageDone(m.stage)) && (m.kind !== "netsheet" || LNDesk.sheetOk(m.stage))) p.modules[m.id] = true; }
   p.step = to;
   const was = !!p.done;
   if(steps[to] && steps[to].type === "done" && d.modules.every((m) => p.modules[m.id])) p.done = true;
@@ -791,7 +863,8 @@ function moduleBody(m){
     return `<div class="lab-box"><div class="lab-case"><span class="mono">${esc(c.caseNo)}</span><h3>Your case: ${esc(c.client.first)} ${esc(c.client.last)}</h3><p>DOL ${esc(c.dol)} · ${esc(c.facts)}</p></div>
       ${m.note ? `<p class="lab-note">${esc(m.note)}</p>` : ""}
       <ol class="lab-tasks">${list.map((t) => `<li class="${t.ok ? "ok" : ""}">${t.ok ? "✅" : "⬜"} ${esc(t.t)}</li>`).join("")}</ol>
-      <div class="lab-foot"><span class="mono">${done}/${list.length} done</span><button class="btn btn-primary" onclick="goto('desk')">🗂 Open the Lien Desk →</button></div></div>`;
+      <div class="lab-foot"><span class="mono">${done}/${list.length} done</span><button class="btn btn-primary" onclick="goto('desk')">🗂 Open the Lien Desk →</button></div></div>
+      ${state.isAdmin ? "" : LNDesk.gradeCard(m.stage, m.stage === "day2" ? "Day 2 score (automated grader)" : "Day 3 score (automated grader)")}`;
   }
   if(m.kind === "deck" || m.kind === "video"){
     const link = linkOf(m), src = lnEmbed.embed(m.kind, link), page = lnEmbed.page(m.kind, link);
@@ -800,6 +873,15 @@ function moduleBody(m){
     return `<div class="frame-box"><div class="frame" id="${fid}"><iframe src="${esc(src)}" title="${esc(m.title)}" allow="autoplay; fullscreen" allowfullscreen loading="lazy" referrerpolicy="strict-origin-when-cross-origin"></iframe></div></div>
       <div class="frame-actions"><span>${m.kind === "video" ? "🎬 " + esc(m.title) + " · plays from Google Drive (sign in with your legalsupporthelp.com account if it asks)" : "📚 Use the arrows under the slides to page through the deck."}</span>
         <span class="frame-btns"><button class="btn btn-sm btn-ghost" type="button" onclick="frameFull('${fid}')">⛶ Full screen</button>${m.kind === "video" ? `<a class="btn btn-sm btn-ghost viewer-link" data-kind="video" data-title="${esc(m.title)}" href="${esc(page)}">⧉ Pop out</a>` : ""}<a class="btn btn-sm btn-ghost" href="${esc(page)}" target="_blank" rel="noopener">${m.kind === "video" ? "Open in Drive" : "Open in Canva"} ↗</a></span></div>`;
+  }
+  if(m.kind === "tools"){
+    return `${m.note ? `<p class="vc-note">${esc(m.note)}</p>` : ""}<div class="tools-grid">${m.items.map((t) => `<div class="tool-card"><div class="tool-ic">${t.icon}</div><div><b>${esc(t.name)}</b><p>${esc(t.what)}</p><small>${esc(t.how)}</small>
+      ${t.go ? `<button class="btn btn-sm btn-primary" onclick="goto('${t.go}')">Open →</button>` : t.link ? `<a class="btn btn-sm btn-ghost" href="${esc(t.link)}" target="_blank" rel="noopener">Open ↗</a>` : ""}</div></div>`).join("")}</div>`;
+  }
+  if(m.kind === "netsheet"){
+    const c = LNDesk.caseOf();
+    return `<div class="ns-embed-head"><span>${esc(m.note || "")}</span><span class="mono">${esc(c.caseNo)} · ${esc(c.client.first)} ${esc(c.client.last)}</span><button class="btn btn-sm btn-ghost" onclick="goto('desk')">🗂 Case File &amp; PIP log ↗</button></div>
+      <div class="ns-embed">${LNDesk.sheetHtml()}</div>`;
   }
   if(m.kind === "videos"){
     return `${m.note ? `<p class="vc-note">${esc(m.note)}</p>` : ""}<div class="vcards">${m.items.map((it) => `<a class="vcard viewer-link" data-kind="video" data-title="${esc(it.title)}" href="${esc(lnEmbed.page("video", it.link))}">
@@ -816,8 +898,9 @@ function moduleBody(m){
     const a = answersOf(m.id);
     const n = m.questions.filter((q, j) => (a[j] || "").trim()).length;
     return `<div class="qa-head"><span>Answer each question in your own words. ${state.isAdmin ? "" : "Your answers save to your account as you type."} Name your document <b class="mono">${esc(m.naming)}</b>.</span>
-        ${state.isAdmin ? "" : `<span class="qa-count">${n}/${m.questions.length} answered</span><button class="btn btn-sm btn-orange" onclick="copyAnswers('${m.id}')">⧉ Copy all answers</button>`}</div>
-      <ol class="qa-list">${m.questions.map((q, j) => `<li><p>${q.core ? '<span class="core-tag">★ Core</span> ' : ""}${esc(q.q)}</p>${state.isAdmin ? "" : `<textarea rows="3" aria-label="Your answer to question ${j + 1}" oninput="saveAnswer('${m.id}',${j},this.value)">${esc(a[j] || "")}</textarea>`}</li>`).join("")}</ol>`;
+        ${state.isAdmin ? "" : `<span class="qa-count">${n}/${m.questions.length} answered</span><button class="btn btn-sm btn-primary" onclick="checkAnswers('${m.id}')">🏅 Check my answers</button><button class="btn btn-sm btn-orange" onclick="copyAnswers('${m.id}')">⧉ Copy all answers</button>`}</div>
+      ${!state.isAdmin && ((state.progress || {}).answerGrades || {})[m.id] ? (() => { const g = state.progress.answerGrades[m.id]; return `<div class="qa-grade"><b>🏅 ${g.score}/100</b> · ${g.covered} of ${g.total} key concepts covered · checked ${esc(new Date(g.at).toLocaleString())}</div>`; })() : ""}
+      <ol class="qa-list">${m.questions.map((q, j) => `<li><p>${q.core ? '<span class="core-tag">★ Core</span> ' : ""}${esc(q.q)}</p>${qaFeedback(m, j)}${state.isAdmin ? "" : `<textarea rows="3" aria-label="Your answer to question ${j + 1}" oninput="saveAnswer('${m.id}',${j},this.value)">${esc(a[j] || "")}</textarea>`}</li>`).join("")}</ol>`;
   }
   if(m.kind === "guide"){
     return `<div class="guide">${m.sections.map((g, gi) => `<section class="guide-sec"><h3>${esc(g.h)}</h3>
@@ -854,6 +937,29 @@ function saveAnswer(id, j, v){
   const m = moduleById(id), c = document.querySelector(".qa-count");
   if(c && m) c.textContent = `${m.questions.filter((q, k) => (a[k] || "").trim()).length}/${m.questions.length} answered`;
   saveProgress();
+}
+// 🏅 the automated grader for the process questions: each question has key concepts (js/ln-course.js keys), each a group
+// of words of which any one counts. An answer's score is the share of its concepts it covers; the step's, their average.
+function gradeAnswer(q, text){
+  const t = " " + String(text || "").toLowerCase() + " ", keys = q.keys || [];
+  const hit = keys.map((g) => g.some((w) => t.includes(String(w).toLowerCase())));
+  return { hit, covered: hit.filter(Boolean).length, total: keys.length, words: String(text || "").trim().split(/\s+/).filter(Boolean).length };
+}
+function checkAnswers(id){
+  const m = moduleById(id), a = answersOf(id); if(!m) return;
+  const per = m.questions.map((q, j) => gradeAnswer(q, a[j]));
+  const covered = per.reduce((s, x) => s + x.covered, 0), total = per.reduce((s, x) => s + x.total, 0);
+  // a one-line answer can't carry the reasoning: under 25 words, the question earns at most half
+  const score = Math.round(per.reduce((s, x) => s + (x.total ? x.covered / x.total : 0) * (x.words < 25 ? 0.5 : 1), 0) / per.length * 100);
+  state.progress = state.progress || {}; state.progress.answerGrades = state.progress.answerGrades || {};
+  state.progress.answerGrades[id] = { score, covered, total, at: new Date().toISOString(), per: per.map((x) => ({ c: x.covered, t: x.total, w: x.words })) };
+  saveProgress(); render(); toast(`Your answers: ${score}/100.`);
+}
+function qaFeedback(m, j){
+  const g = ((state.progress || {}).answerGrades || {})[m.id]; if(!g || state.isAdmin) return "";
+  const q = m.questions[j], r = gradeAnswer(q, answersOf(m.id)[j]);
+  const miss = (q.keys || []).filter((_, k) => !r.hit[k]).map((grp) => grp[0]);
+  return `<div class="qa-fb ${r.covered === r.total && r.words >= 25 ? "ok" : ""}">${r.covered}/${r.total} key concepts${r.words < 25 ? " · add more detail (25 words or more)" : ""}${miss.length ? ` · think about: ${esc(miss.join(", "))}` : ""}</div>`;
 }
 function answersText(m, a){ return m.questions.map((q, j) => `${j + 1}. ${q.q}\n${(a[j] || "").trim() || "(no answer yet)"}`).join("\n\n"); }
 function copyText(t){ try{ navigator.clipboard.writeText(t).then(() => toast("Copied."), () => toast("Couldn't copy. Select the text and copy it.")); }catch(e){ toast("Couldn't copy. Select the text and copy it."); } }
@@ -898,7 +1004,7 @@ const QUESTION_MODULES = ALL_MODULES.filter((m) => m.kind === "questions");
 function showAnswers(id){
   const r = (state.admin.rows || []).find((x) => x.id === id), p = (state.admin.progress || {})[id];
   overlay(`<div class="mh-day">${esc(r ? r.batch || "" : "")}</div><div class="mh-title">${esc(r ? r.name || id : id)}: answers</div>`,
-    QUESTION_MODULES.map((m) => `<h3 style="margin:4px 0 8px;color:var(--navy)">Day ${m.day} · ${esc(m.title)}</h3><ol class="topic-list">${m.questions.map((q, j) => `<li><b>${q.core ? "★ " : ""}${esc(q.q)}</b><div class="ans">${esc((answersOf(m.id, p)[j] || "").trim() || "(no answer)")}</div></li>`).join("")}</ol>`).join(""));
+    QUESTION_MODULES.map((m) => `<h3 style="margin:4px 0 8px;color:var(--navy)">Day ${m.day} · ${esc(m.title)}${p && p.answerGrades && p.answerGrades[m.id] ? ` · 🏅 ${p.answerGrades[m.id].score}/100` : ""}</h3><ol class="topic-list">${m.questions.map((q, j) => `<li><b>${q.core ? "★ " : ""}${esc(q.q)}</b><div class="ans">${esc((answersOf(m.id, p)[j] || "").trim() || "(no answer)")}</div></li>`).join("")}</ol>`).join(""));
 }
 async function assignCase(id, caseId){
   const a = Object.assign({}, (state.admin.assign || {})[id] || {}, { caseId });
@@ -966,7 +1072,7 @@ function viewAdmin(){
         const a = (state.admin.assign || {})[r.id] || {}, sm = LNDesk.summary(r, (state.admin.progress || {})[r.id]);
         return `<tr><td>${esc(r.name || r.id)}</td>
           <td><select onchange="assignCase('${esc(r.id)}', this.value)"><option value="">Their own case</option>${LNDesk.cases.map((c) => `<option value="${c.id}" ${a.caseId === c.id ? "selected" : ""}>${esc(c.client.first)} ${esc(c.client.last)}</option>`).join("")}</select></td>
-          <td style="font-weight:500;font-size:12.5px">${sm ? `${esc(sm.caseId)} · ${sm.emails} emails · release ${sm.exec ? "✓" : "—"} · initial sheet ${sm.initial ? sm.initial.passed + "/" + sm.initial.total : "—"} · final ${sm.final ? sm.final.passed + "/" + sm.final.total : "—"} · signed ${sm.signed ? "✓" : "—"}` : "Not started"}</td>
+          <td style="font-weight:500;font-size:12.5px">${sm ? `${sm.grade ? `<b>🏅 Day 2: ${sm.grade.day2.score} · Day 3: ${sm.grade.day3.score}</b><br>` : ""}${esc(sm.caseId)} · ${sm.emails} emails · release ${sm.exec ? "✓" : "—"} · initial sheet ${sm.initial ? sm.initial.passed + "/" + sm.initial.total : "—"} · final ${sm.final ? sm.final.passed + "/" + sm.final.total : "—"} · signed ${sm.signed ? "✓" : "—"}` : "Not started"}</td>
           <td><label class="btn btn-ghost btn-sm" style="cursor:pointer">⬆ Upload<input type="file" accept="application/pdf,image/*" style="display:none" onchange="uploadRelease('${esc(r.id)}', this)"></label>${a.releaseName ? ` <small>${esc(a.releaseName)}</small>` : ""}</td></tr>`; }).join("") || `<tr><td colspan="4">No trainees yet.</td></tr>`}</tbody></table></div>
     </section>
     <section class="card sec">
@@ -996,7 +1102,7 @@ function render(){
   else if(state.view === "desk") main = LNDesk.view();
   else { state.view = "dashboard"; main = viewDashboard(); }
   app.innerHTML = (state.view === "pendingApproval" ? "" : topbar()) + `<main class="${state.view === "desk" ? "main-wide" : state.view === "player" || state.view === "day" ? "main-player" : ""}">${main}</main>` + footer();
-  if(state.view === "desk") LNDesk.after();
+  if(document.querySelector(".ld-sheet")) LNDesk.after();   // the Lien Desk, or a Net Sheet embedded in a day's step
 }
 
 /* ---------- boot ---------- */

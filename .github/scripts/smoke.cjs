@@ -73,6 +73,8 @@ const DECK = /^https:\/\/www\.canva\.com\/design\/[\w-]+\/[\w-]+\/view\?embed$/,
           await p.click('.doc-tabs button:nth-child(2)');
           assert.match(await p.getAttribute('.doc-tabs button.on', 'aria-selected'), /true/);
         }
+        if (await p.locator('.tool-card').count()) assert.ok((await p.locator('.tool-card').count()) >= 6, what + ': Know Your Tools');
+        if (await p.locator('.ns-embed').count()) assert.equal(await p.locator('.ns-embed .ld-sheet').count(), 1, what + ': the embedded Net Sheet');
         if (await p.locator('.vcard').count()) {
           // the Standard's video cards: a click plays it in the pop-out viewer
           await p.locator('.vcard').first().click();
@@ -83,6 +85,12 @@ const DECK = /^https:\/\/www\.canva\.com\/design\/[\w-]+\/[\w-]+\/view\?embed$/,
         if (await p.locator('.qa-list textarea').count()) {
           await p.fill('.qa-list li:nth-child(1) textarea', `Answer from ${tag}`);
           assert.match(await p.textContent('.qa-count'), /^1\//);
+          // 🏅 the automated grader: key concepts covered, with what to think about
+          await p.fill('.qa-list li:nth-child(2) textarea', 'A statutory lien is created by law and must be repaid first; a contractual lien comes from the plan contract; a medical provider lien or letter of protection is the provider waiting to be paid from the settlement, so each has a different legal priority and reimbursement right.');
+          await p.click('button:has-text("Check my answers")');
+          await p.waitForSelector('.qa-grade');
+          assert.match(await p.textContent('.qa-list li:nth-child(2) .qa-fb'), /5\/5 key concepts/);
+          assert.match(await p.textContent('.qa-list li:nth-child(1) .qa-fb'), /think about/);
         }
         await noSideScroll(p, what);
       }
@@ -102,7 +110,7 @@ const DECK = /^https:\/\/www\.canva\.com\/design\/[\w-]+\/[\w-]+\/view\?embed$/,
     await p.click('#day-2 .module-start-btn'); await p.waitForSelector('.obj-list li');
     await p.click('.stage-bar .btn-primary'); await p.waitForSelector('.stage');
     await p.click('text=Slide Map'); await p.click('#overlay .map-list li:nth-child(3) button');
-    await p.waitForSelector('.stage-module'); assert.match(await p.textContent(".step-count"), /Step 3 of 5/);
+    await p.waitForSelector('.stage-module'); assert.match(await p.textContent(".step-count"), /Step 3 of 7/);
     await p.click('.nav button:has-text("Dashboard")'); await p.waitForSelector('.day-card');
     await p.waitForTimeout(600);   // the save is debounced
     await p.reload();

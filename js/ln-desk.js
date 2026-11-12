@@ -61,7 +61,7 @@ function caseId(){
 }
 const CASE = () => CASES.find((c) => c.id === caseId()) || CASES[0];
 function W(){ const d = prog(), id = caseId(); d.caseId = id; d.cases[id] = d.cases[id] || { mail: [], viewed: {}, sheet: { cells: {} }, checks: {}, got: { corrected: {}, approved: {}, answered: {} }, drafts: { rr: {}, cs: {} } }; return d.cases[id]; }
-function save(){ if(typeof window.saveProgress === "function") window.saveProgress(); }
+function save(){ if(!window.state.isAdmin) try{ keepGrade(); }catch(e){} if(typeof window.saveProgress === "function") window.saveProgress(); }
 const traineeFirst = () => { const t = window.state.trainee || {}; return String(t.firstName || String(t.name || "").split(/\s+/)[0] || "").trim(); };
 const traineeName = () => String((window.state.trainee || {}).name || "").trim();
 
@@ -286,6 +286,52 @@ function checkSheet(stage){
   return items;
 }
 
+/* ---------- 🏅 the automated grader: each day's case work out of 100 (pass: 80) ----------
+   Day 2: the release round-trip (15) · the initial Net Sheet (40, by the share of lines that tie out) · the Reduction
+   Requests drafted correctly (45, by each letter's checks). Day 3: updated bills and payoffs requested (15) · Reduction
+   Requests sent and answered (20) · email conventions (10: each reply that couldn't route or find the account costs 2) ·
+   the final Net Sheet (30) · the Closing Statement (15) · sent to the client and signed (10). Kept in the desk
+   (grade), so a trainer sees it, and written to the day's score on the trainee's record. */
+const REFUSAL = /unable to locate this account|routes reduction requests by subject|don't see the settlement release|addressed to another provider|isn't in this case's contacts|statement is out of date|Please correct the letter/i;
+function grade(stage, c, w){
+  c = c || CASE(); w = w || W();
+  const items = [], add = (label, max, got, note) => items.push({ label, max, got: Math.max(0, Math.min(max, Math.round(got * 10) / 10)), note });
+  const share = (list, max, f) => list.length ? list.reduce((s, x) => s + f(x), 0) * max / list.length : max;
+  const ck = (st) => w.checks[st] && w.checks[st].total ? w.checks[st].passed / w.checks[st].total : 0;
+  const red = c.payees.filter(reducible);
+  if(stage === "day2"){
+    add("The Settlement Release(s) sent to the trainer, all attached", 10, w.got.releaseSent ? 10 : 0);
+    add("The fully executed release received", 5, w.got.exec ? 5 : 0);
+    add("The initial Net Sheet ties out", 40, 40 * ck("initial"), w.checks.initial ? `${w.checks.initial.passed}/${w.checks.initial.total} lines at the last check` : "not checked yet");
+    add("The Reduction Requests drafted correctly", 45, share(red, 45, (p) => { const d = w.drafts.rr[p.id]; return d && d.file ? Math.max(0, 1 - rrValid(c, w, p).length / 4) : 0; }), `${red.length} letter${red.length === 1 ? "" : "s"}: file name, client, DOL, PIP, balance, amount`);
+  } else {
+    const out = c.payees.filter((p) => p.onFile), sent = (w.mail || []).filter((m) => m.dir === "out").length;
+    const refusals = (w.mail || []).filter((m) => m.dir === "in" && REFUSAL.test(m.body || "")).length;
+    add("Updated bills and payoffs requested", 15, share(out, 15, (p) => w.got.corrected[p.id] ? 1 : 0));
+    add("Reduction Requests sent and answered", 20, share(red, 20, (p) => w.got.approved[p.id] != null ? 1 : 0));
+    add("Email conventions, every email in the case (attachments, subject line, client's full name and DOL)", 10, sent ? 10 - 2 * refusals : 0, refusals ? `${refusals} repl${refusals === 1 ? "y" : "ies"} asked you to fix and resend` : sent ? "every email routed first time" : "no emails yet");
+    add("The final Net Sheet ties out", 30, 30 * ck("final"), w.checks.final ? `${w.checks.final.passed}/${w.checks.final.total} lines at the last check` : "not checked yet");
+    add("The Closing Statement matches", 15, w.drafts.cs && w.drafts.cs.file ? 15 * Math.max(0, 1 - csIssues(c, w).length / 5) : 0);
+    add("Sent to the client and signed", 10, w.got.signed ? 10 : w.got.clientSent ? 5 : 0);
+  }
+  const score = Math.round(items.reduce((s, i) => s + i.got, 0));
+  return { stage, score, pass: score >= 80, items };
+}
+// the grade is kept in the desk (the trainer reads it) and as the day's score on the trainee's record (the Portal reads it)
+function keepGrade(){
+  const w = W(), S = window.state;
+  try{ w.grade = { day2: grade("day2"), day3: grade("day3"), at: new Date().toISOString() }; }catch(e){ return; }
+  const t = S.trainee; if(!t || S.isAdmin) return;
+  t.dayProgress = t.dayProgress || {};
+  [["day2", 2], ["day3", 3]].forEach(([k, n]) => { const p = t.dayProgress[n] = Object.assign({}, t.dayProgress[n] || {}); if(p.deskScore !== w.grade[k].score){ p.deskScore = w.grade[k].score; p.score = w.grade[k].score; } });
+  if(typeof window.saveTrainee === "function") window.saveTrainee();
+}
+function gradeCard(g, title){
+  return `<div class="ld-card ld-grade"><div class="ld-row"><h2 style="flex:1;margin:0">🏅 ${E(title)}</h2><span class="ld-score ${g.pass ? "pass" : ""}">${g.score}<small>/100</small></span></div>
+    <ul>${g.items.map((i) => `<li><span>${E(i.label)}${i.note ? ` <small>· ${E(i.note)}</small>` : ""}</span><b class="${i.got >= i.max ? "ok" : i.got > 0 ? "part" : ""}">${i.got}/${i.max}</b></li>`).join("")}</ul>
+    <p class="ld-muted">${g.pass ? "✓ Passing (80 or more)." : "Passing is 80 or more. It updates as you work."}</p></div>`;
+}
+
 /* ---------- the tasks, by day ---------- */
 const hasAsk = (d) => d && d.requested !== undefined && d.requested !== null && String(d.requested).trim() !== "";
 function rrValid(c, w, p){
@@ -456,6 +502,7 @@ function head(c, w){
 function vTasks(c, w){
   const sec = (h, list) => `<div class="ld-card"><h2>${h}</h2><ol class="ld-tasks">${list.map((t) => `<li class="${t.ok ? "ok" : ""}">${t.ok ? "✅" : "⬜"} ${E(t.t)}</li>`).join("")}</ol></div>`;
   return `<div class="ld-grid2">${sec("Day 2 · The release, the initial Net Sheet, the Reduction Requests", tasks("day2"))}${sec("Day 3 · Updated bills, reductions, the Closing Statement", tasks("day3"))}</div>
+    <div class="ld-grid2">${gradeCard(grade("day2"), "Day 2 score")}${gradeCard(grade("day3"), "Day 3 score")}</div>
     <div class="ld-card"><div class="ld-row"><h2 style="flex:1;margin:0">How the demo does it</h2><button class="btn btn-sm btn-primary" onclick="LNDesk.demo()">▶ Watch the demo recording</button></div><ol class="ld-how">
       <li><b>Case File:</b> open the Settlement Release Form(s), the bills, the PIP log, the lien notices and payoff letters, and the cost ledger. Note the dates: a statement or payoff can be out of date.</li>
       <li><b>Email:</b> send the release(s) to your trainer; the fully executed release comes back.</li>
@@ -569,7 +616,11 @@ function bindSheet(){
 window.LNDesk = {
   view, tasks, cases: CASES, caseOf: () => CASE(), expected: (stage) => expected(CASE(), W(), stage),
   stageDone: (stage) => tasks(stage).every((t) => t.ok),
-  after(){ if(UI.tab === "sheet") bindSheet(); },
+  after(){ if(document.querySelector(".ld-sheet")) bindSheet(); },
+  // the Net Sheet embedded in a day's step (index.html: kind "netsheet")
+  sheetHtml(){ const c = CASE(), w = W(); return vSheet(c, w); },
+  sheetOk: (stage) => !!(W().checks[stage] && W().checks[stage].ok),
+  grade: (stage) => grade(stage), gradeCard: (stage, title) => gradeCard(grade(stage), title),
   tab(k){ UI.tab = k; UI.compose = null; window.render(); },
   doc(id){ UI.doc = id; window.render(); },
   print(){ const f = document.querySelector(".ld-doc"); try{ f.contentWindow.focus(); f.contentWindow.print(); }catch(e){ window.toast("Open the document in a new tab to print it."); } },
@@ -612,7 +663,7 @@ window.LNDesk = {
   check(stage){ UI.checks[stage] = checkSheet(stage); window.render(); },
   // the trainer's view of one trainee's desk (Admin)
   summary(rec, progRec){ const d = (progRec || {}).desk; if(!d || !d.cases) return null; const id = d.caseId, w = d.cases[id]; if(!w) return null;
-    return { caseId: id, emails: (w.mail || []).length, initial: w.checks.initial, final: w.checks.final, signed: !!(w.got || {}).signed, exec: !!(w.got || {}).exec }; }
+    return { caseId: id, emails: (w.mail || []).length, initial: w.checks.initial, final: w.checks.final, signed: !!(w.got || {}).signed, exec: !!(w.got || {}).exec, grade: w.grade || null }; }
 };
 
 /* ---------- styles ---------- */
@@ -653,6 +704,17 @@ css.textContent = `.ld{display:flex;flex-direction:column;gap:12px}
 .ld-draft{display:grid;grid-template-columns:minmax(260px,360px) minmax(0,1fr);gap:10px}@media(max-width:1100px){.ld-draft{grid-template-columns:1fr}}
 .ld-form{display:flex;flex-direction:column;gap:6px;overflow-y:auto;max-height:calc(100vh - 300px);padding-right:4px}.ld-form label{display:flex;flex-direction:column;gap:2px;font-size:12px;font-weight:700;color:var(--ink-soft)}
 .ld-form fieldset{border:1px solid var(--line);border-radius:10px;padding:6px 10px;display:flex;flex-direction:column;gap:4px}.ld-form legend{font-size:12px;font-weight:800;color:var(--navy)}
+.ld-grade ul{list-style:none;margin:8px 0 4px;padding:0}.ld-grade li{display:flex;justify-content:space-between;gap:10px;padding:6px 0;border-bottom:1px solid var(--line);font-size:14.5px;font-weight:600}
+.ld-grade li small{color:var(--ink-soft);font-weight:500}.ld-grade li b{font-family:'IBM Plex Mono',monospace;white-space:nowrap}.ld-grade li b.ok{color:var(--success)}.ld-grade li b.part{color:#8F4A12}
+.ld-score{font:800 30px/1 var(--font-ui);color:var(--danger)}.ld-score.pass{color:var(--success)}.ld-score small{font-size:15px;color:var(--ink-soft)}
+.ld-case p{font-size:15px !important}.ld-case h1{font-size:26px !important}.ld-tabs button{font-size:15.5px !important}
+.ld-list button{font-size:14.5px !important;font-weight:700 !important}.ld-list button span,.ld-list button small{font-size:13px !important}.ld-list h3{font-size:12.5px !important;color:var(--ink) !important}
+.ld-card h2{font-size:19px !important}.ld-tasks{font-size:16px !important}.ld-tasks li.ok{color:#2E6343 !important}.ld-how{font-size:15px !important}
+.ld-body{font-size:15.5px !important}.ld-from{font-size:14px !important;color:var(--ink) !important}.ld-muted{font-size:14px !important;color:var(--ink) !important}
+.ld-t{font-size:14.5px !important}.ld-t th{font-size:12.5px !important;color:var(--ink) !important}.ld-in{font-size:14.5px !important}.ld-t output{font-size:14px !important;font-weight:700}
+.ld-sheet h3{font-size:17px !important}.ld-check{font-size:14.5px !important}.ld-check li.ok{color:#2E6343 !important}.ld-check small{color:var(--ink) !important}
+.ld-form label,.ld-compose label{font-size:13.5px !important;color:var(--ink) !important}.ld-form input,.ld-compose input,.ld-compose select,.ld-compose textarea{font-size:15px !important}
+.ld-coach{font-size:14.5px !important}.ld-att{font-size:14px !important}
 .ld-chk{flex-direction:row !important;align-items:flex-start;gap:6px !important;font-weight:600 !important;color:var(--ink) !important}.ld-prev{display:flex;min-width:0}.ld-prev .ld-doc{min-height:calc(100vh - 320px)}`;
 document.head.appendChild(css);
 })();

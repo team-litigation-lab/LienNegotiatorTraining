@@ -98,8 +98,22 @@ window.LN_COURSE = {
           link: "https://www.canva.com/design/DAHabx7BhKE/BPidIfAISKJuol56ntSmZg/view" },
         { id: "d2-video", kind: "video", title: "The Lien Negotiator Role, Pt. 2",
           link: "https://drive.google.com/file/d/1sUjQCpEqkrvf802Ck23aajx4Z2ox8zgE/view" },
+        { id: "d2-tools", kind: "tools", title: "Know Your Tools", label: "Know Your Tools",
+          note: "Everything you use to work a settled case, before you start yours.",
+          items: [
+            { icon: "🗂", name: "Lien Desk", what: "Your assigned case, start to finish: Tasks, Case File, Email, Net Sheet and Drafts in one place.", how: "Top bar → 🗂 Lien Desk, or the Case Activity step.", go: "desk" },
+            { icon: "📁", name: "Case File", what: "The release(s), the settlement letter, itemized bills and ledgers, the PIP log, lien notices and payoff letters, the cost ledger and the retainer.", how: "Check every date: a bill or payoff can be out of date." },
+            { icon: "📊", name: "PIP Log", what: "What the PIP carrier paid each provider, and when. The provider's own ledger can lag behind it.", how: "Square every bill with it: charges – PIP – other payments – adjustments = balance owed." },
+            { icon: "🧮", name: "Net Sheet", what: "NET SETTLEMENT CALCULATIONS: settlement, fees, expenses, medical bills, non-medical liens, total net settlement.", how: "✓ Check initial sheet (Day 2) and ✓ Check final sheet (Day 3) tell you what ties out." },
+            { icon: "✉️", name: "Email", what: "Your inbox for the case: the trainer, each provider's billing office, the lienholders and the client.", how: "Subject: Type of Request | LAST NAME, FIRST NAME. Include the client's full name and DOL." },
+            { icon: "✍️", name: "Drafts", what: "The BILL REDUCTION REQUEST letter and the SETTLEMENT CLOSING STATEMENT, with a live preview.", how: "MED - Provider's name - Reduction Request (your first name) · Client's Name – Closing Statement (your name)." },
+            { icon: "🔎", name: "NPI Lookup", what: "Find a provider that isn't easily identifiable.", how: "npino.com, or npidb.org.", link: "https://npino.com/" },
+            { icon: "🏅", name: "Automated Grader", what: "Scores each day's case work out of 100, with what earned and missed points.", how: "Lien Desk → 📋 Tasks shows your score; it updates as you work." }
+          ] },
         { id: "d2-lab", kind: "lab", stage: "day2", title: "Your Case: the Release, the Initial Net Sheet and the Reduction Request", label: "Case Activity",
-          note: "You're assigned a settled case. Download the Settlement Release(s) and handle the process from there: email the release(s) to your trainer, who sends back the fully executed release. Once it's in, draft the initial Net Sheet, up to the point where you'll send the Reduction Request." }
+          note: "You're assigned a settled case. Download the Settlement Release(s) and handle the process from there: email the release(s) to your trainer, who sends back the fully executed release. Once it's in, draft the initial Net Sheet, up to the point where you'll send the Reduction Request." },
+        { id: "d2-netsheet", kind: "netsheet", stage: "initial", title: "The Initial Net Sheet", label: "Initial Net Sheet",
+          note: "Work your case's Net Sheet right here: the settlement, the fee, the expenses, and each provider's balance squared with the PIP log. Then ✓ Check initial sheet." }
       ]
     },
     {
@@ -154,20 +168,21 @@ window.LN_COURSE = {
           ] },
         { id: "d3-questions", kind: "questions", title: "Process Questions", label: "Process Questions", group: "AM · Answering Process Questions",
           naming: "Lien_Negotiator_Process_Questions_Answers (your name)",
-          // core: the five the facilitator uses when time is limited.
+          // core: the five the facilitator uses when time is limited. keys: the automated grader's key concepts, each
+          // a group of words of which any one counts (a stem like "negotiat" matches negotiate / negotiation).
           questions: [
-            { q: "Analyze the specific responsibilities of a lien negotiator in relation to the post-settlement process. How do they interact with attorneys, clients, and providers?", core: true },
-            { q: "Analyze the difference between statutory, contractual, and medical provider liens. What are the legal implications of each?" },
-            { q: "Compare the documentation required for a simple case with one that includes third-party liens, child support obligations, and extensive treatment." },
-            { q: "Analyze the typical factors providers consider when agreeing to a medical bill reduction (e.g., settlement amount, client hardship).", core: true },
-            { q: "Assess how persuasive documentation (e.g., settlement amount, lien summary, client hardship letter) influences negotiation outcomes.", core: true },
-            { q: "Analyze the purpose of a settlement release and its binding nature once signed. What rights does the client waive?" },
-            { q: "Evaluate the importance of reviewing the release terms with the client. What issues could arise if the client signs without understanding?" },
-            { q: "Analyze how the closing statement reflects the full financial breakdown of a personal injury case.", core: true },
-            { q: "Evaluate the role of transparency in the closing statement. How does it support trust and prevent disputes?" },
-            { q: "Analyze the net sheet's function in summarizing what the client will receive after deductions. Why must it match the closing statement exactly?", core: true },
-            { q: "Judge whether the net sheet should be presented before or after lien negotiations are finalized and why." },
-            { q: "Assess whether it's appropriate for the legal team to pressure clients to accept settlements. Where is the ethical boundary?" }
+            { q: "Analyze the specific responsibilities of a lien negotiator in relation to the post-settlement process. How do they interact with attorneys, clients, and providers?", core: true, keys: [["post-settlement", "after settlement", "after the settlement", "settlement funds", "disburse"], ["attorney"], ["client"], ["provider", "lienholder", "lien holder"], ["negotiat", "reduc"]] },
+            { q: "Analyze the difference between statutory, contractual, and medical provider liens. What are the legal implications of each?", keys: [["statut"], ["contract"], ["medical provider", "provider lien", "letter of protection", "lop"], ["law", "legal", "enforce"], ["priority", "must be paid", "repay", "reimburs"]] },
+            { q: "Compare the documentation required for a simple case with one that includes third-party liens, child support obligations, and extensive treatment.", keys: [["release"], ["net sheet", "closing statement"], ["bill", "ledger", "itemiz"], ["pip", "eob", "payment log"], ["child support", "third-party", "third party", "lien letter", "lien notice"]] },
+            { q: "Analyze the typical factors providers consider when agreeing to a medical bill reduction (e.g., settlement amount, client hardship).", core: true, keys: [["settlement amount", "limited settlement", "policy limit"], ["hardship"], ["total", "other liens", "all liens", "lien"], ["paid", "pip", "insurance"], ["prompt", "quick", "fast", "lump"]] },
+            { q: "Assess how persuasive documentation (e.g., settlement amount, lien summary, client hardship letter) influences negotiation outcomes.", core: true, keys: [["settlement amount", "settlement"], ["lien summary", "summary"], ["hardship"], ["document", "evidence", "proof"], ["persua", "likel", "accept", "approv"]] },
+            { q: "Analyze the purpose of a settlement release and its binding nature once signed. What rights does the client waive?", keys: [["release"], ["final", "binding", "cannot", "no longer"], ["waive", "give up", "gives up", "surrender"], ["future", "further", "additional"], ["claim", "sue", "lawsuit"]] },
+            { q: "Evaluate the importance of reviewing the release terms with the client. What issues could arise if the client signs without understanding?", keys: [["review", "explain", "walk"], ["understand"], ["sign"], ["dispute", "complain", "surprise", "confus"], ["liens", "responsib"]] },
+            { q: "Analyze how the closing statement reflects the full financial breakdown of a personal injury case.", core: true, keys: [["gross", "settlement amount"], ["fee"], ["cost", "expense"], ["medical", "bill", "lien"], ["net"]] },
+            { q: "Evaluate the role of transparency in the closing statement. How does it support trust and prevent disputes?", keys: [["transparen", "clear", "itemiz"], ["trust"], ["dispute", "complain", "question"], ["client"], ["sign", "acknowledg", "agree"]] },
+            { q: "Analyze the net sheet's function in summarizing what the client will receive after deductions. Why must it match the closing statement exactly?", core: true, keys: [["net sheet"], ["deduct", "fee", "cost", "lien"], ["receive", "net", "take home", "take-home"], ["match", "same", "consisten", "exact"], ["closing statement"]] },
+            { q: "Judge whether the net sheet should be presented before or after lien negotiations are finalized and why.", keys: [["before", "after"], ["final", "finaliz", "agreed", "approved"], ["reduc", "negotiat"], ["accurate", "exact", "change", "estimate"], ["client"]] },
+            { q: "Assess whether it's appropriate for the legal team to pressure clients to accept settlements. Where is the ethical boundary?", keys: [["pressure", "coerc", "force"], ["ethic", "professional", "rule"], ["client"], ["decision", "decide", "choice", "informed", "right"], ["attorney", "advice", "advise", "recommend"]] }
           ] },
         { id: "d3-exercise", kind: "deck", title: "Exercise", label: "Exercise", group: "AM · Answering Process Questions",
           link: "https://www.canva.com/design/DAGva6b4Q_Q/sJk9AIQaiwaxO__NlgPplA/view" },
@@ -198,6 +213,8 @@ window.LN_COURSE = {
           ] },
         { id: "d3-lab", kind: "lab", stage: "day3", title: "Your Case: Updated Bills, Reductions and the Closing Statement", label: "Case Activity", group: "Live Demo · Your Case",
           note: "Continue your case, step by step, just like the demo: request updated bills and payoffs where the file is out of date (the provider sends the corrected bill), send your Reduction Requests, finalize the Net Sheet, draft the Closing Statement, and send it with the Settlement Release Form(s) to the client." },
+        { id: "d3-netsheet", kind: "netsheet", stage: "final", title: "The Final Net Sheet", label: "Final Net Sheet", group: "Live Demo · Your Case",
+          note: "Finalize your Net Sheet here: the corrected bills, the updated payoffs and each agreed reduction. Then ✓ Check final sheet. Your Closing Statement must match it exactly." },
         { id: "d3-shadowing", kind: "videos", title: "Shadowing and Training Video Viewing", label: "Training & Shadowing Videos", group: "PM · Shadowing and Training Video Viewing",
           note: "Please go over these videos for your next task.",
           items: [

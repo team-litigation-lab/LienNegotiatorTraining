@@ -83,6 +83,7 @@ const ticket = (t) => { const p = b64u(JSON.stringify(t)); return `${p}.${b64u(c
     await draft(`Reduction Request · ${nm}`, Object.assign({ file: `MED - ${nm} - Reduction Request (Ada)`, client: 'JOHN DOE', dob: '08/13/1990', dol: '07/01/2025', balance: bal, requested: req }, nm === 'Sunshine' ? {} : { pip }));
   assert.match(await p.locator('.ld-prev iframe').getAttribute('srcdoc'), /BILL REDUCTION REQUEST/);
   assert.deepEqual(await tasksOk('day2'), [true, true, true, true, true], 'Day 2 is done');
+  assert.equal(await p.evaluate(() => LNDesk.grade('day2').score), 100, 'the automated grader: a perfect Day 2');
 
   // ---- Day 3 ----
   r = await send('billing@colonnaderehab.example', 'Updated bill request', 'Please send an updated itemized statement.', []);
@@ -112,6 +113,20 @@ const ticket = (t) => { const p = b64u(JSON.stringify(t)); return `${p}.${b64u(c
     [['John Doe – Closing Statement'], ['Settlement Release Form · BI', 'John Doe – Settlement Release Form BI']]);
   assert.match(r.body, /signed them/); await tab('Email');
   assert.deepEqual(await tasksOk('day3'), [true, true, true, true, true, true], 'Day 3 is done');
+  // the grader: three replies asked for a fix (the release not attached, no client name / DOL, a wrong subject line):
+  // email conventions 4/10, so 94
+  const g3 = await p.evaluate(() => LNDesk.grade('day3'));
+  assert.equal(g3.items.find((i) => /conventions/.test(i.label)).got, 4); assert.equal(g3.score, 94); assert.ok(g3.pass);
+  await tab('Tasks'); assert.match(await p.textContent('.ld-grade:last-child'), /94/);
+  // the Final Net Sheet, embedded in Day 3's step: the same sheet, with its figures
+  await p.click('.nav button:has-text("Day 3")'); await p.waitForSelector('.obj-list');
+  await p.click('.stage-bar .btn-primary'); await p.click('text=Slide Map');
+  await p.locator('#overlay .map-list button', { hasText: 'Final Net Sheet' }).click();
+  await p.waitForSelector('.ns-embed .ld-sheet');
+  assert.equal(await p.inputValue('.ns-embed .ld-in[data-k="M1red"]'), '700');
+  await p.click('.ns-embed button:has-text("Check final sheet")');
+  await p.waitForSelector('.ns-embed .ld-check');
+  assert.match(await p.textContent('.ns-embed .ld-check'), /ties out/);
 
   // the course's Day 3 step follows the desk
   await p.click('.nav button:has-text("Day 3")'); await p.waitForSelector('.obj-list');

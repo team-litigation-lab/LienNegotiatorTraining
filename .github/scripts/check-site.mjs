@@ -37,7 +37,10 @@ for (const d of LN_COURSE.days) {
     n++;
     if (ids.has(m.id)) fail.push(`js/ln-course.js: module id ${m.id} repeats`);
     ids.add(m.id);
-    if (!['deck', 'video', 'files', 'questions', 'guide', 'lab', 'videos'].includes(m.kind)) fail.push(`js/ln-course.js: ${m.id} kind must be deck, video, files, questions, guide or lab`);
+    if (!['deck', 'video', 'files', 'questions', 'guide', 'lab', 'videos', 'tools', 'netsheet'].includes(m.kind)) fail.push(`js/ln-course.js: ${m.id} kind must be deck, video, files, questions, guide, lab, videos, tools or netsheet`);
+    if (m.kind === 'netsheet' && !['initial', 'final'].includes(m.stage)) fail.push(`js/ln-course.js: ${m.id} (netsheet) needs stage "initial" or "final"`);
+    if (m.kind === 'tools' && (!Array.isArray(m.items) || m.items.some((t) => !t.name || !t.what))) fail.push(`js/ln-course.js: ${m.id} needs items, each a name and what it does`);
+    if (m.kind === 'questions' && m.questions && m.questions.some((q) => !Array.isArray(q.keys) || q.keys.length < 3 || q.keys.some((g) => !Array.isArray(g) || !g.length))) fail.push(`js/ln-course.js: ${m.id}: every question needs at least 3 key-concept groups for the automated grader`);
     if (m.kind === 'videos' && (!Array.isArray(m.items) || !m.items.length || m.items.some((x) => !x.title || !lnEmbed.video(x.link)))) fail.push(`js/ln-course.js: ${m.id} needs items, each a title and a drive.google.com/file/d/… link`);
     if (m.kind === 'lab' && !['day2', 'day3'].includes(m.stage)) fail.push(`js/ln-course.js: ${m.id} (lab) needs stage "day2" or "day3"`);
     else if ((m.kind === 'deck' || m.kind === 'video') && !lnEmbed.embed(m.kind, m.link)) fail.push(`js/ln-course.js: ${m.id} is not a ${m.kind === 'video' ? 'drive.google.com/file/d/…' : 'canva.com/design/…'} link: ${m.link}`);
