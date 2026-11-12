@@ -97,7 +97,139 @@ window.LN_COURSE = {
         { id: "d2-deck", kind: "deck", title: "The Lien Negotiator Role, Pt. 2", slides: 72,
           link: "https://www.canva.com/design/DAHabx7BhKE/BPidIfAISKJuol56ntSmZg/view" },
         { id: "d2-video", kind: "video", title: "The Lien Negotiator Role, Pt. 2",
-          link: "https://drive.google.com/file/d/1sUjQCpEqkrvf802Ck23aajx4Z2ox8zgE/view" }
+          link: "https://drive.google.com/file/d/1sUjQCpEqkrvf802Ck23aajx4Z2ox8zgE/view" },
+        { id: "d2-tools", kind: "tools", title: "Know Your Tools", label: "Know Your Tools",
+          note: "Everything you use to work a settled case, before you start yours.",
+          items: [
+            { icon: "🗂", name: "Lien Desk", what: "Your assigned case, start to finish: Tasks, Case File, Email, Net Sheet and Drafts in one place.", how: "Top bar → 🗂 Lien Desk, or the Case Activity step.", go: "desk" },
+            { icon: "📁", name: "Case File", what: "The release(s), the settlement letter, itemized bills and ledgers, the PIP log, lien notices and payoff letters, the cost ledger and the retainer.", how: "Check every date: a bill or payoff can be out of date." },
+            { icon: "📊", name: "PIP Log", what: "What the PIP carrier paid each provider, and when. The provider's own ledger can lag behind it.", how: "Square every bill with it: charges – PIP – other payments – adjustments = balance owed." },
+            { icon: "🧮", name: "Net Sheet", what: "NET SETTLEMENT CALCULATIONS: settlement, fees, expenses, medical bills, non-medical liens, total net settlement.", how: "✓ Check initial sheet (Day 2) and ✓ Check final sheet (Day 3) tell you what ties out." },
+            { icon: "✉️", name: "Email", what: "Your inbox for the case: the trainer, each provider's billing office, the lienholders and the client.", how: "Subject: Type of Request | LAST NAME, FIRST NAME. Include the client's full name and DOL." },
+            { icon: "✍️", name: "Drafts", what: "The BILL REDUCTION REQUEST letter and the SETTLEMENT CLOSING STATEMENT, with a live preview.", how: "MED - Provider's name - Reduction Request (your first name) · Client's Name – Closing Statement (your name)." },
+            { icon: "🔎", name: "NPI Lookup", what: "Find a provider that isn't easily identifiable.", how: "npino.com, or npidb.org.", link: "https://npino.com/" },
+            { icon: "🏅", name: "Automated Grader", what: "Scores each day's case work out of 100, with what earned and missed points.", how: "Lien Desk → 📋 Tasks shows your score; it updates as you work." }
+          ] },
+        { id: "d2-lab", kind: "lab", stage: "day2", title: "Your Case: the Release, the Initial Net Sheet and the Reduction Request", label: "Case Activity",
+          note: "You're assigned a settled case. Download the Settlement Release(s) and handle the process from there: email the release(s) to your trainer, who sends back the fully executed release. Once it's in, draft the initial Net Sheet, up to the point where you'll send the Reduction Request." },
+        { id: "d2-netsheet", kind: "netsheet", stage: "initial", title: "The Initial Net Sheet", label: "Initial Net Sheet",
+          note: "Work your case's Net Sheet right here: the settlement, the fee, the expenses, and each provider's balance squared with the PIP log. Then ✓ Check initial sheet." }
+      ]
+    },
+    {
+      day: 3,
+      title: "Process Questions, Live Demo & Shadowing",
+      theme: "Releases, Net Sheets & Closing Statements",
+      icon: "🧾",
+      objectives: [
+        "Explain the Lien Negotiator's part in the post-settlement process, and how they work with attorneys, clients and providers",
+        "Tell statutory, contractual and medical provider liens apart, and what each means legally",
+        "Know the documents a case needs, from a simple case to one with third-party liens, child support and extensive treatment",
+        "Build a persuasive medical bill reduction request: what providers weigh, and the documentation that moves them",
+        "Explain a settlement release, what the client waives, and why the terms are reviewed with the client",
+        "Draft the net sheet and the closing statement, and make them match exactly",
+        "Draft and send a reduction request, the closing statement and the settlement release, under the firm's naming conventions",
+        "Hold the ethical line on pressuring a client to accept a settlement"
+      ],
+      topics: [
+        { h: "Digital Handouts: Required Documents, Settlement Resistance, Settlement Release, Net Sheet, Closing Statement" },
+        { h: "Answering Process Questions (individual activity)" },
+        { h: "Exercise" },
+        { h: "Live Demo: Drafting and Sending the Reduction Request and the Closing Statement" },
+        { h: "Demo Guide: Naming Conventions, Subject Lines and Letter Templates" },
+        { h: "Shadowing and Training Video Viewing" },
+        { h: "Materials for Additional Reference" }
+      ],
+      // Shown only to a trainer (in the side panel of the step it belongs to, by module id, or "agenda").
+      trainerNotes: {
+        "agenda": ["AM: Answering Process Questions, then the Live Demo after the discussion. PM: Shadowing and Training Video Viewing, then Free Communication Upskill for 1 to 1½ hours."],
+        "d3-questions": [
+          "If time is limited, use only the five ★ Core questions.",
+          "After the discussion, send these materials in the training GC: https://drive.google.com/drive/folders/16YmI2zIJYxqbAeyYIaTxzYSapTv7ukz-",
+          "Discussion folder: https://drive.google.com/drive/folders/1sQRjiWureRoEK1eyS2t6rG5SCb91QL2w"
+        ],
+        "d3-demo": ["Send the Demo Guide's reminders and instructions in the training GC, with the two folders (reference materials, and the completed sample outputs)."],
+        "d3-shadowing": ["Communicate with the shadow buddy and give them the list of attendees, with the number of Filipino and Latin American trainees. Remind trainees in the training GC of their shadowing time and to set To-Do: Shadowing Lien Negotiator Role (Mario). If no shadowing buddy is available, these recorded shadowing videos stand in for it."],
+        "done": [
+          "Facilitator's Reference for the Demo (Reduction Request, Settlement Release Forms and Closing Statement). Activity 1.1, Francesse: https://drive.google.com/file/d/1Mtwe--GLG9DbvXzVCMFICvC5mzEVmm6d/view · Activity 1.2, La'norris: https://drive.google.com/file/d/1Vnlead_ANzvmm2XjF0H-cIR6-oBqsBv7/view",
+          "Materials for the demo: https://drive.google.com/drive/folders/1sljuF-iV-HRf_i7hLcck8iNBq6TnfHES",
+          "The demo answer keys are not on this page (it is public). Keep them with the trainers."
+        ]
+      },
+      modules: [
+        { id: "d3-handouts", kind: "files", title: "Digital Handouts", label: "Digital Handouts", group: "AM · Answering Process Questions",
+          note: "Individual activity: read these before you answer the process questions.",
+          items: [
+            { title: "Required Documents", link: "https://drive.google.com/file/d/1StatfcTr35aMbYdM6_rSTLlSa-spKuz5/view" },
+            { title: "Settlement Resistance", link: "https://drive.google.com/file/d/1jBDzp-duJfdKEaCwN8FLQbXGI63cHpk5/view" },
+            { title: "Settlement Release", link: "https://drive.google.com/file/d/1jGDi755qwt8voha7AQbcPHjDFiuAC8Du/view" },
+            { title: "Net Sheet", link: "https://drive.google.com/file/d/1DoNix0hVil6jPpcPQoiuOd8D4ZhGZ4fC/view" },
+            { title: "Closing Statement", link: "https://drive.google.com/file/d/1Mj926nXo1mZoRFFuhfeGdD8xROHX0j4H/view" }
+          ] },
+        { id: "d3-questions", kind: "questions", title: "Process Questions", label: "Process Questions", group: "AM · Answering Process Questions",
+          naming: "Lien_Negotiator_Process_Questions_Answers (your name)",
+          // core: the five the facilitator uses when time is limited. keys: the automated grader's key concepts, each
+          // a group of words of which any one counts (a stem like "negotiat" matches negotiate / negotiation).
+          questions: [
+            { q: "Analyze the specific responsibilities of a lien negotiator in relation to the post-settlement process. How do they interact with attorneys, clients, and providers?", core: true, keys: [["post-settlement", "after settlement", "after the settlement", "settlement funds", "disburse"], ["attorney"], ["client"], ["provider", "lienholder", "lien holder"], ["negotiat", "reduc"]] },
+            { q: "Analyze the difference between statutory, contractual, and medical provider liens. What are the legal implications of each?", keys: [["statut"], ["contract"], ["medical provider", "provider lien", "letter of protection", "lop"], ["law", "legal", "enforce"], ["priority", "must be paid", "repay", "reimburs"]] },
+            { q: "Compare the documentation required for a simple case with one that includes third-party liens, child support obligations, and extensive treatment.", keys: [["release"], ["net sheet", "closing statement"], ["bill", "ledger", "itemiz"], ["pip", "eob", "payment log"], ["child support", "third-party", "third party", "lien letter", "lien notice"]] },
+            { q: "Analyze the typical factors providers consider when agreeing to a medical bill reduction (e.g., settlement amount, client hardship).", core: true, keys: [["settlement amount", "limited settlement", "policy limit"], ["hardship"], ["total", "other liens", "all liens", "lien"], ["paid", "pip", "insurance"], ["prompt", "quick", "fast", "lump"]] },
+            { q: "Assess how persuasive documentation (e.g., settlement amount, lien summary, client hardship letter) influences negotiation outcomes.", core: true, keys: [["settlement amount", "settlement"], ["lien summary", "summary"], ["hardship"], ["document", "evidence", "proof"], ["persua", "likel", "accept", "approv"]] },
+            { q: "Analyze the purpose of a settlement release and its binding nature once signed. What rights does the client waive?", keys: [["release"], ["final", "binding", "cannot", "no longer"], ["waive", "give up", "gives up", "surrender"], ["future", "further", "additional"], ["claim", "sue", "lawsuit"]] },
+            { q: "Evaluate the importance of reviewing the release terms with the client. What issues could arise if the client signs without understanding?", keys: [["review", "explain", "walk"], ["understand"], ["sign"], ["dispute", "complain", "surprise", "confus"], ["liens", "responsib"]] },
+            { q: "Analyze how the closing statement reflects the full financial breakdown of a personal injury case.", core: true, keys: [["gross", "settlement amount"], ["fee"], ["cost", "expense"], ["medical", "bill", "lien"], ["net"]] },
+            { q: "Evaluate the role of transparency in the closing statement. How does it support trust and prevent disputes?", keys: [["transparen", "clear", "itemiz"], ["trust"], ["dispute", "complain", "question"], ["client"], ["sign", "acknowledg", "agree"]] },
+            { q: "Analyze the net sheet's function in summarizing what the client will receive after deductions. Why must it match the closing statement exactly?", core: true, keys: [["net sheet"], ["deduct", "fee", "cost", "lien"], ["receive", "net", "take home", "take-home"], ["match", "same", "consisten", "exact"], ["closing statement"]] },
+            { q: "Judge whether the net sheet should be presented before or after lien negotiations are finalized and why.", keys: [["before", "after"], ["final", "finaliz", "agreed", "approved"], ["reduc", "negotiat"], ["accurate", "exact", "change", "estimate"], ["client"]] },
+            { q: "Assess whether it's appropriate for the legal team to pressure clients to accept settlements. Where is the ethical boundary?", keys: [["pressure", "coerc", "force"], ["ethic", "professional", "rule"], ["client"], ["decision", "decide", "choice", "informed", "right"], ["attorney", "advice", "advise", "recommend"]] }
+          ] },
+        { id: "d3-exercise", kind: "deck", title: "Exercise", label: "Exercise", group: "AM · Answering Process Questions",
+          link: "https://www.canva.com/design/DAGva6b4Q_Q/sJk9AIQaiwaxO__NlgPplA/view" },
+        { id: "d3-demo", kind: "video", title: "Drafting and Sending Reduction Request and Closing Statement", label: "Live Demo", group: "Live Demo · Tutorial Demo Recording",
+          note: "While you review this recording to prepare for your Lien Negotiator demo, keep the Demo Guide's reference materials open: they are the ones used in the sample demo.",
+          link: "https://drive.google.com/file/d/1EcVjtKuR-cYQ-K3QomaADzBiJ05Apu6X/view" },
+        { id: "d3-guide", kind: "guide", title: "Demo Guide", label: "Demo Guide", group: "Live Demo · Reference",
+          sections: [
+            { h: "Reference materials", links: [
+              { t: "📁 Demo Reference Materials", u: "https://drive.google.com/drive/folders/1mWDS1zvxFk09QQZcuT-txI_lNk0N_ebB" },
+              { t: "📁 Completed Net Sheet, Reduction Request Letter & Closing Statement (sample demo output)", u: "https://drive.google.com/drive/folders/1d7O-IOP6fVJu8rC08V4INEmJKlV3ocCf" },
+              { t: "🔎 NPI lookup: npino.com", u: "https://npino.com/" },
+              { t: "🔎 Alternative: npidb.org", u: "https://npidb.org/" }
+            ], p: "For medical providers that are not easily identifiable, use Google search or the National Provider Identifier (NPI) lookup sites." },
+            { h: "First half: Initial Net Sheet Drafting and Medical Reduction Request", rows: [
+              ["Naming convention", "MED - Provider's name - Reduction Request (your first name only)"],
+              ["Example", "MED - Medview Inc. - Reduction Request (Michelle)"],
+              ["Subject line", "Type of Request | LAST NAME, FIRST NAME of the client"],
+              ["Example", "Billing Reduction Request | DOE, JOHN TEST"]
+            ], pre: "Good day!\n\nWe would like to take this opportunity to thank you for the excellent medical care and treatment provided to our client- LAST NAME, FIRST NAME of the client - DOL mm/dd/yyyy. At this time, we are asking for your assistance in helping us reduce their bill. Kindly see the attached bill reduction request for our client.\n\nIf you have any questions, please do not hesitate to contact us.\n\nHoping for your kind consideration. Thank you.\n\nBest regards,\n[complete name of the VA]\nLien Negotiator\n[work email add]\n[office phone #]",
+              example: "Good day!\n\nWe would like to take this opportunity to thank you for the excellent medical care and treatment provided to our client, PETIT PAPA, FRANCESSE - DOL 01/23/2023.\n\nAt this time, we are requesting your assistance in reducing their bill. Please see the attached bill reduction request for our client.\n\nIf you have any questions, please do not hesitate to contact us.\n\nWe appreciate your kind consideration and thank you in advance.\n\nBest Regards,\n[Your complete name]\nLien Negotiator\n[your work email]\nPhone Number: [office phone #]" },
+            { h: "Second half: Final Net Sheet Drafting and Closing Statement Drafting", rows: [
+              ["Naming convention", "Client's Name – Closing Statement (your name)"],
+              ["Two types of settlement", "Name each Settlement Release Form by its type: Client's Name – Settlement Release Form BI · Client's Name – Settlement Release Form UM"],
+              ["Subject line", "LAST NAME, FIRST NAME of the client - Closing Statement and Settlement Release Form/s"],
+              ["Example", "DOE, JOHN TEST - Closing Statement and Settlement Release Form/s"]
+            ], pre: "Good day!\n\nCongratulations on your case settlement! I hope this message finds you well. Please find attached your closing statement and settlement release for your review and signature. Kindly review the documents, sign them, and return them to me once completed.\n\nIf you have any questions, please feel free to reach out.\n\nThank you for your prompt attention.\n\nBest regards," }
+          ] },
+        { id: "d3-lab", kind: "lab", stage: "day3", title: "Your Case: Updated Bills, Reductions and the Closing Statement", label: "Case Activity", group: "Live Demo · Your Case",
+          note: "Continue your case, step by step, just like the demo: request updated bills and payoffs where the file is out of date (the provider sends the corrected bill), send your Reduction Requests, finalize the Net Sheet, draft the Closing Statement, and send it with the Settlement Release Form(s) to the client." },
+        { id: "d3-netsheet", kind: "netsheet", stage: "final", title: "The Final Net Sheet", label: "Final Net Sheet", group: "Live Demo · Your Case",
+          note: "Finalize your Net Sheet here: the corrected bills, the updated payoffs and each agreed reduction. Then ✓ Check final sheet. Your Closing Statement must match it exactly." },
+        { id: "d3-shadowing", kind: "videos", title: "Shadowing and Training Video Viewing", label: "Training & Shadowing Videos", group: "PM · Shadowing and Training Video Viewing",
+          note: "Please go over these videos for your next task.",
+          items: [
+            { title: "Reduction & Disbursement Training", label: "Training Video", link: "https://drive.google.com/file/d/1rv1Vwatczu3JVegzpEA_pAMxwXsO0EIl/view" },
+            { title: "Lien Negotiator Recording", label: "Training Video", link: "https://drive.google.com/file/d/1stDohvUe3okRlq7HB8qU5uTfgD6e3I6h/view" },
+            { title: "Kenneth, September 27", label: "Shadowing Video", link: "https://drive.google.com/file/d/1q0J7C0Fz1G7OsPooJLK_1bRg8VaHl-6p/view" }
+          ] },
+        { id: "d3-reference", kind: "videos", title: "Materials for Additional Reference", label: "Reference Videos", group: "Materials for Additional Reference",
+          note: "Shadowing videos for additional reference.",
+          items: [
+            { title: "Kenneth, September 28", label: "Shadowing Video", link: "https://drive.google.com/file/d/16VEGXqkzxDVLcwadQXNbfWhUPicZweHP/view" },
+            { title: "Discussion with Kenneth", label: "Shadowing Video", link: "https://drive.google.com/file/d/1CMfB9tqOFrWamJfm-VZGtRX8wELiWXFa/view" },
+            { title: "Lien Negotiator Recording of Gilda Marie Anagap", label: "Shadowing Video", link: "https://drive.google.com/file/d/1stDohvUe3okRlq7HB8qU5uTfgD6e3I6h/view" },
+            { title: "Bill, August 25, with William Allanigue (more in Tagalog)", label: "Shadowing Video", link: "https://drive.google.com/file/d/1Nq9oXyPmxcll2Yob4PKz3MZ4yNvGCTUh/view" }
+          ] }
       ]
     }
   ]

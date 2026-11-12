@@ -14,6 +14,11 @@ for (const f of walk(ROOT).filter((f) => /\.(c?js)$/.test(f))) {
 }
 const html = fs.readFileSync(path.join(ROOT, 'index.html'), 'utf8');
 [...html.matchAll(/<script>([\s\S]*?)<\/script>/g)].forEach((m, i) => { try { new vm.Script(m[1]); } catch (e) { fail.push(`index.html inline script ${i + 1}: ${e.message}`); } });
+// every <style> block's braces balance: one missing brace silently drops every rule after it
+[...html.matchAll(/<style>([\s\S]*?)<\/style>/g)].forEach((m, i) => {
+  let d = 0, low = 0; for (const ch of m[1].replace(/\/\*[\s\S]*?\*\//g, '')) { if (ch === '{') d++; if (ch === '}') d--; low = Math.min(low, d); }
+  if (d !== 0 || low < 0) fail.push(`index.html <style> block ${i + 1}: the braces don't balance (${d > 0 ? d + ' unclosed' : 'an extra }'}); the rules after the slip are ignored`);
+});
 const refs = [...html.matchAll(/(?:src|href)="(\/?[^"#:]+?)(?:\?[^"]*)?"/g)].map((m) => m[1]).filter((r) => !r.startsWith("//") && !r.includes("${"));
 for (const r of new Set(refs)) if (!fs.existsSync(path.join(ROOT, r.replace(/^\//, '')))) fail.push(`index.html loads ${r}, which doesn't exist`);
 JSON.parse(fs.readFileSync(path.join(ROOT, 'wrangler.json'), 'utf8'));
@@ -32,10 +37,59 @@ for (const d of LN_COURSE.days) {
     n++;
     if (ids.has(m.id)) fail.push(`js/ln-course.js: module id ${m.id} repeats`);
     ids.add(m.id);
-    if (m.kind !== 'deck' && m.kind !== 'video') fail.push(`js/ln-course.js: ${m.id} kind must be "deck" or "video"`);
-    else if (!lnEmbed.embed(m.kind, m.link)) fail.push(`js/ln-course.js: ${m.id} is not a ${m.kind === 'video' ? 'drive.google.com/file/d/…' : 'canva.com/design/…'} link: ${m.link}`);
+    if (!['deck', 'video', 'files', 'questions', 'guide', 'lab', 'videos', 'tools', 'netsheet'].includes(m.kind)) fail.push(`js/ln-course.js: ${m.id} kind must be deck, video, files, questions, guide, lab, videos, tools or netsheet`);
+    if (m.kind === 'netsheet' && !['initial', 'final'].includes(m.stage)) fail.push(`js/ln-course.js: ${m.id} (netsheet) needs stage "initial" or "final"`);
+    if (m.kind === 'tools' && (!Array.isArray(m.items) || m.items.some((t) => !t.name || !t.what))) fail.push(`js/ln-course.js: ${m.id} needs items, each a name and what it does`);
+    if (m.kind === 'questions' && m.questions && m.questions.some((q) => !Array.isArray(q.keys) || q.keys.length < 3 || q.keys.some((g) => !Array.isArray(g) || !g.length))) fail.push(`js/ln-course.js: ${m.id}: every question needs at least 3 key-concept groups for the automated grader`);
+    if (m.kind === 'videos' && (!Array.isArray(m.items) || !m.items.length || m.items.some((x) => !x.title || !lnEmbed.video(x.link)))) fail.push(`js/ln-course.js: ${m.id} needs items, each a title and a drive.google.com/file/d/… link`);
+    if (m.kind === 'lab' && !['day2', 'day3'].includes(m.stage)) fail.push(`js/ln-course.js: ${m.id} (lab) needs stage "day2" or "day3"`);
+    else if ((m.kind === 'deck' || m.kind === 'video') && !lnEmbed.embed(m.kind, m.link)) fail.push(`js/ln-course.js: ${m.id} is not a ${m.kind === 'video' ? 'drive.google.com/file/d/…' : 'canva.com/design/…'} link: ${m.link}`);
+    if (m.kind === 'files' && (!Array.isArray(m.items) || !m.items.length || m.items.some((x) => !x.title || !lnEmbed.video(x.link)))) fail.push(`js/ln-course.js: ${m.id} needs items, each a title and a drive.google.com/file/d/… link`);
+    if (m.kind === 'questions' && (!Array.isArray(m.questions) || !m.questions.length || m.questions.some((q) => !q.q))) fail.push(`js/ln-course.js: ${m.id} needs questions`);
+    if (m.kind === 'guide' && (!Array.isArray(m.sections) || !m.sections.length)) fail.push(`js/ln-course.js: ${m.id} needs sections`);
     if (m.kind === 'deck' && /\/edit\b/.test(m.link)) fail.push(`js/ln-course.js: ${m.id} is a Canva editor link; use the /view link`);
   }
 }
+// The Lien Desk's cases (js/ln-desk-cases.js): every case is complete, and its numbers hold together.
+const dctx = { window: {} };
+vm.runInNewContext(fs.readFileSync(path.join(ROOT, 'js/ln-desk-cases.js'), 'utf8'), dctx);
+const CASES = dctx.window.LN_CASES || [];
+if (!CASES.length) fail.push('js/ln-desk-cases.js has no cases');
+const cids = new Set();
+for (const c of CASES) {
+  const at = `js/ln-desk-cases.js ${c.id}`;
+  if (cids.has(c.id)) fail.push(`${at}: the id repeats`); cids.add(c.id);
+  for (const k of ['client', 'dol', 'caseNo', 'facts', 'settlements', 'fee', 'costs', 'payees', 'challenges']) if (!c[k]) fail.push(`${at}: missing ${k}`);
+  if (!c.settlements || !c.settlements.length || c.settlements.some((s) => !['BI', 'UM'].includes(s.type) || !(s.amount > 0) || !s.carrier || !s.claimNo)) fail.push(`${at}: every settlement needs type BI/UM, carrier, claimNo and amount`);
+  const ps = c.payees || [];
+  if (!ps.some((p) => p.lien && /health subrogation/i.test(p.type))) fail.push(`${at}: needs a health subrogation lien`);
+  if (!ps.some((p) => p.lien && /pre-settlement funding/i.test(p.type))) fail.push(`${at}: needs a pre-settlement funding lien`);
+  const keys = ps.map((p) => p.name.toLowerCase().split(/[\s—–,-]+/).filter((w) => w && !['the', 'of'].includes(w))[0]);
+  keys.forEach((k, i) => { if (keys.some((x, j) => j !== i && (x.includes(k) || k.includes(x)))) fail.push(`${at}: payee names must start with distinct words (the Net Sheet finds rows by them): ${ps[i].name}`); });
+  if (new Set(ps.map((p) => p.email)).size !== ps.length) fail.push(`${at}: every payee needs its own email address`);
+  for (const p of ps) {
+    const bal = p.lien ? p.amount : p.lines.reduce((s, l) => s + l.amount, 0) - (p.pip || 0) - (p.health || 0) - (p.adj || 0);
+    if (!(bal >= 0)) fail.push(`${at} ${p.id}: the balance is below zero`);
+    if (!/\.example$/.test(p.email || '')) fail.push(`${at} ${p.id}: emails end in .example (nothing can be sent)`);
+    if (p.reduce && p.reduce.floor != null && !(p.reduce.floor >= 0 && p.reduce.floor < bal)) fail.push(`${at} ${p.id}: the reduction floor must be $0 (a waiver) or more, and below the current balance (${bal})`);
+    if (/pre-settlement funding/i.test(p.type) && !(p.onFile && p.onFile.amount < p.amount)) fail.push(`${at} ${p.id}: a funding lien's payoff on file must be out of date (onFile.amount below the current payoff)`);
+    if (/health subrogation/i.test(p.type) && Math.abs(p.amount - ps.filter((x) => !x.lien).reduce((s, x) => s + (x.health || 0), 0)) > 0.005) fail.push(`${at} ${p.id}: the health lien must equal what the plan paid on the providers' bills`);
+  }
+  if (!/\.example$/.test(c.client.email || '')) fail.push(`${at}: the client's email ends in .example`);
+  // the money holds together: the net to the client is above zero before and after the reductions
+  const gross = (c.settlements || []).reduce((s, x) => s + x.amount, 0), fee = gross * (/⅓/.test(c.fee.pct) ? 1 / 3 : parseFloat(c.fee.pct) / 100), costs = (c.costs || []).reduce((s, x) => s + x.amount, 0);
+  let ini = 0, fin = 0;
+  for (const p of ps) {
+    const o = Object.assign({ pip: p.pip, health: p.health, adj: p.adj }, p.onFile || {});
+    const bi = p.lien ? (p.onFile && p.onFile.amount != null ? p.onFile.amount : p.amount) : p.lines.concat((p.onFile && p.onFile.extraLines) || []).reduce((s, l) => s + l.amount, 0) - (o.pip || 0) - (o.health || 0) - (o.adj || 0);
+    const bn = p.lien ? p.amount : p.lines.reduce((s, l) => s + l.amount, 0) - (p.pip || 0) - (p.health || 0) - (p.adj || 0);
+    ini += bi; fin += bn <= 0 ? 0 : p.reduce && p.reduce.floor != null ? p.reduce.floor : bn;
+    if (p.onFile && !p.lien && !p.onFile.extraLines && ['pip', 'health', 'adj'].every((k) => (p.onFile[k] || 0) === (p[k] || 0))) fail.push(`${at} ${p.id}: onFile changes nothing (the bill on file must differ from the corrected one)`);
+  }
+  // (before reductions the net can be below zero: that's why the reductions are needed, as in the demo's own case)
+  if (!(gross - fee - costs - fin > 0)) fail.push(`${at}: the net to the client must be above $0.00 after the reductions`);
+  if (!ps.some((p) => p.onFile && !p.lien)) fail.push(`${at}: needs at least one provider bill on file that is out of date (a corrected bill to request)`);
+}
+if (/answer key/i.test(JSON.stringify(LN_COURSE).replace(/answer keys are not on this page/i, ''))) fail.push('js/ln-course.js mentions an answer key: keep answer keys off this public page');
 if (fail.length) { console.error(fail.join('\n')); process.exit(1); }
-console.log(`OK: scripts parse, index.html's files exist, ${LN_COURSE.days.length} days and ${n} modules embed.`);
+console.log(`OK: scripts parse, index.html's files exist, ${LN_COURSE.days.length} days and ${n} modules embed, ${CASES.length} Lien Desk case(s) hold together.`);

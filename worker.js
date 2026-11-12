@@ -190,7 +190,9 @@ const OWN = (id) => [`trainee:${id}`, `progress:${id}`];
 const PROTECTED_TRAINEE_FIELDS = ["approved", "rejected", "archived", "registeredAt"];
 function canRead(tok, key) {
   if (tok.role === "a") return true;
-  return OWN(tok.id).includes(key) || PUBLIC_READ.some((re) => re.test(key));
+  // assign:<id> (the Lien Desk case a trainer assigned) and release:<id> (a fully executed release a trainer uploaded):
+  // a trainee reads their own, and only a trainer writes them.
+  return OWN(tok.id).includes(key) || key === `assign:${tok.id}` || key === `release:${tok.id}` || PUBLIC_READ.some((re) => re.test(key));
 }
 async function traineeWrite(env, tok, key, value) {
   const kv = kvOf(env);
@@ -208,7 +210,7 @@ async function traineeWrite(env, tok, key, value) {
     await kv.put(key, JSON.stringify(merged)); return null;
   }
   if (key === `progress:${id}`) {
-    if (String(value).length > 200000) return "Too large";
+    if (String(value).length > 1000000) return "Too large";   // the answers and a whole Lien Desk case, emails included
     await kv.put(key, value); return null;
   }
   return "Not allowed";

@@ -10,13 +10,29 @@ In the CM course's format: **Day cards** on the dashboard → the day's **Object
 |---|---|---|---|
 | **Day 1 · The Lien Negotiator Role, Pt. 1** | Liens, Lien Holders & Reductions (9 topics) | [34 slides](https://www.canva.com/design/DAGthtOQUg4/8AoCnBiC8yWJGOM_zLUXjg/view) | [Video](https://drive.google.com/file/d/1rmdqifC5m_3c9FYDZkrzsUampVKmUMaY/view) |
 | **Day 2 · The Lien Negotiator Role, Pt. 2** | ERISA & Government Plan Liens (10 topics) | [72 slides](https://www.canva.com/design/DAHabx7BhKE/BPidIfAISKJuol56ntSmZg/view) | [Video](https://drive.google.com/file/d/1sUjQCpEqkrvf802Ck23aajx4Z2ox8zgE/view) |
+| **Day 3 · Process Questions, Live Demo & Shadowing** | Releases, Net Sheets & Closing Statements (12 modules) | [Exercise](https://www.canva.com/design/DAGva6b4Q_Q/sJk9AIQaiwaxO__NlgPplA/view) | 8 videos, each embedded in full (below) |
 
-- **Dashboard:** one Day card per day, drawn like the CM course's: *Day n · title* in the head, the day's icon and theme pill, **Start** / **Continue** / **Review**, and **☰ Topics** (the day's outline, with the slides each topic covers). No welcome panel.
+- **Dashboard:** the CM banner (the completion ribbon, *Lien Negotiation Accelerator*, the workshop title, and **▶ Continue where you left off** once a day is started; no Roadmap button), then one Day card per day, drawn like the CM course's: *Day n · title* in the head, the day's icon and theme pill, **Start** / **Continue** / **Review**, and **☰ Topics** (the day's outline, with the slides each topic covers).
 - **Objectives page** (the CM day page): *🎯 By the end of today you'll be able to …*, *📘 The Lesson* outline in two columns, *🧭 Today's Modules*, and **← Dashboard** / **Start Day n →**.
 - **The day's steps** (the CM lesson player): a stage with the step's title, banner and chip, **← Previous · 🗺 Slide Map · Step n of N · Next →** under it (← → keys too), and the side panel (the day, **📋 Objectives**, **⛶ Full screen**). The steps are **Training Agenda** (the theme, objectives and numbered topics) → **Module 1 · Slide Deck** (the Canva deck) → **Module 2 · Recorded Session** (the Drive video) → **Day Complete**. Every step fits on one screen. A module counts as done once the trainee moves on from it with Next; the day is done when they reach Day Complete with both modules done. A trainee who leaves mid-day continues from the same step.
 - **🛡 Admin:** every trainee who has opened the course, their batch, each day's status (modules done), when they were last active, with *Remove access* / *Restore access*; and **Course links**, to replace a module's deck or video without a deploy.
 
-The day's objectives and topics were written from the decks' own slides (their section headings, with slide numbers).
+Days 1 and 2's objectives and topics were written from the decks' own slides (their section headings, with slide numbers).
+
+**Day 3** (the Foundational schedule's *Day 18: Lien Negotiator Training*) is a day of activities, each its own step:
+
+| Part | Module(s) |
+|---|---|
+| AM · Answering Process Questions | **📄 Digital Handouts** (Required Documents, Settlement Resistance, Settlement Release, Net Sheet, Closing Statement, each opened in an embedded viewer) · **✍️ Process Questions** (all 12, the five ★ Core ones marked; each answered in a box that saves to the trainee's account, with *Copy all answers* for the named document) · **Exercise** (Canva) |
+| Live Demo | **▶ Tutorial Demo Recording** (Drafting and Sending Reduction Request and Closing Statement) · **🧭 Demo Guide** (the reference folders, NPI lookup, naming conventions, subject lines, and the two letter templates with Copy buttons) |
+| PM · Shadowing and Training Video Viewing | **▶** Reduction & Disbursement Training · Lien Negotiator Recording · Kenneth, September 27 |
+| Materials for Additional Reference | **▶** Kenneth, September 28 · Discussion with Kenneth · Lien Negotiator Recording of Gilda Marie Anagap · Bill, August 25, with William Allanigue (more in Tagalog) |
+
+Every video is embedded in full (its own step, a full-size Drive player).
+
+- **Trainer notes** (the facilitator's notes: which five questions to use when time is short, what to send in the GC and when, the shadow buddy, the demo activity files) show in the side panel **to a trainer only**. This page and this repository are public, so the **demo answer keys are deliberately not in it**; the checks refuse an answer key in `js/ln-course.js`. Keep them with the trainers.
+- **Trainees' answers** are in `progress:<id>` (`{ answers: { "d3-questions": [ … ] } }`); Admin → Trainees → **✍️ Answers** shows them.
+- The sample letter in the Demo Guide is signed with placeholders rather than a staff member's name, email and phone number.
 
 | File | What it is |
 |---|---|
@@ -25,6 +41,23 @@ The day's objectives and topics were written from the decks' own slides (their s
 | `js/portal-gate.js` | The Portal sign-in screen. **The same file as in every LSH course repo** (copied from Case-Management-Training); change it in all of them. |
 | `worker.js` | The Worker: the CM Worker's sign-in (tokens, admin password, Portal tickets, Batch IDs) unchanged, plus progress storage and the automatic Time In. |
 | `wrangler.json` | The Worker's name (`liennegotiatortraining`) and its `LSH_KV` binding. |
+
+## 🗂 The Lien Desk (the case activity, Days 2 and 3)
+
+Each trainee works one settled case, step by step like the demo (`js/ln-desk.js`, the cases in `js/ln-desk-cases.js`): **Case File** (crisp documents on LSH Law Firm letterhead: the release(s), the settlement letter, itemized bills and ledgers, the PIP log, lien notices and payoff letters, the cost ledger, the retainer), **Email** (an inbox with scripted replies: the trainer returns the fully executed release; providers send corrected bills and answer reduction requests, approving, countering below their floor, or waiving; a funding company won't reduce; the client returns the signed closing statement; a missing name or DOL, or a wrong subject line, gets a realistic reply), **Net Sheet** (the firm's NET SETTLEMENT CALCULATIONS: settlement, atty fees, expense log, medical bills with PIP / Med / Health payments, adjustments, balance owed, agreed reduction and max offer, non-medical liens, total net settlement), and **Drafts** (the firm's **BILL REDUCTION REQUEST** letter and **SETTLEMENT CLOSING STATEMENT AND INSTRUCTION FOR DISTRIBUTION**, with the naming conventions checked).
+
+- **Day 2:** download the Settlement Release(s) → email them to the trainer → the fully executed release comes back (or the trainer uploads a real one: Admin → 🗂 Lien Desk) → the initial Net Sheet, each balance squared with the PIP log → the Reduction Request(s), ready to send.
+- **Day 3:** request updated bills and payoffs → send the Reduction Requests → finalize the Net Sheet with the agreed amounts → the Closing Statement (it must match the Net Sheet exactly) → send it with the Settlement Release Form(s) to the client → the client signs.
+
+**12 cases.** Three are the original activities, rewritten (new names, LSH Law Firm, every scanned document recreated), with their figures checked against the answer keys:
+
+| Case | From | The original's figures |
+|---|---|---|
+| **John Doe** (& Mary Doe, spouse) | the demo's case (Activity 1.2 and the closing statement activity) | Colonnade $7,858.13 → $700, Shreeve MRI $743.65 → $250, MediVista $168.55 → waived; net $5,024.19 before the two liens added |
+| **Jane Doe** | Activity 1.1 | 40% fee; Brightcare $8,653.84 → $500, HighView MRI $2,018.26 → $900, Good Hope $66.65 → waived; net $4,144.81 before the two liens added |
+| **James Doe** | Activity 2 | BI $10,000 + UM $25,000; PIP exhausted; Spinewell, Allied and Triad Lakes squared with the PIP log; Pagewood's bill went to the deductible |
+
+and nine more from the CM course's mock PI cases (Sarah Miller, David Chen, Elena Rodriguez, Mark Thompson, Gladys Winslow, JT Taylor, Sophie Vane, Robert Lee, Bradley Peterson). Every case has a health subrogation lien and a pre-settlement funding lien. Provider and insurer names are made up, and every email address ends in `.example`. The answer keys themselves are not in this public repository.
 
 ## 🔐 Sign in on the Main Portal only
 
@@ -89,7 +122,7 @@ This repository is its own Worker, the same as the CM course.
 The Portal already lists **Lien Negotiator Training** (`LIEN NEGOTIATION`). To open this site from it, add its address next to the other programs':
 
 - `functions/api/launch.js` and `programs.html`: `'LIEN NEGOTIATION': 'https://liennegotiatortraining.legalsupporthelp.workers.dev/'`
-- `functions/api/program-progress.js` (`PROGRAMS`), for progress: `{ id: 'ln', label: 'Lien Negotiator Training', prefix: 'ln:', days: 2, url: 'https://liennegotiatortraining.legalsupporthelp.workers.dev/' }`
+- `functions/api/program-progress.js` (`PROGRAMS`), for progress: `{ id: 'ln', label: 'Lien Negotiator Training', prefix: 'ln:', days: 3, url: 'https://liennegotiatortraining.legalsupporthelp.workers.dev/' }`
 
 ## 🎨 The standard page style
 

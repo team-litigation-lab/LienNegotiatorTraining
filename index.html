@@ -103,6 +103,33 @@ main{flex:1;max-width:1400px;margin:0 auto;padding:24px 20px 40px;width:100%;}
 .page-hero p.lead{color:#C9CDE3;font-size:15px;line-height:1.6;max-width:72ch;margin:0;font-weight:500;}
 
 
+/* ---------- the dashboard banner (the CM course's: the completion ribbon, the eyebrow and title, Continue where you left off) ---------- */
+.dash-top{position:relative;overflow:hidden;border-radius:20px;padding:18px 30px 12px;margin-bottom:16px;color:#fff;
+  background:radial-gradient(900px 320px at 85% -20%, rgba(219,132,55,.28), transparent 60%),
+             radial-gradient(600px 300px at -5% 120%, rgba(120,132,190,.25), transparent 60%),
+             linear-gradient(135deg, #1F2440 0%, #2B3158 55%, #353C68 100%);
+  box-shadow:0 18px 40px -22px rgba(20,24,48,.65);}
+.dash-top::after{content:"";position:absolute;inset:0;pointer-events:none;opacity:.07;
+  background-image:linear-gradient(rgba(255,255,255,.9) 1px, transparent 1px),linear-gradient(90deg, rgba(255,255,255,.9) 1px, transparent 1px);background-size:28px 28px;
+  -webkit-mask-image:linear-gradient(90deg, transparent 0%, #000 55%, transparent 100%);mask-image:linear-gradient(90deg, transparent 0%, #000 55%, transparent 100%);}
+.dash-top > *{position:relative;z-index:1;}
+.dash-hero{display:grid;grid-template-columns:90px minmax(0,1fr);gap:24px;align-items:center;}
+.dash-hero-ribbon{display:flex;justify-content:center;}
+.dash-hero-ribbon svg{max-width:78px;height:auto;filter:drop-shadow(0 8px 14px rgba(0,0,0,.35));}
+.dash-top .eyebrow{display:inline-block;margin:0 0 8px;padding:5px 12px;border-radius:999px;background:rgba(219,132,55,.16);border:1px solid rgba(240,192,138,.45);color:#F5C99A;font-size:11.5px;letter-spacing:.14em;font-weight:700;}
+.dash-hero h1{color:#fff;font-size:clamp(22px, 2.3vw, 32px);line-height:1.18;letter-spacing:-.01em;margin:0;font-weight:700;}
+.hero-spark{display:inline-block;width:.62em;height:.62em;margin-left:.28em;vertical-align:.08em;animation:heroSpark 3.2s ease-in-out infinite;transform-origin:50% 50%;}
+.hero-spark-lead{margin-left:0;margin-right:.28em;transform:scaleX(-1);animation-name:heroSparkLead;}
+@keyframes heroSpark{0%,100%{transform:scale(1) rotate(0);opacity:1;}50%{transform:scale(.82) rotate(12deg);opacity:.75;}}
+@keyframes heroSparkLead{0%,100%{transform:scaleX(-1) scale(1) rotate(0);opacity:1;}50%{transform:scaleX(-1) scale(.82) rotate(12deg);opacity:.75;}}
+@media (prefers-reduced-motion: reduce){.hero-spark{animation:none;}}
+.dash-hero-row{display:flex;justify-content:center;align-items:center;gap:10px;flex-wrap:wrap;padding:10px 0 2px;margin-top:10px;border-top:1px solid rgba(255,255,255,.12);}
+.dash-resume-btn{display:flex;align-items:baseline;gap:8px;min-width:0;max-width:100%;border:0;border-radius:999px;background:#DB8437;color:#fff;padding:7px 16px;font:inherit;font-size:13.5px;font-weight:800;box-shadow:0 4px 12px rgba(219,132,55,.45);white-space:nowrap;}
+.dash-resume-btn span{font-size:12px;font-weight:600;opacity:.92;overflow:hidden;text-overflow:ellipsis;min-width:0;}
+.dash-resume-btn span::before{content:"· ";}
+.dash-resume-btn:hover{background:#B5651F;}
+@media(max-width:760px){.dash-top{padding:16px 16px 10px;border-radius:16px;} .dash-hero{grid-template-columns:1fr;gap:10px;text-align:center;} .dash-resume-btn{white-space:normal;}}
+
 /* ---------- Day cards (the CM course's dashboard cards) ---------- */
 .module-grid{display:grid;grid-template-columns:repeat(auto-fill, minmax(250px, 300px));gap:16px;align-items:stretch;}
 .module-card{position:relative;border:1px solid rgba(255,255,255,.7);border-radius:16px;overflow:hidden;box-shadow:var(--shadow);display:flex;flex-direction:column;min-height:300px;padding:6px;}
@@ -125,7 +152,7 @@ main{flex:1;max-width:1400px;margin:0 auto;padding:24px 20px 40px;width:100%;}
 
 /* ---------- pop-ups (Topics, Slide Map) ---------- */
 .overlay{position:fixed;inset:0;z-index:120;background:rgba(15,19,36,.55);display:flex;align-items:center;justify-content:center;padding:16px;}
-.overlay-card{width:min(560px,100%);max-height:85vh;display:flex;flex-direction:column;background:#fff !important;overflow:hidden;}
+.overlay-card{width:min(760px,100%);max-height:85vh;display:flex;flex-direction:column;background:#fff !important;overflow:hidden;}
 .overlay-card .module-head{background:var(--g-navy);border:0;}
 .overlay-card .mh-title{color:#fff;}
 .overlay-card .mh-day{color:#F5C99A;}
@@ -144,7 +171,7 @@ main{flex:1;max-width:1400px;margin:0 auto;padding:24px 20px 40px;width:100%;}
 .day-headline .mono{color:var(--orange-deep);font-size:13px;font-weight:600;}
 .day-headline h1{margin:0;font-size:20px;color:var(--navy);}
 .stage-shell{background:linear-gradient(135deg,#1F2440 0%,#2B3158 55%,#353C68 100%);border-radius:22px;padding:12px 14px 12px;box-shadow:0 18px 40px -22px rgba(20,24,48,.65);}
-.obj-wrap{background:rgba(255,255,255,.72);border-radius:16px;padding:10px;display:flex;flex-direction:column;gap:10px;border-top:4px solid var(--orange-deep);}
+.obj-wrap{background:rgba(255,255,255,.72);border-radius:16px;padding:10px;display:flex;flex-direction:column;gap:10px;max-height:max(320px, calc(100vh - 220px));overflow-y:auto;border-top:4px solid var(--orange-deep);}
 .obj-box{background:rgba(255,255,255,.82);border-radius:12px;padding:10px 14px;border-top:4px solid var(--orange);}
 .obj-box.obj-navy{border-top-color:var(--navy);}
 .obj-box h2{font-family:var(--font-ui);font-size:16px;font-weight:800;color:var(--navy);margin:0 0 6px;}
@@ -163,7 +190,9 @@ main{flex:1;max-width:1400px;margin:0 auto;padding:24px 20px 40px;width:100%;}
 
 /* ---------- the day's player (the CM course's lesson player) ---------- */
 .player{display:grid;grid-template-columns:minmax(0,1fr) 250px;gap:18px;align-items:start;}
-@media(max-width:1000px){.player{grid-template-columns:1fr;} .player-side{order:-1;}}
+.player-main{min-width:0;}
+@media(max-width:1000px){.player{grid-template-columns:minmax(0,1fr);} .player-side{order:-1;}}
+@media(max-width:600px){.stage-title{white-space:normal;}}
 .stage{position:relative;background:linear-gradient(135deg,#1F2440 0%,#2B3158 55%,#353C68 100%);border-radius:20px;padding:16px 22px 18px;box-shadow:0 18px 40px -22px rgba(20,24,48,.65);color:#fff;overflow:hidden;}
 .stage:fullscreen{border-radius:0;overflow:auto;display:flex;flex-direction:column;}
 .stage:fullscreen .stage-body{flex:1;}
@@ -172,7 +201,7 @@ main{flex:1;max-width:1400px;margin:0 auto;padding:24px 20px 40px;width:100%;}
 .corner.tr{right:10px;top:10px;border-left:0;border-bottom:0;border-radius:0 6px 0 0;}
 .corner.bl{left:10px;bottom:10px;border-right:0;border-top:0;border-radius:0 0 0 6px;}
 .corner.br{right:10px;bottom:10px;border-left:0;border-top:0;border-radius:0 0 6px 0;}
-.stage-title{font-family:var(--font-ui);font-weight:900;font-size:clamp(22px,2.4vw,30px);color:#F2A35C;margin:0 0 10px;padding-bottom:8px;letter-spacing:-.01em;text-shadow:0 0 1px #fff,0 2px 0 rgba(255,255,255,.18);border-bottom:2px solid rgba(255,255,255,.18);background:linear-gradient(90deg,var(--orange) 0 26px,transparent 26px) bottom left/100% 3px no-repeat;}
+.stage-title{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-family:var(--font-ui);font-weight:900;font-size:clamp(22px,2.4vw,30px);color:#F2A35C;margin:0 0 10px;padding-bottom:8px;letter-spacing:-.01em;text-shadow:0 0 1px #fff,0 2px 0 rgba(255,255,255,.18);border-bottom:2px solid rgba(255,255,255,.18);background:linear-gradient(90deg,var(--orange) 0 26px,transparent 26px) bottom left/100% 3px no-repeat;}
 .stage-banner{background:linear-gradient(90deg,#3C4268,#4A5180);border-bottom:3px solid var(--orange);border-radius:6px;text-align:center;padding:9px 12px;font-size:14px;font-weight:800;letter-spacing:.04em;text-transform:uppercase;}
 .stage-chiprow{margin:10px 0 10px;display:flex;align-items:center;flex-wrap:wrap;gap:8px 0;}
 .stage-chip{display:inline-block;background:#EEF0F6;color:var(--navy);border-radius:8px;padding:5px 14px;font-size:16px;font-weight:800;letter-spacing:.04em;}
@@ -213,6 +242,145 @@ main{flex:1;max-width:1400px;margin:0 auto;padding:24px 20px 40px;width:100%;}
 .side-tip{font-size:12.5px;color:var(--ink-soft);font-weight:600;margin:2px 0 0;}
 @media(max-width:600px){.stage{padding:16px 14px;} .player-bar .btn{padding:9px 12px;font-size:13.5px;} .step-count{order:-1;flex-basis:100%;}}
 
+/* ---------- Day 3's kinds of module: handouts, process questions, the guide, the wrap-up ---------- */
+.doc-tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px;}
+.doc-tabs button{border:1px solid rgba(255,255,255,.25);background:rgba(255,255,255,.08);color:#fff;border-radius:8px;padding:6px 11px;font-size:13px;font-weight:700;}
+.doc-tabs button.on{background:var(--orange);border-color:var(--orange);color:#241304;}
+.doc-frame{position:relative;height:max(260px, calc(100vh - 500px));border-radius:12px;overflow:hidden;background:#fff;}
+.doc-frame iframe{position:absolute;inset:0;width:100%;height:100%;border:0;}
+.qa-head{display:flex;align-items:center;gap:10px;flex-wrap:wrap;font-size:13px;font-weight:600;color:#C9CDE3;margin-bottom:8px;}
+.qa-head > span:first-child{flex:1 1 300px;}
+.qa-head b{color:#F5C99A;}
+.qa-count{font-family:'IBM Plex Mono',monospace;font-size:12px;color:#fff;}
+.qa-list,.guide{max-height:max(280px, calc(100vh - 470px));overflow-y:auto;background:#FFFDF8;color:var(--ink);border-radius:12px;padding:12px 14px 12px 34px;margin:0;}
+.guide{padding:12px 14px;}
+.qa-list li{padding:6px 0 10px;border-bottom:1px solid var(--line);}
+.qa-list li p{margin:0 0 6px;font-size:14px;line-height:1.45;}
+.qa-list textarea{width:100%;border:1px solid var(--line);border-radius:8px;padding:8px 10px;font:500 13.5px var(--font-ui);resize:vertical;background:#fff;}
+.qa-list textarea:focus{outline:2px solid var(--orange-soft);border-color:var(--orange);}
+.core-tag{display:inline-block;font-size:11px;font-weight:800;color:#7A3F0C;background:rgba(240,192,138,.55);border-radius:4px;padding:1px 6px;}
+.guide-sec{padding:4px 0 12px;border-bottom:1px solid var(--line);margin-bottom:8px;}
+.guide-sec h3{margin:0 0 6px;font-size:16px;color:var(--navy);font-family:var(--font-ui);font-weight:800;}
+.guide-sec p{margin:0 0 8px;font-size:13.5px;font-weight:500;}
+.guide-links{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:6px;}
+.guide-rows{width:100%;border-collapse:collapse;font-size:13px;margin-bottom:8px;}
+.guide-rows th{text-align:left;width:190px;padding:5px 8px;color:var(--ink-soft);font-size:12px;vertical-align:top;}
+.guide-rows td{padding:5px 8px;font-size:12.5px;background:rgba(38,43,69,.04);border-radius:4px;}
+.guide-pre{border:1px solid var(--line);border-radius:10px;margin:8px 0;overflow:hidden;}
+.guide-pre-h{display:flex;align-items:center;justify-content:space-between;padding:6px 10px;background:rgba(38,43,69,.05);font-size:13px;}
+.guide-pre pre{margin:0;padding:10px 12px;font:500 12.5px/1.5 'IBM Plex Mono',monospace;white-space:pre-wrap;}
+.stage-done .done-box{max-height:max(300px, calc(100vh - 380px));overflow-y:auto;}
+.done-count{font-weight:700 !important;color:var(--navy) !important;}
+.wrap-box{text-align:left;background:#FFFDF8;border:1px solid var(--orange-soft);border-radius:12px;padding:12px 16px;margin:6px auto 14px;max-width:720px;}
+.wrap-box h3{margin:0 0 6px;color:var(--navy);font-size:17px;}
+.wrap-box p{margin:0 0 8px !important;max-width:none !important;}
+.wrap-box ol{margin:0 0 8px;padding-left:20px;font-size:13.5px;}
+.wrap-box li{padding:2px 0;}
+.wrap-note{font-weight:700 !important;color:var(--orange-deep) !important;}
+.side-note-box{background:#FFFDF8;border:1px solid var(--orange-soft);border-radius:10px;padding:10px 12px;font-size:13px;font-weight:600;line-height:1.45;color:var(--ink);}
+.trainer-notes{margin-top:6px;background:rgba(255,255,255,.7);border:1px dashed var(--navy-soft);border-radius:10px;padding:10px 12px;font-size:12.5px;}
+.trainer-notes b{color:var(--navy);}
+.trainer-notes ul{margin:6px 0 0;padding-left:16px;}
+.trainer-notes li{padding:2px 0;font-weight:500;overflow-wrap:anywhere;}
+.trainer-notes a{color:var(--orange-deep);font-weight:700;}
+.ans{white-space:pre-wrap;font-weight:500;font-size:13.5px;background:#F6F7FB;border-radius:6px;padding:6px 8px;margin-top:4px;}
+
+/* ---------- the Lien Desk's step in a day, and its page ---------- */
+main.main-wide{max-width:1600px;}
+.lab-box{background:#FFFDF8;color:var(--ink);border-radius:12px;padding:14px 18px;max-height:max(300px, calc(100vh - 420px));overflow-y:auto;}
+.lab-case .mono{color:var(--orange-deep);font-size:12px}.lab-case h3{margin:2px 0;font-size:18px;color:var(--navy);font-family:var(--font-ui);font-weight:800}.lab-case p{margin:0 0 8px;font-size:13px;font-weight:500;color:var(--ink-soft)}
+.lab-note{font-size:13.5px;font-weight:600;margin:0 0 6px}
+.lab-tasks{list-style:none;margin:0 0 10px;padding:0;font-size:14px}.lab-tasks li{padding:5px 0;border-bottom:1px solid var(--line)}.lab-tasks li.ok{color:var(--success)}
+.lab-foot{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+
+/* ---------- videos, as in the Standard Foundational Training: cards that play in the pop-out viewer (js/ln-viewer.js),
+   and the action row under a deck or video (⛶ Full screen · ⧉ Pop out · Open ↗) ---------- */
+.frame-actions{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-top:8px;font-size:12.5px;color:#C9CDE3;font-weight:600;}
+.frame-btns{display:flex;gap:6px;flex-wrap:wrap;}
+.frame-actions .btn-ghost{background:rgba(255,255,255,.92);color:var(--navy);border-color:transparent;}
+.frame:fullscreen{border-radius:0;}
+.vc-note{color:#C9CDE3;font-size:13.5px;font-weight:600;margin:0 0 10px;}
+.vcards{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px;align-content:start;}
+.vcard{display:flex;flex-direction:column;gap:6px;min-width:0;padding:8px 8px 10px;border:1px solid #E3E6EE;border-radius:12px;background:#fff;color:var(--ink);text-decoration:none;box-shadow:0 1px 3px rgba(30,35,64,.08);transition:box-shadow .15s,transform .15s;}
+.vcard:hover{box-shadow:0 6px 18px rgba(30,35,64,.16);transform:translateY(-2px);}
+.vcard-pic{position:relative;display:block;aspect-ratio:16/9;border-radius:8px;overflow:hidden;background:#1E2340;}
+.vcard-pic iframe{position:absolute;inset:0;width:100%;height:100%;border:0;pointer-events:none;}
+.vcard-play{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:48px;height:48px;border-radius:50%;background:rgba(201,116,43,.92);color:#fff;font-size:20px;line-height:48px;text-align:center;padding-left:3px;box-sizing:border-box;box-shadow:0 2px 8px rgba(0,0,0,.35);transition:transform .15s;}
+.vcard:hover .vcard-play{transform:translate(-50%,-50%) scale(1.12);}
+.vcard b{font-size:14.5px;line-height:1.3;color:var(--navy);}
+.vcard small{font-size:12px;font-weight:700;color:var(--orange-deep);}
+.stage-module:has(.vcards) .stage-body{overflow-y:auto;}
+
+
+/* ============================================================================
+   Big, bold and high-contrast. Every text is at least 13px and most 15px or more, headings heavier, and every
+   colour on its background clears WCAG AA (4.5:1; 3:1 for large text): the deep orange (#B5651F) reaches only
+   4.4:1 on white, so small orange lettering is #8F4A12 (6.6:1). .github/scripts/contrast.cjs checks it.
+   ========================================================================= */
+:root{--orange-text:#8F4A12;}
+.mnum,.side-day,.day-headline .mono,.lab-case .mono,.topic-list li span,.module-body .mnum{color:var(--orange-text) !important;}
+.nav button,.nav a{font-size:14.5px;font-weight:700;}
+.brand-text b{font-size:17px;}
+.mh-title{font-size:17.5px;font-weight:800;}
+.module-theme{font-size:16.5px;font-weight:700;}
+.module-start-btn{font-size:17px;font-weight:800;}
+.module-topics-btn,.mc-count{font-size:14px;font-weight:700;}
+.stage-title{font-size:clamp(26px,2.6vw,34px) !important;}
+.stage-banner{font-size:16px;}
+.stage-chip{font-size:18px !important;}
+.agenda-theme p{font-size:15px !important;}
+.agenda-item b{font-size:16px !important;}
+.agenda-item small{font-size:13.5px;color:#E3E6F2;}
+.agenda-mod{font-size:14px;}
+.obj-box h2{font-size:19px !important;}
+.obj-list li{font-size:16.5px !important;font-weight:700;}
+.outline{font-size:15.5px !important;}
+.outline li span{font-size:13.5px !important;}
+.frame-actions{font-size:14px;color:#E3E6F2;}
+.vc-note{font-size:16px;color:#E3E6F2;}
+.vcard b{font-size:16.5px;}
+.vcard small{font-size:13.5px;color:var(--orange-text);}
+.qa-head{font-size:14.5px;color:#E3E6F2;}
+.qa-list li p{font-size:16px !important;font-weight:700;}
+.qa-list textarea{font-size:15px !important;}
+.guide-sec h3{font-size:18px !important;}
+.guide-sec p,.guide-rows td,.guide-pre pre{font-size:15px !important;}
+.guide-rows th{font-size:13.5px !important;color:var(--ink-soft);}
+.lab-tasks{font-size:16px !important;}
+.lab-note,.lab-case p{font-size:15px !important;}
+.side-tip{font-size:14px;}
+.player-side h2{font-size:21px;}
+.side-btn{font-size:15px;font-weight:700;}
+.footer-note{font-size:13px;}
+.done-box p{font-size:16px !important;}
+/* Know Your Tools */
+.tools-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:12px;}
+.tool-card{display:flex;gap:12px;align-items:flex-start;background:#fff;color:var(--ink);border-radius:12px;padding:14px 16px;border-top:4px solid var(--orange);}
+.tool-card:nth-child(2n){border-top-color:var(--navy);}
+.tool-ic{font-size:30px;line-height:1;}
+.tool-card b{display:block;font-size:18px;color:var(--navy);margin-bottom:4px;}
+.tool-card p{margin:0 0 6px;font-size:15px;font-weight:600;line-height:1.45;}
+.tool-card small{display:block;font-size:13.5px;color:var(--orange-text);font-weight:700;margin-bottom:8px;}
+.stage-module:has(.tools-grid) .stage-body,.stage-module:has(.ns-embed) .stage-body{overflow-y:auto;}
+/* the Net Sheet embedded in a step */
+.ns-embed-head{display:flex;gap:12px;align-items:center;flex-wrap:wrap;color:#E3E6F2;font-size:15px;font-weight:600;margin-bottom:10px;}
+.ns-embed-head > span:first-child{flex:1 1 400px;}
+.ns-embed-head .btn-ghost{background:#fff;color:var(--navy);}
+.ns-embed .ld-sheet{margin:0;}
+/* the process questions' grader */
+.qa-grade{background:#fff;color:var(--navy);border-radius:10px;padding:8px 12px;margin:0 0 8px;font-size:15px;font-weight:700;}
+.qa-fb{font-size:13.5px;font-weight:700;color:#8F4A12;margin:0 0 6px;}
+.qa-fb.ok{color:var(--success);}
+/* a light card on the dark stage (the embedded Net Sheet, the score card) takes dark text, not the stage's white */
+.stage .ld-card,.stage .ld-grade,.stage .tool-card{color:var(--ink);}
+/* white on the brand orange is 2.85:1: the orange buttons carry dark text, hovered too */
+.btn-orange,.btn-orange:hover{color:#241304;}
+/* the Case Activity step: its tasks and its score read as one page that scrolls, not a squeezed box */
+.stage-module:has(.lab-box) .stage-body{overflow-y:auto;}
+.stage-module .lab-box{flex:0 0 auto !important;max-height:none !important;overflow:visible;}
+.stage-module .lab-box + .ld-grade{margin-top:10px;}
+.btn-primary:hover,.btn-primary:not([disabled]):hover{color:#241304;background-color:var(--orange);background-image:var(--g-accent);}   /* hovered: the same light gradient, with the glow (dark text on the deep orange was 4.1:1) */
+
 /* ---------- admin ---------- */
 .admin-table{width:100%;border-collapse:collapse;font-size:13.5px;}
 .admin-table th{text-align:left;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-soft);padding:10px 12px;border-bottom:1px solid var(--line);}
@@ -224,7 +392,7 @@ main{flex:1;max-width:1400px;margin:0 auto;padding:24px 20px 40px;width:100%;}
 .sec{padding:20px 22px;margin-bottom:18px;}
 .sec h2{margin:0 0 4px;font-size:20px;color:var(--navy);}
 .sec > p{margin:0 0 14px;font-size:13.5px;color:var(--ink-soft);font-weight:500;}
-@media(max-width:760px){.page-hero{padding:20px 16px;border-radius:16px;} main{padding:20px 16px 40px;} 
+@media(max-width:760px){.page-hero{padding:20px 16px;border-radius:16px;} main{padding:20px 16px 40px;}}
 /* ============================================================================
    The LSH standard page style — the see-through surfaces every LSH site shares.
    A vendored copy of the block at the end of the CM course's <style> (itself a copy of the Training Portal's
@@ -268,9 +436,41 @@ body::before{opacity:.40;}
 @media print{
   .topbar,.btn-primary,.btn-navy{background-image:none;box-shadow:none;}
 }
+
+/* ============================================================================
+   The day's pages fill the window, as in the CM course: on a laptop or desktop the
+   Objectives page and the player take the full width (no 1400px cap) and the full
+   height, down to the Previous / Next bar. A slide deck or video is the largest
+   16:9 that fits the room left (container units); a list, a document or the
+   questions stretch to the height and scroll inside. A phone keeps the normal flow.
+   ========================================================================= */
+.frame-box{width:100%;}
+@media (min-width:1001px) and (min-height:560px){
+  #app:has(main.main-player){height:100vh;min-height:0;}
+  main.main-player{max-width:none;flex:1;min-height:0;display:flex;flex-direction:column;padding:16px 24px 10px;}
+  main.main-player > .player{flex:1;min-height:0;align-items:stretch;grid-template-columns:minmax(0,1fr) 270px;}
+  .player-main{display:flex;flex-direction:column;min-height:0;}
+  .player-main > .stage{flex:1;min-height:0;display:flex;flex-direction:column;}
+  .stage-body{flex:1;min-height:0;display:flex;flex-direction:column;}
+  .stage-agenda .stage-body,.stage-done .stage-body{overflow-y:auto;}
+  .frame-box{flex:1;min-height:0;container-type:size;display:flex;align-items:center;justify-content:center;}
+  .stage .frame-box .frame{width:min(100cqw, calc(100cqh * 16 / 9));min-width:0;margin:0;}
+  .doc-frame{flex:1;height:auto;min-height:0;}
+  .qa-list,.guide,.lab-box{flex:1;max-height:none;min-height:0;}
+  .stage-done .done-box{flex:1;max-height:none;min-height:0;}
+  .agenda-grid{grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:10px;}
+  .agenda-item{padding:10px 12px;}
+  .agenda-item b{font-size:14px;}
+  main.main-player > .day-headline{flex:0 0 auto;}
+  main.main-player > .stage-shell{flex:1;min-height:0;display:flex;flex-direction:column;}
+  main.main-player .obj-wrap{flex:1;max-height:none;min-height:0;}
+  main.main-player .obj-list li,main.main-player .outline{font-size:14.5px;}
+  main.main-player ~ .footer-note{padding:6px 24px 10px;}
+}
 </style>
 <script src="/js/portal-gate.js?v=2026.10.23-dashboard"></script>
 <script src="/js/ln-course.js?v=2026.11.11"></script>
+<script src="/js/ln-desk-cases.js?v=2026.11.12"></script>
 <style>html.lsh-booting #app{visibility:hidden;}</style>
 <script>document.documentElement.classList.add("lsh-booting");setTimeout(function(){document.documentElement.classList.remove("lsh-booting");},4000);</script>
 </head>
@@ -284,14 +484,14 @@ body::before{opacity:.40;}
    repo) expects of an engine: state, render(), goto(), authStatus(), logout(), setAdminToken(),
    setTraineeToken(), submitLogin() and resumeWhereLeftOff().
    ============================================================ */
-const APP_BUILD = "2026.11.11-3";
+const APP_BUILD = "2026.11.12-4";
 const PORTAL_HOME = "https://cm-training-activity.pages.dev/";
 const LOGO_FULL_SRC = "/logo.svg";
 const COURSE = window.LN_COURSE;
 const TOKEN_KEYS = { admin: "ln.adminToken", trainee: "ln.traineeToken", last: "ln.last" };
 
 const state = {
-  view: "boot", dayNum: 1, step: 0,
+  view: "boot", dayNum: 1, step: 0, sub: {}, progress: null, deskAssign: "", deskRelease: null,
   secure: true, portalOnly: false, portalSecret: false,
   adminToken: "", authToken: "", isAdmin: false,
   traineeId: "", trainee: null,
@@ -299,6 +499,7 @@ const state = {
   admin: { rows: null, loading: false },
   resumePending: false
 };
+window.state = state;   // js/ln-desk.js reads it
 
 function esc(t){ return String(t == null ? "" : t).replace(/[&<>"']/g, (c) => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c])); }
 function store(k, v){ try{ if(v) localStorage.setItem(k, v); else localStorage.removeItem(k); }catch(e){} }
@@ -374,6 +575,15 @@ async function loadTrainee(){
   if(!state.trainee) state.trainee = { id: state.traineeId, name: state.traineeId, dayProgress: {} };
   state.trainee.dayProgress = state.trainee.dayProgress || {};
   state.trainee.lastActive = new Date().toISOString();
+  try{ state.progress = (await kvGet("progress:" + state.traineeId)) || {}; }catch(e){ state.progress = {}; }
+  // the Lien Desk: the case a trainer assigned (assign:<id>), and a fully executed release they uploaded (release:<id>)
+  try{
+    const a = (await kvGet("assign:" + state.traineeId)) || {};
+    state.deskAssign = a.caseId || "";
+    const merged = ((state.progress.desk || {}).cases || {});
+    const have = Object.values(merged).some((w) => w && w.got && w.got.uploadAt === a.releaseAt);
+    if(a.releaseAt && !have) state.deskRelease = await kvGet("release:" + state.traineeId);
+  }catch(e){}
   saveTrainee();
   api("/api/checkin", {training: COURSE.title}).catch(() => {});
 }
@@ -388,14 +598,30 @@ async function loadCourseLinks(){ try{ state.courseLinks = (await kvGet("setting
 
 /* ---------- the course: days, and each day's steps ---------- */
 const ALL_MODULES = COURSE.days.flatMap((d) => d.modules.map((m) => Object.assign({ day: d.day }, m)));
+window.ALL_MODULES = ALL_MODULES;   // js/ln-desk.js opens the demo recording from it
 function dayByNum(n){ return COURSE.days.find((d) => d.day === Number(n)); }
 function moduleById(id){ return ALL_MODULES.find((m) => m.id === id); }
 function linkOf(m){ const o = (state.courseLinks || {})[m.id]; return (o && o.link) || m.link; }
-const KIND = { deck: { icon: "🎞", label: "Slide Deck", chip: "📚 The Slides" }, video: { icon: "▶", label: "Recorded Session", chip: "🎬 The Session" } };
+const KIND = {
+  deck: { icon: "🎞", label: "Slide Deck", chip: "📚 The Slides" },
+  video: { icon: "▶", label: "Recorded Session", chip: "🎬 The Video" },
+  files: { icon: "📄", label: "Handouts", chip: "📄 The Handouts" },
+  questions: { icon: "✍️", label: "Process Questions", chip: "✍️ Your Answers" },
+  guide: { icon: "🧭", label: "Guide", chip: "🧭 The Guide" },
+  lab: { icon: "🗂", label: "Case Activity", chip: "🗂 The Lien Desk" },
+  videos: { icon: "🎬", label: "Videos", chip: "🎬 The Videos" },
+  tools: { icon: "🧰", label: "Know Your Tools", chip: "🧰 Know Your Tools" },
+  netsheet: { icon: "🧮", label: "Net Sheet", chip: "🧮 Your Net Sheet" }
+};
+// A module's own label (Live Demo, Shadowing Video …), else its kind's.
+function modLabel(m){ return m.label || KIND[m.kind].label; }
+// Modules with one embeddable address (a deck or a video): the ones Admin → Course links can replace.
+const LINKED = (m) => m.kind === "deck" || m.kind === "video";
+const slidesOf = (t) => t.slides ? ` <span>slides ${esc(t.slides)}</span>` : "";
 // A day's steps, as the CM course plays a day: the Training Agenda, each module, then Day complete.
 function stepsOf(d){
   return [{ type: "agenda", title: "Training Agenda" }]
-    .concat(d.modules.map((m, j) => ({ type: "module", module: Object.assign({ day: d.day }, m), n: j + 1, title: `Module ${j + 1} · ${KIND[m.kind].label}` })))
+    .concat(d.modules.map((m, j) => ({ type: "module", module: Object.assign({ day: d.day }, m), n: j + 1, title: `Module ${j + 1} · ${modLabel(m)}` })))
     .concat([{ type: "done", title: "Day Complete" }]);
 }
 function dayProg(d, rec){ const dp = ((rec || state.trainee) || {}).dayProgress || {}; return dp[d.day] || dp[String(d.day)] || {}; }
@@ -409,7 +635,7 @@ function recordStep(d, from, to){
   if(state.isAdmin || !state.trainee) return;
   const steps = stepsOf(d), dp = state.trainee.dayProgress;
   const p = Object.assign({}, dp[d.day] || {}); p.modules = Object.assign({}, p.modules || {});
-  if(to > from && steps[from] && steps[from].type === "module") p.modules[steps[from].module.id] = true;
+  if(to > from && steps[from] && steps[from].type === "module"){ const m = steps[from].module; if((m.kind !== "lab" || LNDesk.stageDone(m.stage)) && (m.kind !== "netsheet" || LNDesk.sheetOk(m.stage))) p.modules[m.id] = true; }
   p.step = to;
   const was = !!p.done;
   if(steps[to] && steps[to].type === "done" && d.modules.every((m) => p.modules[m.id])) p.done = true;
@@ -425,6 +651,7 @@ function topbar(){
   if(state.isAdmin || state.traineeId){
     nav.push(`<button class="${state.view === "dashboard" ? "active" : ""}" onclick="goto('dashboard')">Dashboard</button>`);
     COURSE.days.forEach((d) => nav.push(`<button class="${(state.view === "day" || state.view === "player") && state.dayNum === d.day ? "active" : ""}" onclick="goto('day',${d.day})">Day ${d.day}</button>`));
+    nav.push(`<button class="${state.view === "desk" ? "active" : ""}" onclick="goto('desk')">🗂 Lien Desk</button>`);
     if(state.isAdmin) nav.push(`<button class="${state.view === "admin" ? "active" : ""}" onclick="goto('admin')">🛡 Admin</button>`);
     nav.push(`<a class="nav-out" href="${PORTAL_HOME}">← Training Directory</a>`);
     nav.push(`<button onclick="logout()">Sign out</button>`);
@@ -437,10 +664,60 @@ function topbar(){
 }
 function footer(){ return `<div class="footer-note">LSH Lien Negotiator Training · Internal Training Portal · <span class="mono">build ${APP_BUILD}</span></div>`; }
 
+// The dashboard banner, as the CM course draws it: the completion ribbon (its completionRibbonSvg), the eyebrow and the
+// title between two sparks, then ▶ Continue where you left off (once a day has been started).
+function completionRibbonSvg(pct){
+  const points = 14, r1 = 48, r2 = 41, cx = 60, cy = 52;
+  let path = "";
+  for(let i = 0; i < points * 2; i++){
+    const ang = (Math.PI * 2 * i) / (points * 2) - Math.PI / 2, rr = i % 2 === 0 ? r1 : r2;
+    path += (i === 0 ? "M" : "L") + (cx + rr * Math.cos(ang)).toFixed(2) + "," + (cy + rr * Math.sin(ang)).toFixed(2) + " ";
+  }
+  path += "Z";
+  return `<svg class="seal completion-ribbon" viewBox="0 0 120 160" role="img" aria-label="${pct}% of program complete">
+    <defs>
+      <linearGradient id="crStar" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#F7E08A"/><stop offset=".5" stop-color="#D4AF37"/><stop offset="1" stop-color="#A8841F"/></linearGradient>
+      <radialGradient id="crFace" cx=".38" cy=".32" r=".75"><stop offset="0" stop-color="#FFF4C4"/><stop offset=".55" stop-color="#E7C458"/><stop offset="1" stop-color="#B8911F"/></radialGradient>
+      <linearGradient id="crTailL" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#E9C95A"/><stop offset="1" stop-color="#B08A22"/></linearGradient>
+      <linearGradient id="crTailR" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#D4AF37"/><stop offset="1" stop-color="#8F6E14"/></linearGradient>
+    </defs>
+    <path d="M38,82 L22,152 L40,140 L50,158 L62,92 Z" fill="url(#crTailL)"/>
+    <path d="M82,82 L98,152 L80,140 L70,158 L58,92 Z" fill="url(#crTailR)"/>
+    <path d="${path}" fill="url(#crStar)" stroke="#8A6A12" stroke-width="1.2"/>
+    <circle cx="${cx}" cy="${cy}" r="35" fill="url(#crFace)" stroke="#8A6A12" stroke-width="1"/>
+    <circle cx="${cx}" cy="${cy}" r="30" fill="none" stroke="#FFF6CF" stroke-width="1.1" opacity=".85"/>
+    <text x="${cx}" y="${cy + 4}" text-anchor="middle" font-family="Fraunces" font-weight="700" font-size="${String(pct).length > 2 ? 19 : 23}" fill="#3A2A05">${pct}%</text>
+    <text x="${cx}" y="${cy + 16}" text-anchor="middle" font-family="IBM Plex Mono" font-weight="700" font-size="7" letter-spacing=".4" fill="#3A2A05" opacity=".85">${pct >= 100 ? "DONE" : "COMPLETE"}</text>
+  </svg>`;
+}
+const SPARK = (lead) => `<svg class="hero-spark${lead ? " hero-spark-lead" : ""}" viewBox="0 0 40 40" aria-hidden="true"><path d="M20 2 L24.5 15.5 L38 20 L24.5 24.5 L20 38 L15.5 24.5 L2 20 L15.5 15.5 Z" fill="#F0C08A"/><path d="M33 3 L34.6 7.4 L39 9 L34.6 10.6 L33 15 L31.4 10.6 L27 9 L31.4 7.4 Z" fill="#fff"/><circle cx="6" cy="33" r="2.4" fill="#B5651F"/></svg>`;
+// Where the trainee left off: the first day that isn't done and has been started, at its saved step.
+function resumeTarget(){
+  if(state.isAdmin) return null;
+  const d = COURSE.days.find((x) => { const p = dayProg(x); return !p.done && (p.step || dayCount(x)); });
+  if(!d) return null;
+  const steps = stepsOf(d), i = Math.max(0, Math.min(steps.length - 1, dayProg(d).step || 0));
+  return { day: d.day, step: i, label: `Day ${d.day} · ${steps[i].title}` };
+}
+function resumeDay(){ const r = resumeTarget(); if(r){ state.dayNum = r.day; state.step = r.step; goto("player"); } }
+function dashBanner(){
+  const done = state.isAdmin ? 0 : COURSE.days.filter((d) => dayProg(d).done).length;
+  const pct = Math.round(done / COURSE.days.length * 100), r = resumeTarget();
+  return `<div class="dash-top">
+    <div class="dash-hero">
+      <div class="dash-hero-ribbon">${completionRibbonSvg(pct)}</div>
+      <div class="dash-hero-text">
+        <p class="eyebrow">LIEN NEGOTIATION ACCELERATOR</p>
+        <h1>${SPARK(true)}Lien Negotiator Professional Development Workshop${SPARK(false)}</h1>
+      </div>
+    </div>
+    ${r ? `<div class="dash-hero-row"><button type="button" class="dash-resume-btn" onclick="resumeDay()" title="Back to ${esc(r.label)}">▶ Continue where you left off<span>${esc(r.label)}</span></button></div>` : ""}
+  </div>`;
+}
 // The dashboard: one Day card per day, as the CM course draws them (Day n · title in the head, the icon and the theme
 // in the middle, Start, then ☰ Topics).
 function viewDashboard(){
-  return `<div class="module-grid day-grid">${COURSE.days.map((d) => {
+  return dashBanner() + `<div class="module-grid day-grid">${COURSE.days.map((d) => {
     const st = state.isAdmin ? "new" : dayStatus(d);
     return `<article class="module-card day-card mc-${st}" id="day-${d.day}">
       <div class="module-head"><div class="mh-title">Day ${d.day} · ${esc(d.title)}</div>${st === "done" ? `<div class="mh-day">✓ Completed</div>` : ""}</div>
@@ -465,14 +742,19 @@ function overlay(head, body){
 function showTopics(n){
   const d = dayByNum(n); if(!d) return;
   overlay(`<div class="mh-day">Day ${d.day} · ${d.topics.length} topics</div><div class="mh-title">${esc(d.title)}</div>`,
-    `<ol class="topic-list">${d.topics.map((t) => `<li><b>${esc(t.h)}</b> <span>slides ${esc(t.slides)}</span></li>`).join("")}</ol>`);
+    `<ol class="topic-list">${d.topics.map((t) => `<li><b>${esc(t.h)}</b>${slidesOf(t)}</li>`).join("")}</ol>`);
 }
 
 // A day's Objectives page: what the trainee will be able to do, and the day's outline (the CM course's day page).
 function viewDay(){
   const d = dayByNum(state.dayNum), half = Math.ceil(d.topics.length / 2);
-  const outline = (topics) => topics.map((t) => `<li>📘 <b>${esc(t.h)}</b> <span>slides ${esc(t.slides)}</span></li>`).join("");
-  const mods = d.modules.map((m, j) => `<li>${KIND[m.kind].icon} <b>Module ${j + 1}: ${esc(KIND[m.kind].label)}</b> <span>${m.slides ? m.slides + " slides" : "the recorded class"}${!state.isAdmin && moduleDone(Object.assign({ day: d.day }, m)) ? " · ✓ done" : ""}</span></li>`).join("");
+  const outline = (topics) => topics.map((t) => `<li>📘 <b>${esc(t.h)}</b>${slidesOf(t)}</li>`).join("");
+  const done = (m) => !state.isAdmin && moduleDone(Object.assign({ day: d.day }, m));
+  const groups = [...new Set(d.modules.map((m) => m.group).filter(Boolean))];
+  const mods = d.modules.length > 4 && groups.length
+    ? groups.map((g) => { const ms = d.modules.filter((m) => m.group === g);
+        return `<li>${KIND[ms[0].kind].icon} <b>${esc(g)}</b> <span>${ms.length} module${ms.length === 1 ? "" : "s"}${state.isAdmin ? "" : ` · ${ms.filter(done).length}/${ms.length} done`}</span></li>`; }).join("")
+    : d.modules.map((m, j) => `<li>${KIND[m.kind].icon} <b>Module ${j + 1}: ${esc(modLabel(m))}</b> <span>${m.slides ? m.slides + " slides" : m.kind === "video" ? "the recorded class" : esc(m.title)}${done(m) ? " · ✓ done" : ""}</span></li>`).join("");
   const p = dayProg(d), resume = !state.isAdmin && p.step && !p.done;
   return `<div class="day-headline"><span class="mono">Day ${d.day} of ${COURSE.days.length}</span><h1>Day ${d.day} · ${esc(d.title)}</h1></div>
     <section class="stage-shell">
@@ -512,6 +794,7 @@ function showSlideMap(){
   overlay(`<div class="mh-day">Day ${d.day} · Slide Map</div><div class="mh-title">${esc(d.title)}</div>`,
     `<ol class="topic-list map-list">${stepsOf(d).map((s, i) => `<li><button class="${i === state.step ? "on" : ""}" onclick="closeOverlay();stepTo(${i})"><b>${esc(s.title)}</b>${s.type === "module" && !state.isAdmin && moduleDone(s.module) ? " <span>✓ done</span>" : ""}</button></li>`).join("")}</ol>`);
 }
+function frameFull(id){ const el = document.getElementById(id), req = el && (el.requestFullscreen || el.webkitRequestFullscreen); if(req) try{ const r = req.call(el); if(r && r.catch) r.catch(() => {}); }catch(e){} }
 function stageFullScreen(){ const el = document.querySelector(".stage"); if(el && el.requestFullscreen) el.requestFullscreen().catch(() => {}); }
 
 // The day's steps, one at a time, in the CM course's player: the stage, Previous · Slide Map · Step n of N · Next, and the
@@ -523,16 +806,15 @@ function viewPlayer(){
   if(s.type === "agenda"){
     head = "Lien Negotiator Training"; banner = `Day ${d.day} · Training Agenda`; chip = "📅 Training Agenda";
     body = `<div class="agenda-theme"><span class="theme-tag">${esc(d.theme)}</span><p>${esc(d.objectives.join("; "))}.</p></div>
-      <div class="agenda-grid">${d.topics.map((t, k) => `<div class="agenda-item"><span class="agenda-n">${String(k + 1).padStart(2, "0")}</span><div><b>${esc(t.h)}</b><small>📚 slides ${esc(t.slides)}</small></div></div>`).join("")}</div>
+      <div class="agenda-grid">${d.topics.map((t, k) => `<div class="agenda-item"><span class="agenda-n">${String(k + 1).padStart(2, "0")}</span><div><b>${esc(t.h)}</b>${t.slides ? `<small>📚 slides ${esc(t.slides)}</small>` : ""}</div></div>`).join("")}</div>
 `;
-    chipExtra = `<div class="agenda-mods">${d.modules.map((m, j) => `<span class="agenda-mod">${KIND[m.kind].icon} Module ${j + 1}: ${esc(KIND[m.kind].label)}${m.slides ? ` · ${m.slides} slides` : ""}</span>`).join("")}</div>`;
+    chipExtra = `<div class="agenda-mods">${d.modules.length > 4
+      ? `<span class="agenda-mod">🧭 ${d.modules.length} modules</span>${d.modules.some((m) => m.kind === "video") ? `<span class="agenda-mod">▶ ${d.modules.filter((m) => m.kind === "video").length} videos</span>` : ""}`
+      : d.modules.map((m, j) => `<span class="agenda-mod">${KIND[m.kind].icon} Module ${j + 1}: ${esc(modLabel(m))}${m.slides ? ` · ${m.slides} slides` : ""}</span>`).join("")}</div>`;
   } else if(s.type === "module"){
-    const m = s.module, link = linkOf(m), src = lnEmbed.embed(m.kind, link), page = lnEmbed.page(m.kind, link);
-    head = m.title; banner = `Day ${d.day} · Module ${s.n} · ${KIND[m.kind].label}`; chip = KIND[m.kind].chip;
-    body = src
-      ? `<div class="frame"><iframe src="${esc(src)}" title="${esc(m.title)}: ${esc(KIND[m.kind].label)}" allow="autoplay; fullscreen" allowfullscreen loading="lazy" referrerpolicy="strict-origin-when-cross-origin"></iframe></div>
-         <p class="frame-note">${m.kind === "video" ? "The session plays from Google Drive. If it asks you to sign in, use your legalsupporthelp.com Google account." : "Use the arrows under the slides, or the slides' own full-screen button, to page through the deck."} <a href="${esc(page)}" target="_blank" rel="noopener">Open in a new tab ↗</a></p>`
-      : `<div class="empty">This module isn't set up yet. ${state.isAdmin ? "Add its address in Admin → Course links." : "Please tell your trainer."}</div>`;
+    const m = s.module;
+    head = m.title; banner = `Day ${d.day} · Module ${s.n} · ${m.group ? m.group : modLabel(m)}`; chip = m.kind === "video" && m.label ? `▶ ${m.label}` : KIND[m.kind].chip;
+    body = moduleBody(m);
   } else {
     const all = d.modules.every((m) => moduleDone(Object.assign({ day: d.day }, m)));
     const next = dayByNum(d.day + 1);
@@ -540,8 +822,9 @@ function viewPlayer(){
     body = `<div class="done-box">
       <div class="done-icon">${state.isAdmin || all ? "🎉" : "🧭"}</div>
       <h2>${state.isAdmin ? "End of the day's steps" : all ? `Day ${d.day} is complete` : "Almost there"}</h2>
-      <p>${state.isAdmin ? "Trainees reach this step after both modules; their day is recorded as complete here." : all ? "Both modules are done and your progress is saved to your account." : "Go through every module first: a module counts as done once you move on from it with Next."}</p>
-      <ul class="outline">${d.modules.map((m, j) => `<li>${!state.isAdmin && moduleDone(Object.assign({ day: d.day }, m)) ? "✅" : KIND[m.kind].icon} <b>Module ${j + 1}: ${esc(KIND[m.kind].label)}</b></li>`).join("")}</ul>
+      <p>${state.isAdmin ? "Trainees reach this step after every module; their day is recorded as complete here." : all ? "Every module is done and your progress is saved to your account." : "Go through every module first: a module counts as done once you move on from it with Next."}</p>
+      ${d.modules.length > 4 ? `<p class="done-count">${state.isAdmin ? d.modules.length + " modules" : `${dayCount(d)} of ${d.modules.length} modules done`}</p>` : `<ul class="outline">${d.modules.map((m, j) => `<li>${!state.isAdmin && moduleDone(Object.assign({ day: d.day }, m)) ? "✅" : KIND[m.kind].icon} <b>Module ${j + 1}: ${esc(modLabel(m))}</b></li>`).join("")}</ul>`}
+      ${d.wrapUp ? `<div class="wrap-box"><h3>${esc(d.wrapUp.h)}</h3><p>${esc(d.wrapUp.p)}</p><ol>${d.wrapUp.steps.map((x) => `<li>${esc(x)}</li>`).join("")}</ol>${d.wrapUp.note ? `<p class="wrap-note">📅 ${esc(d.wrapUp.note)}</p>` : ""}</div>` : ""}
       <div class="done-actions"><button class="btn btn-ghost" onclick="goto('dashboard')">Back to the Dashboard</button>${next ? `<button class="btn btn-primary" onclick="goto('day',${next.day})">Day ${next.day} →</button>` : ""}</div>
     </div>`;
   }
@@ -549,7 +832,7 @@ function viewPlayer(){
     <div class="player-main">
       <section class="stage stage-${s.type}">
         <span class="corner tl"></span><span class="corner tr"></span><span class="corner bl"></span><span class="corner br"></span>
-        <h1 class="stage-title">${esc(head)}</h1>
+        <h1 class="stage-title" title="${esc(head)}">${esc(head)}</h1>
         <div class="stage-banner">${esc(banner)}</div>
         <div class="stage-chiprow"><span class="stage-chip">${esc(chip)}</span>${chipExtra}</div>
         <div class="stage-body">${body}</div>
@@ -567,9 +850,121 @@ function viewPlayer(){
       <button class="side-btn" onclick="goto('day',${d.day})">📋 Objectives</button>
       <button class="side-btn side-dark" onclick="stageFullScreen()">⛶ Full screen</button>
       <p class="side-tip">Tip: use ← → keys to move between steps.</p>
+      ${s.type === "module" && s.module.note && (s.module.kind === "video" || s.module.kind === "deck") ? `<div class="side-note-box">📌 ${esc(s.module.note)}</div>` : ""}
+      ${trainerNotes(d, s)}
     </aside>
   </div>`;
 }
+// What a module's step shows, by its kind.
+function frameNote(text, page){ return `<p class="frame-note">${esc(text)} ${page ? `<a href="${esc(page)}" target="_blank" rel="noopener">Open in a new tab ↗</a>` : ""}</p>`; }
+function moduleBody(m){
+  if(m.kind === "lab"){
+    const c = LNDesk.caseOf(), list = LNDesk.tasks(m.stage), done = list.filter((t) => t.ok).length;
+    return `<div class="lab-box"><div class="lab-case"><span class="mono">${esc(c.caseNo)}</span><h3>Your case: ${esc(c.client.first)} ${esc(c.client.last)}</h3><p>DOL ${esc(c.dol)} · ${esc(c.facts)}</p></div>
+      ${m.note ? `<p class="lab-note">${esc(m.note)}</p>` : ""}
+      <ol class="lab-tasks">${list.map((t) => `<li class="${t.ok ? "ok" : ""}">${t.ok ? "✅" : "⬜"} ${esc(t.t)}</li>`).join("")}</ol>
+      <div class="lab-foot"><span class="mono">${done}/${list.length} done</span><button class="btn btn-primary" onclick="goto('desk')">🗂 Open the Lien Desk →</button></div></div>
+      ${state.isAdmin ? "" : LNDesk.gradeCard(m.stage, m.stage === "day2" ? "Day 2 score (automated grader)" : "Day 3 score (automated grader)")}`;
+  }
+  if(m.kind === "deck" || m.kind === "video"){
+    const link = linkOf(m), src = lnEmbed.embed(m.kind, link), page = lnEmbed.page(m.kind, link);
+    if(!src) return `<div class="empty">This module isn't set up yet. ${state.isAdmin ? "Add its address in Admin → Course links." : "Please tell your trainer."}</div>`;
+    const fid = "fr-" + m.id;
+    return `<div class="frame-box"><div class="frame" id="${fid}"><iframe src="${esc(src)}" title="${esc(m.title)}" allow="autoplay; fullscreen" allowfullscreen loading="lazy" referrerpolicy="strict-origin-when-cross-origin"></iframe></div></div>
+      <div class="frame-actions"><span>${m.kind === "video" ? "🎬 " + esc(m.title) + " · plays from Google Drive (sign in with your legalsupporthelp.com account if it asks)" : "📚 Use the arrows under the slides to page through the deck."}</span>
+        <span class="frame-btns"><button class="btn btn-sm btn-ghost" type="button" onclick="frameFull('${fid}')">⛶ Full screen</button>${m.kind === "video" ? `<a class="btn btn-sm btn-ghost viewer-link" data-kind="video" data-title="${esc(m.title)}" href="${esc(page)}">⧉ Pop out</a>` : ""}<a class="btn btn-sm btn-ghost" href="${esc(page)}" target="_blank" rel="noopener">${m.kind === "video" ? "Open in Drive" : "Open in Canva"} ↗</a></span></div>`;
+  }
+  if(m.kind === "tools"){
+    return `${m.note ? `<p class="vc-note">${esc(m.note)}</p>` : ""}<div class="tools-grid">${m.items.map((t) => `<div class="tool-card"><div class="tool-ic">${t.icon}</div><div><b>${esc(t.name)}</b><p>${esc(t.what)}</p><small>${esc(t.how)}</small>
+      ${t.go ? `<button class="btn btn-sm btn-primary" onclick="goto('${t.go}')">Open →</button>` : t.link ? `<a class="btn btn-sm btn-ghost" href="${esc(t.link)}" target="_blank" rel="noopener">Open ↗</a>` : ""}</div></div>`).join("")}</div>`;
+  }
+  if(m.kind === "netsheet"){
+    const c = LNDesk.caseOf();
+    return `<div class="ns-embed-head"><span>${esc(m.note || "")}</span><span class="mono">${esc(c.caseNo)} · ${esc(c.client.first)} ${esc(c.client.last)}</span><button class="btn btn-sm btn-ghost" onclick="goto('desk')">🗂 Case File &amp; PIP log ↗</button></div>
+      <div class="ns-embed">${LNDesk.sheetHtml()}</div>`;
+  }
+  if(m.kind === "videos"){
+    return `${m.note ? `<p class="vc-note">${esc(m.note)}</p>` : ""}<div class="vcards">${m.items.map((it) => `<a class="vcard viewer-link" data-kind="video" data-title="${esc(it.title)}" href="${esc(lnEmbed.page("video", it.link))}">
+        <span class="vcard-pic"><iframe loading="lazy" tabindex="-1" aria-hidden="true" src="${esc(lnEmbed.video(it.link))}"></iframe><span class="vcard-play" aria-hidden="true">▶</span></span>
+        <b>${esc(it.title)}</b><small>${esc(it.label || "Video")} · click to play</small></a>`).join("")}</div>`;
+  }
+  if(m.kind === "files"){
+    const k = Math.max(0, Math.min(m.items.length - 1, (state.sub[m.id] || 0))), it = m.items[k];
+    return `<div class="doc-tabs" role="tablist">${m.items.map((x, j) => `<button role="tab" aria-selected="${j === k}" class="${j === k ? "on" : ""}" onclick="state.sub['${m.id}']=${j};render()">📄 ${esc(x.title)}</button>`).join("")}</div>
+      <div class="doc-frame"><iframe src="${esc(lnEmbed.video(it.link))}" title="${esc(it.title)}" allow="fullscreen" allowfullscreen loading="lazy"></iframe></div>`
+      + frameNote(`${m.note ? m.note + " " : ""}${it.title}: ${k + 1} of ${m.items.length}.`, lnEmbed.page("video", it.link));
+  }
+  if(m.kind === "questions"){
+    const a = answersOf(m.id);
+    const n = m.questions.filter((q, j) => (a[j] || "").trim()).length;
+    return `<div class="qa-head"><span>Answer each question in your own words. ${state.isAdmin ? "" : "Your answers save to your account as you type."} Name your document <b class="mono">${esc(m.naming)}</b>.</span>
+        ${state.isAdmin ? "" : `<span class="qa-count">${n}/${m.questions.length} answered</span><button class="btn btn-sm btn-primary" onclick="checkAnswers('${m.id}')">🏅 Check my answers</button><button class="btn btn-sm btn-orange" onclick="copyAnswers('${m.id}')">⧉ Copy all answers</button>`}</div>
+      ${!state.isAdmin && ((state.progress || {}).answerGrades || {})[m.id] ? (() => { const g = state.progress.answerGrades[m.id]; return `<div class="qa-grade"><b>🏅 ${g.score}/100</b> · ${g.covered} of ${g.total} key concepts covered · checked ${esc(new Date(g.at).toLocaleString())}</div>`; })() : ""}
+      <ol class="qa-list">${m.questions.map((q, j) => `<li><p>${q.core ? '<span class="core-tag">★ Core</span> ' : ""}${esc(q.q)}</p>${qaFeedback(m, j)}${state.isAdmin ? "" : `<textarea rows="3" aria-label="Your answer to question ${j + 1}" oninput="saveAnswer('${m.id}',${j},this.value)">${esc(a[j] || "")}</textarea>`}</li>`).join("")}</ol>`;
+  }
+  if(m.kind === "guide"){
+    return `<div class="guide">${m.sections.map((g, gi) => `<section class="guide-sec"><h3>${esc(g.h)}</h3>
+      ${g.p ? `<p>${esc(g.p)}</p>` : ""}
+      ${g.links ? `<div class="guide-links">${g.links.map((l) => `<a class="btn btn-sm btn-ghost" href="${esc(l.u)}" target="_blank" rel="noopener">${esc(l.t)} ↗</a>`).join("")}</div>` : ""}
+      ${g.rows ? `<table class="guide-rows">${g.rows.map((r) => `<tr><th>${esc(r[0])}</th><td class="mono">${esc(r[1])}</td></tr>`).join("")}</table>` : ""}
+      ${g.pre ? `<div class="guide-pre"><div class="guide-pre-h"><b>Letter body template</b><button class="btn btn-sm btn-ghost" onclick="copyText(this.parentNode.nextElementSibling.textContent)">⧉ Copy</button></div><pre>${esc(g.pre)}</pre></div>` : ""}
+      ${g.example ? `<div class="guide-pre"><div class="guide-pre-h"><b>Example</b><button class="btn btn-sm btn-ghost" onclick="copyText(this.parentNode.nextElementSibling.textContent)">⧉ Copy</button></div><pre>${esc(g.example)}</pre></div>` : ""}
+    </section>`).join("")}</div>`;
+  }
+  return "";
+}
+// The trainer's notes for a step: shown in the side panel to a trainer only (never to a trainee).
+function linkify(t){ return esc(t).replace(/https:\/\/[^\s<]+/g, (u) => `<a href="${u}" target="_blank" rel="noopener">${u.replace(/^https:\/\/(www\.)?/, "").slice(0, 34)}…</a>`); }
+function trainerNotes(d, s){
+  if(!state.isAdmin || !d.trainerNotes) return "";
+  const notes = d.trainerNotes[s.type === "module" ? s.module.id : s.type];
+  return notes && notes.length ? `<div class="trainer-notes"><b>🔒 Trainer notes</b><ul>${notes.map((x) => `<li>${linkify(x)}</li>`).join("")}</ul></div>` : "";
+}
+// The trainee's answers (process questions), kept in progress:<id> as { answers: { <module id>: [answer, …] } }.
+function answersOf(id, rec){ const a = ((rec || state.progress) || {}).answers || {}; return a[id] || []; }
+// progress:<id> (the process-question answers and the Lien Desk), saved a moment after the last change.
+let progressTimer = null;
+function saveProgress(){
+  if(state.isAdmin || !state.traineeId || !state.progress) return;
+  clearTimeout(progressTimer);
+  progressTimer = setTimeout(() => { kvSet("progress:" + state.traineeId, state.progress).catch(() => toast("Couldn't save your work. Check your connection.")); }, 600);
+}
+function saveAnswer(id, j, v){
+  if(state.isAdmin || !state.traineeId) return;
+  state.progress = state.progress || {}; state.progress.answers = state.progress.answers || {};
+  const a = (state.progress.answers[id] = (state.progress.answers[id] || []).slice());
+  a[j] = String(v).slice(0, 6000); state.progress.answers[id] = a;
+  const m = moduleById(id), c = document.querySelector(".qa-count");
+  if(c && m) c.textContent = `${m.questions.filter((q, k) => (a[k] || "").trim()).length}/${m.questions.length} answered`;
+  saveProgress();
+}
+// 🏅 the automated grader for the process questions: each question has key concepts (js/ln-course.js keys), each a group
+// of words of which any one counts. An answer's score is the share of its concepts it covers; the step's, their average.
+function gradeAnswer(q, text){
+  const t = " " + String(text || "").toLowerCase() + " ", keys = q.keys || [];
+  const hit = keys.map((g) => g.some((w) => t.includes(String(w).toLowerCase())));
+  return { hit, covered: hit.filter(Boolean).length, total: keys.length, words: String(text || "").trim().split(/\s+/).filter(Boolean).length };
+}
+function checkAnswers(id){
+  const m = moduleById(id), a = answersOf(id); if(!m) return;
+  const per = m.questions.map((q, j) => gradeAnswer(q, a[j]));
+  const covered = per.reduce((s, x) => s + x.covered, 0), total = per.reduce((s, x) => s + x.total, 0);
+  // a one-line answer can't carry the reasoning: under 25 words, the question earns at most half
+  const score = Math.round(per.reduce((s, x) => s + (x.total ? x.covered / x.total : 0) * (x.words < 25 ? 0.5 : 1), 0) / per.length * 100);
+  state.progress = state.progress || {}; state.progress.answerGrades = state.progress.answerGrades || {};
+  state.progress.answerGrades[id] = { score, covered, total, at: new Date().toISOString(), per: per.map((x) => ({ c: x.covered, t: x.total, w: x.words })) };
+  saveProgress(); render(); toast(`Your answers: ${score}/100.`);
+}
+function qaFeedback(m, j){
+  const g = ((state.progress || {}).answerGrades || {})[m.id]; if(!g || state.isAdmin) return "";
+  const q = m.questions[j], r = gradeAnswer(q, answersOf(m.id)[j]);
+  const miss = (q.keys || []).filter((_, k) => !r.hit[k]).map((grp) => grp[0]);
+  return `<div class="qa-fb ${r.covered === r.total && r.words >= 25 ? "ok" : ""}">${r.covered}/${r.total} key concepts${r.words < 25 ? " · add more detail (25 words or more)" : ""}${miss.length ? ` · think about: ${esc(miss.join(", "))}` : ""}</div>`;
+}
+function answersText(m, a){ return m.questions.map((q, j) => `${j + 1}. ${q.q}\n${(a[j] || "").trim() || "(no answer yet)"}`).join("\n\n"); }
+function copyText(t){ try{ navigator.clipboard.writeText(t).then(() => toast("Copied."), () => toast("Couldn't copy. Select the text and copy it.")); }catch(e){ toast("Couldn't copy. Select the text and copy it."); } }
+function copyAnswers(id){ const m = moduleById(id); copyText(answersText(m, answersOf(id))); }
+
 document.addEventListener("keydown", (e) => {
   if(state.view !== "player" || document.getElementById("overlay") || /INPUT|TEXTAREA|SELECT/.test((e.target && e.target.tagName) || "")) return;
   if(e.key === "ArrowRight") stepTo((state.step || 0) + 1);
@@ -587,9 +982,51 @@ async function loadAdmin(){
       Object.values(values).forEach((v) => { try{ const r = JSON.parse(v); if(r) rows.push(r); }catch(e){} });
     }
     rows.sort((a, b) => String(a.batch || "").localeCompare(String(b.batch || "")) || String(a.name || "").localeCompare(String(b.name || "")));
+    // Their answers to the process questions (progress:<id>), read in the same batched way.
+    const pk = rows.map((r) => "progress:" + r.id), prog = {};
+    for(let i = 0; i < pk.length; i += 100){
+      const {values} = await api("/api/storage/get-many", {keys: pk.slice(i, i + 100)});
+      Object.entries(values).forEach(([k, v]) => { try{ prog[k.slice(9)] = JSON.parse(v); }catch(e){} });
+    }
+    state.admin.progress = prog;
+    // the Lien Desk assignments (assign:<id>)
+    const ak = rows.map((r) => "assign:" + r.id), asg = {};
+    for(let i = 0; i < ak.length; i += 100){
+      const {values} = await api("/api/storage/get-many", {keys: ak.slice(i, i + 100)});
+      Object.entries(values).forEach(([k, v]) => { try{ asg[k.slice(7)] = JSON.parse(v); }catch(e){} });
+    }
+    state.admin.assign = asg;
     state.admin.rows = rows;
   }catch(e){ state.admin.rows = []; toast(e.message); }
   state.admin.loading = false; render();
+}
+const QUESTION_MODULES = ALL_MODULES.filter((m) => m.kind === "questions");
+function showAnswers(id){
+  const r = (state.admin.rows || []).find((x) => x.id === id), p = (state.admin.progress || {})[id];
+  overlay(`<div class="mh-day">${esc(r ? r.batch || "" : "")}</div><div class="mh-title">${esc(r ? r.name || id : id)}: answers</div>`,
+    QUESTION_MODULES.map((m) => `<h3 style="margin:4px 0 8px;color:var(--navy)">Day ${m.day} · ${esc(m.title)}${p && p.answerGrades && p.answerGrades[m.id] ? ` · 🏅 ${p.answerGrades[m.id].score}/100` : ""}</h3><ol class="topic-list">${m.questions.map((q, j) => `<li><b>${q.core ? "★ " : ""}${esc(q.q)}</b><div class="ans">${esc((answersOf(m.id, p)[j] || "").trim() || "(no answer)")}</div></li>`).join("")}</ol>`).join(""));
+}
+async function assignCase(id, caseId){
+  const a = Object.assign({}, (state.admin.assign || {})[id] || {}, { caseId });
+  try{ await kvSet("assign:" + id, a); state.admin.assign[id] = a; toast(caseId ? "Case assigned." : "Assignment cleared: the trainee gets their own case."); }catch(e){ toast(e.message); }
+  render();
+}
+// a real fully executed release from the trainer: kept in release:<id>, and it lands in the trainee's Lien Desk inbox
+function uploadRelease(id, input){
+  const f = input.files && input.files[0]; if(!f) return;
+  if(f.size > 5 * 1024 * 1024){ toast("That file is over 5 MB. Upload a smaller PDF."); return; }
+  const rd = new FileReader();
+  rd.onload = async () => {
+    const at = new Date().toISOString();
+    try{
+      await kvSet("release:" + id, { name: f.name, url: rd.result, at });
+      const a = Object.assign({}, (state.admin.assign || {})[id] || {}, { releaseAt: at, releaseName: f.name });
+      await kvSet("assign:" + id, a); state.admin.assign[id] = a;
+      toast("Release uploaded. It's in the trainee's Lien Desk inbox the next time they open it.");
+    }catch(e){ toast(e.message); }
+    render();
+  };
+  rd.readAsDataURL(f);
 }
 async function setTraineeFlag(id, flag){
   const r = (state.admin.rows || []).find((x) => x.id === id); if(!r) return;
@@ -600,32 +1037,43 @@ async function setTraineeFlag(id, flag){
 }
 async function saveCourseLinks(){
   const out = {};
-  for(const m of ALL_MODULES){
+  for(const m of ALL_MODULES.filter(LINKED)){
     const v = ((document.getElementById("cl-" + m.id) || {}).value || "").trim();
     if(!v) continue;
-    if(!lnEmbed.embed(m.kind, v)){ toast(`Day ${m.day}, ${KIND[m.kind].label}: the address must be a ${m.kind === "video" ? "drive.google.com/file/d/…" : "canva.com/design/…"} link.`); return; }
+    if(!lnEmbed.embed(m.kind, v)){ toast(`Day ${m.day}, ${m.title}: the address must be a ${m.kind === "video" ? "drive.google.com/file/d/…" : "canva.com/design/…"} link.`); return; }
     out[m.id] = { link: v };
   }
   try{ await kvSet("settings:course", out); state.courseLinks = out; toast("Course links saved."); }catch(e){ toast(e.message); }
 }
 function viewAdmin(){
   if(state.admin.rows == null && !state.admin.loading) setTimeout(loadAdmin, 0);
-  const rows = state.admin.rows || [], cols = 4 + COURSE.days.length;
+  const rows = state.admin.rows || [], cols = 5 + COURSE.days.length;
   const body = state.admin.loading && !rows.length ? `<tr><td colspan="${cols}">Loading…</td></tr>`
     : !rows.length ? `<tr><td colspan="${cols}">No trainees have opened this course yet. They appear here the first time they open it from the LSH Training Portal.</td></tr>`
     : rows.map((r) => `<tr>
         <td>${esc(r.name || r.id)}</td><td class="mono">${esc(r.batch || "")}</td>
         ${COURSE.days.map((d) => `<td>${pillFor(dayStatus(d, r))} <span class="mono" style="font-size:11.5px">${dayCount(d, r)}/${d.modules.length}</span></td>`).join("")}
         <td style="font-weight:500">${r.lastActive ? esc(new Date(r.lastActive).toLocaleString()) : "—"}</td>
+        <td>${QUESTION_MODULES.some((m) => answersOf(m.id, state.admin.progress && state.admin.progress[r.id]).some((x) => (x || "").trim())) ? `<button class="btn btn-ghost btn-sm" onclick="showAnswers('${esc(r.id)}')">✍️ Answers</button>` : "—"}</td>
         <td>${r.archived || r.rejected ? `<button class="btn btn-ghost btn-sm" onclick="setTraineeFlag('${esc(r.id)}','restore')">Restore access</button>` : `<button class="btn btn-ghost btn-sm" onclick="setTraineeFlag('${esc(r.id)}','archive')">Remove access</button>`}</td>
       </tr>`).join("");
   const links = COURSE.days.map((d) => `<h3 style="margin:14px 0 8px;font-size:16px;color:var(--navy)">Day ${d.day}: ${esc(d.title)}</h3>`
-    + d.modules.map((m, j) => `<label class="field"><span>Module ${j + 1} · ${esc(KIND[m.kind].label)} (blank = ${esc(m.link)})</span><input id="cl-${m.id}" value="${esc(((state.courseLinks || {})[m.id] || {}).link || "")}" placeholder="${m.kind === "video" ? "https://drive.google.com/file/d/…/view" : "https://www.canva.com/design/…/view"}"></label>`).join("")).join("");
+    + d.modules.map((m, j) => !LINKED(m) ? "" : `<label class="field"><span>Module ${j + 1} · ${esc(modLabel(m))}: ${esc(m.title)} (blank = ${esc(m.link)})</span><input id="cl-${m.id}" value="${esc(((state.courseLinks || {})[m.id] || {}).link || "")}" placeholder="${m.kind === "video" ? "https://drive.google.com/file/d/…/view" : "https://www.canva.com/design/…/view"}"></label>`).join("")).join("");
   return `<section class="page-hero"><p class="eyebrow">Admin</p><h1>Trainees & course links</h1><p class="lead">Who has opened the course, how far each trainee is, and where each module's deck or video comes from.</p></section>
     <section class="card sec">
       <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap"><h2>Trainees</h2><button class="btn btn-ghost btn-sm" onclick="loadAdmin()">↻ Refresh</button></div>
       <p>Trainees are approved on the LSH Training Portal; removing access here stops them opening this course only.</p>
-      <div class="table-wrap"><table class="admin-table"><thead><tr><th>Name</th><th>Batch</th>${COURSE.days.map((d) => `<th>Day ${d.day}</th>`).join("")}<th>Last active</th><th></th></tr></thead><tbody>${body}</tbody></table></div>
+      <div class="table-wrap"><table class="admin-table"><thead><tr><th>Name</th><th>Batch</th>${COURSE.days.map((d) => `<th>Day ${d.day}</th>`).join("")}<th>Last active</th><th>Answers</th><th></th></tr></thead><tbody>${body}</tbody></table></div>
+    </section>
+    <section class="card sec">
+      <h2>🗂 Lien Desk</h2>
+      <p>Each trainee works one case on Days 2 and 3. Assign one, or leave it on "Their own case" (each trainee gets one of the ${LNDesk.cases.length}, the same every time). Upload a fully executed release to send it to the trainee's inbox (the simulator sends one too).</p>
+      <div class="table-wrap"><table class="admin-table"><thead><tr><th>Name</th><th>Case</th><th>Progress</th><th>Executed release</th></tr></thead><tbody>${rows.map((r) => {
+        const a = (state.admin.assign || {})[r.id] || {}, sm = LNDesk.summary(r, (state.admin.progress || {})[r.id]);
+        return `<tr><td>${esc(r.name || r.id)}</td>
+          <td><select onchange="assignCase('${esc(r.id)}', this.value)"><option value="">Their own case</option>${LNDesk.cases.map((c) => `<option value="${c.id}" ${a.caseId === c.id ? "selected" : ""}>${esc(c.client.first)} ${esc(c.client.last)}</option>`).join("")}</select></td>
+          <td style="font-weight:500;font-size:12.5px">${sm ? `${sm.grade ? `<b>🏅 Day 2: ${sm.grade.day2.score} · Day 3: ${sm.grade.day3.score}</b><br>` : ""}${esc(sm.caseId)} · ${sm.emails} emails · release ${sm.exec ? "✓" : "—"} · initial sheet ${sm.initial ? sm.initial.passed + "/" + sm.initial.total : "—"} · final ${sm.final ? sm.final.passed + "/" + sm.final.total : "—"} · signed ${sm.signed ? "✓" : "—"}` : "Not started"}</td>
+          <td><label class="btn btn-ghost btn-sm" style="cursor:pointer">⬆ Upload<input type="file" accept="application/pdf,image/*" style="display:none" onchange="uploadRelease('${esc(r.id)}', this)"></label>${a.releaseName ? ` <small>${esc(a.releaseName)}</small>` : ""}</td></tr>`; }).join("") || `<tr><td colspan="4">No trainees yet.</td></tr>`}</tbody></table></div>
     </section>
     <section class="card sec">
       <h2>Course links</h2>
@@ -651,8 +1099,10 @@ function render(){
   else if(state.view === "admin" && state.isAdmin) main = viewAdmin();
   else if(state.view === "day" && dayByNum(state.dayNum)) main = viewDay();
   else if(state.view === "player" && dayByNum(state.dayNum)) main = viewPlayer();
+  else if(state.view === "desk") main = LNDesk.view();
   else { state.view = "dashboard"; main = viewDashboard(); }
-  app.innerHTML = (state.view === "pendingApproval" ? "" : topbar()) + `<main>${main}</main>` + footer();
+  app.innerHTML = (state.view === "pendingApproval" ? "" : topbar()) + `<main class="${state.view === "desk" ? "main-wide" : state.view === "player" || state.view === "day" ? "main-player" : ""}">${main}</main>` + footer();
+  if(document.querySelector(".ld-sheet")) LNDesk.after();   // the Lien Desk, or a Net Sheet embedded in a day's step
 }
 
 /* ---------- boot ---------- */
@@ -681,5 +1131,7 @@ function render(){
   if(state.view !== "login") setTimeout(() => { [].forEach.call(document.documentElement.children, (el) => { if(el.tagName === "DIV" && el.style.zIndex === "2147483000") el.remove(); }); }, 150);
 })();
 </script>
+<script src="/js/ln-viewer.js?v=2026.11.12"></script>
+<script src="/js/ln-desk.js?v=2026.11.12"></script>
 </body>
 </html>
