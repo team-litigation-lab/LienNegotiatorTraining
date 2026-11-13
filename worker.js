@@ -233,7 +233,8 @@ async function listAll(env, prefix) {
    Portal's Program Access, and it is taken off again when the access is granted or restored. The same list Standard Foundational
    Training keeps. A trainee on it leaves every list here: listAll drops every key of theirs, so every roster, Batch Sheet, ranking,
    Trainee Audit and scorecard leaves them out; a Portal ticket doesn't sign them in; and a session they already hold reads only their
-   own record, shown not approved (rejected), so the page closes. The list is read at most once a minute per Worker instance. */
+   own record, shown not approved (rejected), so the page closes. The list is read at most once a minute per Worker instance.
+   The same code is in every LSH course, and every new course keeps it: the contract is COURSE-PROGRAMS.md in the Training-Portal repo. */
 const BLOCK_KEY = "access:blocked";
 const BLOCK_MSG = "Your access to this program has been revoked. Contact your trainer if you believe this is a mistake.";
 let BLOCKED = { at: 0, ids: {} };
