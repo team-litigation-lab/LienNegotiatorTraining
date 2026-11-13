@@ -224,7 +224,34 @@ async function listAll(env, prefix) {
     r.keys.forEach((k) => out.push(k.name));
     cursor = r.list_complete ? undefined : r.cursor;
   } while (cursor);
-  return out;
+  return withoutBlocked(env, out);
+}
+
+/* ---------- 🚫 trainees whose access the LSH Training Portal closed ----------
+   access:blocked = {ids: {"<trainee id>": {why: "offboarded", name, batch, at, by: "portal", reason, portalUser}}}, written by the
+   Portal (its functions/_ft-block.js programBlock / programUnblock): a trainer revokes or suspends this program for a trainee on the
+   Portal's Program Access, and it is taken off again when the access is granted or restored. The same list Standard Foundational
+   Training keeps. A trainee on it leaves every list here: listAll drops every key of theirs, so every roster, Batch Sheet, ranking,
+   Trainee Audit and scorecard leaves them out; a Portal ticket doesn't sign them in; and a session they already hold reads only their
+   own record, shown not approved (rejected), so the page closes. The list is read at most once a minute per Worker instance. */
+const BLOCK_KEY = "access:blocked";
+const BLOCK_MSG = "Your access to this program has been revoked. Contact your trainer if you believe this is a mistake.";
+let BLOCKED = { at: 0, ids: {} };
+async function blockedIds(env, fresh) {
+  const kv = kvOf(env);
+  if (!kv) return {};
+  if (fresh || Date.now() - BLOCKED.at > 60000) {
+    let v = null; try { v = JSON.parse((await kv.get(BLOCK_KEY)) || "null"); } catch (e) { v = null; }
+    BLOCKED = { at: Date.now(), ids: (v && v.ids && typeof v.ids === "object") ? v.ids : {} };
+  }
+  return BLOCKED.ids;
+}
+// the trainee id a key belongs to (trainee:<id>, progress:<id>, checkin:<day>:<id>…): its last part
+const keyTrainee = (k) => String(k).slice(String(k).lastIndexOf(":") + 1);
+// (listAll's keys, without any of a blocked trainee's)
+async function withoutBlocked(env, keys) {
+  const b = await blockedIds(env);
+  return Object.keys(b).length ? keys.filter((k) => k === BLOCK_KEY || !b[keyTrainee(k)]) : keys;
 }
 
 /* ---------- 🕘 automatic Time In: a trainee's first visit today ----------
@@ -298,6 +325,7 @@ export default {
         }
         if (id && id !== chosen && id !== newId && id !== rawId && id !== legacyId) return json({ error: "Name/batch don't match this session" }, 403);
         if (id && id !== chosen && (id === newId || id === rawId || id === legacyId)) { chosen = id; existing = await kv.get(`trainee:${id}`); }
+        if ((await blockedIds(env, true))[chosen]) return json({ error: BLOCK_MSG, code: "access-offboarded" }, 403);
         return json({ id: chosen, token: await makeToken(env, "t", chosen, 24 * 30), existing: existing ? JSON.parse(existing) : null, batch: canonicalBatch(batch) || String(batch || "").trim() });
       };
       if (path === "/api/auth/trainee") {
@@ -343,6 +371,7 @@ export default {
           return json({ admin: true, name: who.name, token: await makeToken(env, "a", "admin", 12) });
         }
         const res = await traineeSession(who.name, who.batch, "");
+        if (res.status !== 200) return res;   // 🚫 (blocked: access-offboarded)
         const out = await res.json();
         // The Portal's approval is the only trainee approval: a trainee it signs in is approved here too
         // (unless an admin here rejected them), so this program never shows "Registration Pending Approval".
@@ -357,6 +386,15 @@ export default {
 
       const tok = secure ? await readToken(env, request) : { role: "a", id: "open-mode" };
       if (!tok) return json({ error: "Sign-in required" }, 401);
+      // 🚫 a trainee whose access the Portal closed: their own record only, shown not approved, so the page closes; nothing else
+      if (tok.role === "t" && (await blockedIds(env))[tok.id]) {
+        const b = await request.clone().json().catch(() => ({}));
+        if (path === "/api/storage/get" && b.key === `trainee:${tok.id}`) {
+          const rec = JSON.parse((await kvOf(env).get(b.key)) || "null");
+          return json({ value: rec ? JSON.stringify(Object.assign({}, rec, { approved: false, rejected: true })) : null });
+        }
+        return json({ error: BLOCK_MSG, code: "access-offboarded" }, 403);
+      }
 
       /* ---------- a session that is still in use is renewed before it runs out ----------
          The page asks for a fresh token in the last hours of a valid one (an admin's lasts 12 hours, a trainee's
