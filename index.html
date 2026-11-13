@@ -519,6 +519,11 @@ async function api(path, body){
   const r = await fetch(path, {method:"POST", headers:h, body:JSON.stringify(body || {})});
   const j = await r.json().catch(() => ({}));
   if(r.status === 401 && path.startsWith("/api/storage")){ await logout(); throw new Error("Sign-in required"); }
+  // 🚫 the LSH Training Portal revoked or suspended this program for the trainee (worker.js access:blocked): the page closes
+  if(r.status === 403 && j.code === "access-offboarded" && state.traineeId && !state.isAdmin){
+    state.trainee = Object.assign({}, state.trainee || {}, { approved: false, rejected: true, portalRevoked: true });
+    if(state.view !== "pendingApproval"){ state.view = "pendingApproval"; render(); }
+  }
   if(!r.ok) throw new Error(j.error || ("Request failed (" + r.status + ")"));
   return j;
 }
@@ -1082,10 +1087,14 @@ function viewAdmin(){
       <button class="btn btn-primary" onclick="saveCourseLinks()">Save course links</button>
     </section>`;
 }
+// (rejected: the access was revoked, here or on the LSH Training Portal; archived alone: paused)
 function viewPending(){
+  const revoked = !!(state.trainee && (state.trainee.rejected || state.trainee.portalRevoked));
   return `<div class="login-shell"><div class="login-card"><img src="${LOGO_FULL_SRC}" alt="Legal Support Help" style="width:150px;height:auto;margin-bottom:18px">
-    <h1 style="font-size:22px;color:var(--navy);margin:0 0 8px">Access paused</h1>
-    <p style="font-size:14px;color:var(--ink-soft);font-weight:500">Your access to this course has been paused by a trainer. Please contact your trainer, or go back to the LSH Training Portal.</p>
+    <h1 style="font-size:22px;color:var(--navy);margin:0 0 8px">${revoked ? "Access revoked" : "Access paused"}</h1>
+    <p style="font-size:14px;color:var(--ink-soft);font-weight:500">${revoked
+      ? "Your access to this program has been revoked. Contact your trainer if you believe this is a mistake."
+      : "Your access to this course has been paused by a trainer. Please contact your trainer, or go back to the LSH Training Portal."}</p>
     <p><a class="btn btn-primary" href="${PORTAL_HOME}">Go to the LSH Training Portal</a></p>
     <p><button class="btn btn-ghost btn-sm" onclick="logout()">Sign out</button></p></div></div>`;
 }
