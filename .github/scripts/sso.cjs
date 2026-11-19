@@ -101,5 +101,32 @@ const ticket = (t, secret = SECRET) => { const p = b64u(JSON.stringify(Object.as
   r = await call(base, '/api/auth/portal', { ticket: ticket({ first: 'Maria', last: 'Santos', b: 'B100926', full: 'Maria L. Santos', exp: exp() }) });
   assert.equal(r.j.id, 'maria-santos--b100926'); assert.equal(r.j.fullName, 'Maria L. Santos');
   assert.equal(JSON.parse(store.get('ln:trainee:maria-santos--b100926')).fullName, 'Maria L. Santos');
+  // 🏅 a day's score is the Worker's copy of the Desk grade saved with the work: a score typed into the record is ignored
+  {
+    const rec0 = JSON.parse(store.get('ln:trainee:jane-doe--b100926'));
+    const forged = Object.assign({}, rec0, { dayProgress: Object.assign({}, rec0.dayProgress, { 2: { done: true, score: 100, deskScore: 100 }, 3: { done: true, score: 100 } }) });
+    r = await call(base, '/api/storage/set', { key: 'trainee:jane-doe--b100926', value: JSON.stringify(forged) }, tTok); assert.equal(r.status, 200);
+    let rec = JSON.parse(store.get('ln:trainee:jane-doe--b100926'));
+    assert.ok(rec.dayProgress[2].done && rec.dayProgress[2].score === undefined && rec.dayProgress[3].score === undefined, 'a score written straight into the record is dropped: ' + JSON.stringify(rec.dayProgress));
+    const prog = { desk: { caseId: 'miller', cases: { miller: { grade: { day2: { score: 72 }, day3: { score: 140 } } } } } };
+    r = await call(base, '/api/storage/set', { key: 'progress:jane-doe--b100926', value: JSON.stringify(prog) }, tTok); assert.equal(r.status, 200);
+    rec = JSON.parse(store.get('ln:trainee:jane-doe--b100926'));
+    assert.equal(rec.dayProgress[2].score, 72, 'the Desk grade saved with the work is Day 2\'s score');
+    assert.equal(rec.dayProgress[2].deskScore, 72);
+    assert.equal(rec.dayProgress[3].score, undefined, 'a grade outside 0-100 is not copied');
+  }
+  // 🔁 a Batch ID changed on the Portal: the trainee keeps their record (platform QA 2026-11-19, LN finding 5)
+  {
+    r = await call(base, '/api/auth/portal', { ticket: ticket({ first: 'Mark', last: 'Lee', b: 'B100126', exp: exp() }) }); assert.equal(r.status, 200);
+    const rec = JSON.parse(store.get('ln:trainee:mark-lee--b100126')); rec.dayProgress = { 1: { done: true } }; store.set('ln:trainee:mark-lee--b100126', JSON.stringify(rec));
+    r = await call(base, '/api/auth/portal', { ticket: ticket({ first: 'Mark', last: 'Lee', b: 'B110226', exp: exp() }) });
+    assert.equal(r.status, 200); assert.equal(r.j.id, 'mark-lee--b100126', 'the kept record opens');
+    const kept = JSON.parse(store.get('ln:trainee:mark-lee--b100126'));
+    assert.equal(kept.batch, 'B110226'); assert.equal(kept.batchFrom, 'B100126'); assert.ok(kept.dayProgress[1].done);
+    assert.ok(!store.has('ln:trainee:mark-lee--b110226'), 'no empty record under the new batch');
+    assert.equal(store.get('ln:trainee-alias:mark-lee--b110226'), 'mark-lee--b100126');
+    const rn = await call(base, '/api/auth/trainee', { name: 'Mark Lee', batch: 'B110226' }, r.j.token);
+    assert.equal(rn.status, 200, JSON.stringify(rn.j)); assert.equal(rn.j.id, 'mark-lee--b100126');
+  }
   console.log('OK: single sign-on and storage rules hold.');
 })().catch((e) => { console.error(e); process.exit(1); });

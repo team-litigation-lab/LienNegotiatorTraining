@@ -196,6 +196,35 @@ function candidateIds(name, batch) {
   return { newId: b ? `${slug}--${b}` : slug, rawId: raw ? `${slug}--${raw}` : slug, legacyId: slugPart(name).slice(0, 40) || "trainee" };
 }
 
+/* 🔁 A trainee whose Batch ID the Portal changed (platform QA 2026-11-19, PD finding 3 / LN finding 5): their ID is name + batch,
+   so the new batch would find no record and start an empty one beside their real one. movedRecord finds the trainee's one other
+   active record by the same name under another batch and keeps using it: its batch becomes the new one (batchFrom keeps the old,
+   which the Portal's block list also matches), and trainee-alias:<new id> = <kept id> lets the session renewal here and the
+   Portal's graded results (call-results / sim-results) find it. Two such records (two people, or a duplicate), a blocked one, or
+   none: nothing moves. The same idea as Standard Training's movedBatch. */
+async function movedRecord(env, kv, who) {
+  const ids = candidateIds(who.name, who.batch);
+  for (const c of new Set([ids.newId, ids.rawId])) if (await kv.get(`trainee:${c}`)) return null;   // a record under this batch: nothing moved
+  const alias = await kv.get(`trainee-alias:${ids.newId}`);
+  if (alias && /^[a-z0-9-]{1,100}$/.test(alias) && await kv.get(`trainee:${alias}`)) return (await blockedIds(env, true))[alias] ? null : alias;
+  const slug = ids.newId.split("--")[0];
+  if (!slug || !ids.newId.includes("--")) return null;
+  const list = await kv.list({ prefix: `trainee:${slug}--` }).catch(() => null);
+  const keys = ((list && list.keys) || []).map((k) => k.name);
+  if (!keys.length || keys.length > 20) return null;
+  const hits = [];
+  for (const k of keys) {
+    let r = null; try { r = JSON.parse((await kv.get(k)) || "null"); } catch (e) { r = null; }
+    if (r && !r.archived && !r.rejected && slugPart(r.name || "") === slugPart(who.name) && batchKey(r.batch || "") !== batchKey(who.batch)) hits.push([k.slice("trainee:".length), r]);
+  }
+  if (hits.length !== 1) return null;
+  const [id, rec] = hits[0];
+  if ((await blockedIds(env, true))[id]) return null;
+  await kv.put(`trainee:${id}`, JSON.stringify(Object.assign({}, rec, { batchFrom: rec.batch || "", batch: canonicalBatch(who.batch) || String(who.batch).trim(), batchMovedAt: new Date().toISOString() })));
+  await kv.put(`trainee-alias:${ids.newId}`, id);
+  return id;
+}
+
 /* ---------- what a trainee may touch ---------- */
 // settings:course holds the admin's overrides of a module's deck or video address (Admin → Course links).
 const PUBLIC_READ = [/^settings:course$/];
@@ -206,6 +235,32 @@ function canRead(tok, key) {
   // assign:<id> (the Lien Desk case a trainer assigned) and release:<id> (a fully executed release a trainer uploaded):
   // a trainee reads their own, and only a trainer writes them.
   return OWN(tok.id).includes(key) || key === `assign:${tok.id}` || key === `release:${tok.id}` || PUBLIC_READ.some((re) => re.test(key));
+}
+/* 🏅 Who writes a day's score (platform QA 2026-11-19, LN finding 10). The Lien Desk grades in the browser (js/ln-desk.js grade), so
+   the grade itself still comes from the trainee's page: the Worker can't re-run the Desk's case work. What it does now is keep
+   the score on trainee:<id> (what the Portal shows) as a copy of the grade saved with the work in progress:<id>, never a number
+   typed into the record on its own, and only a whole number from 0 to 100. Day completion (done) is still the page's to set. */
+const SCORED_DAYS = { day2: "2", day3: "3" };
+function deskScoresFrom(progress) {
+  const d = progress && progress.desk, w = d && d.cases && d.caseId != null ? d.cases[d.caseId] : null, g = w && w.grade;
+  if (!g || typeof g !== "object") return null;
+  const out = {};
+  for (const [k, n] of Object.entries(SCORED_DAYS)) {
+    const s = g[k] && g[k].score;
+    if (Number.isInteger(s) && s >= 0 && s <= 100) out[n] = s;
+  }
+  return Object.keys(out).length ? out : null;
+}
+function keepServerScores(merged, existing) {
+  const inc = merged.dayProgress && typeof merged.dayProgress === "object" ? merged.dayProgress : null;
+  if (!inc) return;
+  const old = (existing && existing.dayProgress) || {};
+  for (const n of Object.values(SCORED_DAYS)) {
+    if (!inc[n] || typeof inc[n] !== "object") continue;
+    const o = old[n] || {};
+    inc[n] = Object.assign({}, inc[n]);
+    for (const f of ["score", "deskScore"]) { if (f in o) inc[n][f] = o[f]; else delete inc[n][f]; }
+  }
 }
 async function traineeWrite(env, tok, key, value) {
   const kv = kvOf(env);
@@ -219,12 +274,31 @@ async function traineeWrite(env, tok, key, value) {
     const merged = Object.assign({}, incoming);
     PROTECTED_TRAINEE_FIELDS.forEach((f) => { if (existing && f in existing) merged[f] = existing[f]; else delete merged[f]; });
     if (!existing) { merged.approved = false; merged.registeredAt = new Date().toISOString(); }
+    // 🏅 Day 2's and Day 3's scores (the Lien Desk's grade, the number the Portal shows) are the Worker's to write, from the grade
+    // saved with the trainee's work (deskScoresFrom, on every progress:<id> save): a score typed straight into the record is ignored.
+    keepServerScores(merged, existing);
     merged.id = id;
     await kv.put(key, JSON.stringify(merged)); return null;
   }
   if (key === `progress:${id}`) {
     if (String(value).length > 1000000) return "Too large";   // the answers and a whole Lien Desk case, emails included
-    await kv.put(key, value); return null;
+    await kv.put(key, value);
+    // the Desk's grade for the case open now becomes Day 2's and Day 3's score on the trainee's record
+    const scores = deskScoresFrom(incoming);
+    if (scores) {
+      const recRaw = await kv.get(`trainee:${id}`);
+      let rec = null; try { rec = recRaw ? JSON.parse(recRaw) : null; } catch (e) { rec = null; }
+      if (rec && typeof rec === "object") {
+        let changed = false;
+        rec.dayProgress = rec.dayProgress && typeof rec.dayProgress === "object" ? rec.dayProgress : {};
+        for (const [n, v] of Object.entries(scores)) {
+          const d = rec.dayProgress[n] = Object.assign({}, rec.dayProgress[n] || {});
+          if (d.score !== v || d.deskScore !== v) { d.score = v; d.deskScore = v; changed = true; }
+        }
+        if (changed) await kv.put(`trainee:${id}`, JSON.stringify(rec));
+      }
+    }
+    return null;
   }
   return "Not allowed";
 }
@@ -324,9 +398,11 @@ export default {
         return json({ token: await makeToken(env, "a", "admin", 12) });
       }
       // The trainee's session for a name + batch: their record id (new or legacy form) and token.
-      const traineeSession = async (name, batch, id) => {
+      // linked: the record movedRecord (or its alias) found for this trainee under an earlier Batch ID
+      const traineeSession = async (name, batch, id, linked) => {
         const { newId, rawId, legacyId } = candidateIds(name, batch);
         let chosen = newId, existing = await kv.get(`trainee:${newId}`);
+        if (linked) { const l = await kv.get(`trainee:${linked}`); if (l) { chosen = linked; existing = l; } }
         // a record made before Batch IDs were read in one form: keyed by the batch exactly as it was typed
         if (!existing && rawId !== newId) {
           const raw = await kv.get(`trainee:${rawId}`);
@@ -352,7 +428,9 @@ export default {
           // Trainees come in through the LSH Training Portal (/api/auth/portal). A name + batch typed here is
           // accepted only to renew the session of a trainee who is already signed in on this device.
           own = await readTraineeTokenGrace(env, request);
-          if (!own || (own.id !== newId && own.id !== rawId && own.id !== legacyId)) return json({ error: "portal-required" }, 403);
+          // (or the record a Batch ID change kept: trainee-alias:<new id>, movedRecord)
+          const movedTo = await kv.get(`trainee-alias:${newId}`);
+          if (!own || (own.id !== newId && own.id !== rawId && own.id !== legacyId && own.id !== movedTo)) return json({ error: "portal-required" }, 403);
         }
         // A new registration has to give the Batch ID in its one form: B + the date the batch started (MMDDYY).
         // Someone whose records are already here keeps signing in with the Batch ID they registered under.
@@ -362,7 +440,9 @@ export default {
         }
         // Under single sign-on the renewal is for the record the trainee is already signed in to, never a
         // same-named trainee's: the id in the body is ignored.
-        return traineeSession(name, batch, portalOnly(env) ? own.id : id);
+        const movedId = await kv.get(`trainee-alias:${newId}`);
+        const want = portalOnly(env) ? own.id : id;
+        return traineeSession(name, batch, want, movedId && want === movedId ? movedId : undefined);
       }
       if (path === "/api/auth/portal") {
         // The Main Portal's sign-in: a signed ticket carries who the trainee is (their name and batch as registered there).
@@ -386,7 +466,7 @@ export default {
           // trainer, with no second password here (the ticket was taken once, above).
           return json({ admin: true, name: who.name, token: await makeToken(env, "a", "admin", 12) });
         }
-        const res = await traineeSession(who.name, who.batch, "");
+        const res = await traineeSession(who.name, who.batch, "", (await movedRecord(env, kv, who)) || undefined);
         if (res.status !== 200) return res;   // 🚫 (blocked: access-offboarded)
         const out = await res.json();
         // The Portal's approval is the only trainee approval: a trainee it signs in is approved here too

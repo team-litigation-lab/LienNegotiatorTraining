@@ -87,12 +87,17 @@ const DECK = /^https:\/\/www\.canva\.com\/design\/[\w-]+\/[\w-]+\/view\?embed$/,
         if (await p.locator('.qa-list textarea').count()) {
           await p.fill('.qa-list li:nth-child(1) textarea', `Answer from ${tag}`);
           assert.match(await p.textContent('.qa-count'), /^1\//);
-          // 🏅 the automated grader: key concepts covered, with what to think about
+          // 🏅 the automated grader: key ideas covered, and where to look; never the grader's key words (a hint that was the key)
           await p.fill('.qa-list li:nth-child(2) textarea', 'A statutory lien is created by law and must be repaid first; a contractual lien comes from the plan contract; a medical provider lien or letter of protection is the provider waiting to be paid from the settlement, so each has a different legal priority and reimbursement right.');
           await p.click('button:has-text("Check my answers")');
           await p.waitForSelector('.qa-grade');
-          assert.match(await p.textContent('.qa-list li:nth-child(2) .qa-fb'), /5\/5 key concepts/);
-          assert.match(await p.textContent('.qa-list li:nth-child(1) .qa-fb'), /think about/);
+          assert.match(await p.textContent('.qa-list li:nth-child(2) .qa-fb'), /5 of 5 key ideas covered/);
+          const fb1 = await p.textContent('.qa-list li:nth-child(1) .qa-fb');
+          assert.match(fb1, /ideas? missing: go back over this day's lesson/);
+          const keys1 = await p.evaluate(() => { const q1 = document.querySelector('.qa-list li:nth-child(1) p').textContent.replace('★ Core', '').trim(); const m = QUESTION_MODULES.find((x) => x.questions[0] && x.questions[0].q.trim() === q1); return m ? (m.questions[0].keys || []).flat() : null; });
+          assert.ok(keys1 && keys1.length, 'the first question\'s key words were found');
+          assert.ok(!keys1.some((k) => fb1.toLowerCase().includes(String(k).toLowerCase())), `the feedback names none of the grader's key words: ${fb1}`);
+          assert.doesNotMatch(fb1, /think about/);
         }
         await noSideScroll(p, what);
       }
