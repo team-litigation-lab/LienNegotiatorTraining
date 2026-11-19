@@ -10,7 +10,9 @@ const assert = require('node:assert/strict');
 
 const SECRET = 'portal-test-secret';
 const b64u = (b) => Buffer.from(b).toString('base64').replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
-const ticket = (t, secret = SECRET) => { const p = b64u(JSON.stringify(t)); return `${p}.${b64u(crypto.createHmac('sha256', 'portal-sso:' + secret).update(p).digest())}`; };
+// A Portal ticket names the program it is for (p, its topic key: the Portal's makeTicket); p: undefined leaves it out.
+const PORTAL_TOPIC = 'LIEN NEGOTIATION';
+const ticket = (t, secret = SECRET) => { const p = b64u(JSON.stringify(Object.assign({ p: PORTAL_TOPIC }, t))); return `${p}.${b64u(crypto.createHmac('sha256', 'portal-sso:' + secret).update(p).digest())}`; };
 
 (async () => {
   const worker = (await import(pathToFileURL(path.join(process.cwd(), 'worker.js')).href)).default;
@@ -77,5 +79,30 @@ const ticket = (t, secret = SECRET) => { const p = b64u(JSON.stringify(t)); retu
   r = await call(base, '/api/storage/get', { key: 'release:jane-doe--b100926' }, tTok); assert.equal(r.status, 200);
   r = await call(base, '/api/checkin', { training: 'Lien Negotiator Training' }, tTok);
   assert.equal(r.j.ok, true);
+  // 🎯 A Portal ticket names the program it is for (p) and works once, whoever it is for (platform QA 2026-11-19, finding 1):
+  // a ticket made for another program or a tool is refused, so Program Access on the Portal stays the one gate.
+  for (const p of ['SOME OTHER PROGRAM', 'kb', 'tool', undefined]) {
+    for (const t of [{ first: 'Pat', last: 'Lane', b: 'B100926' }, { r: 'a', n: 'Trainer' }, { r: 's' }]) {
+      r = await call(base, '/api/auth/portal', { ticket: ticket(Object.assign({}, t, { p, exp: exp() })) });
+      assert.equal(r.status, 401, JSON.stringify([p, t, r.j])); assert.equal(r.j.code, 'audience'); assert.ok(!r.j.token);
+    }
+  }
+  assert.ok(![...store.keys()].some((k) => /pat-lane/.test(k)), 'a refused ticket creates no record');
+  // PORTAL_TICKET_AUDIENCE=optional (only while an older Portal is deployed) takes a ticket with no p, never another program's
+  const opt = Object.assign({}, base, { PORTAL_TICKET_AUDIENCE: 'optional' });
+  r = await call(opt, '/api/auth/portal', { ticket: ticket({ first: 'Pat', last: 'Lane', b: 'B100926', p: undefined, exp: exp() }) });
+  assert.equal(r.status, 200, JSON.stringify(r.j));
+  r = await call(opt, '/api/auth/portal', { ticket: ticket({ first: 'Pat', last: 'Lane', b: 'B100926', p: 'SOME OTHER PROGRAM', exp: exp() }) });
+  assert.equal(r.j.code, 'audience');
+  // a trainee's own ticket works once, like a trainer's; and the Sign-in check's
+  for (const t of [{ first: 'Pat', last: 'Lane', b: 'B100926' }, { r: 's' }]) {
+    const once = ticket(Object.assign({ exp: exp() }, t));
+    r = await call(base, '/api/auth/portal', { ticket: once }); assert.equal(r.status, 200, JSON.stringify(r.j));
+    r = await call(base, '/api/auth/portal', { ticket: once }); assert.equal(r.status, 401); assert.equal(r.j.code, 'used');
+  }
+  // the full registered name is kept as fullName, the ID stays first + last + batch
+  r = await call(base, '/api/auth/portal', { ticket: ticket({ first: 'Maria', last: 'Santos', b: 'B100926', full: 'Maria L. Santos', exp: exp() }) });
+  assert.equal(r.j.id, 'maria-santos--b100926'); assert.equal(r.j.fullName, 'Maria L. Santos');
+  assert.equal(JSON.parse(store.get('ln:trainee:maria-santos--b100926')).fullName, 'Maria L. Santos');
   console.log('OK: single sign-on and storage rules hold.');
 })().catch((e) => { console.error(e); process.exit(1); });
