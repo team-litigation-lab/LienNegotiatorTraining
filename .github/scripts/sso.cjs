@@ -91,6 +91,14 @@ const ticket = (t, secret = SECRET) => { const p = b64u(JSON.stringify(Object.as
   // a ticket with no p (made before the Portal named the program) is still taken, so nobody is locked out mid-rollout
   r = await call(base, '/api/auth/portal', { ticket: ticket({ first: 'Pat', last: 'Lane', b: 'B100926', p: undefined, exp: exp() }) });
   assert.equal(r.status, 200, JSON.stringify(r.j));
+  // SSO_REQUIRE_AUDIENCE=1 (once everything is deployed): a ticket with no p is refused too; this program's own still opens
+  {
+    const req = Object.assign({}, base, { SSO_REQUIRE_AUDIENCE: '1' });
+    r = await call(req, '/api/auth/portal', { ticket: ticket({ first: 'Pat', last: 'Lane', b: 'B100926', p: undefined, exp: exp() }) });
+    assert.equal(r.status, 401); assert.equal(r.j.code, 'audience');
+    r = await call(req, '/api/auth/portal', { ticket: ticket({ first: 'Pat', last: 'Lane', b: 'B100926', exp: exp() }) });
+    assert.equal(r.status, 200, JSON.stringify(r.j));
+  }
   // a trainee's own ticket works once, like a trainer's; and the Sign-in check's
   for (const t of [{ first: 'Pat', last: 'Lane', b: 'B100926' }, { r: 's' }]) {
     const once = ticket(Object.assign({ exp: exp() }, t));
