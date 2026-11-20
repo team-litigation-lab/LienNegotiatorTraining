@@ -153,7 +153,9 @@ async function readPortalTicket(env, ticket, why = {}) {
   // full: the whole name as registered on the Portal (a middle initial, a suffix), shown as the trainee's fullName; the
   // ID stays first + last name + batch, so a trainee never gets a second account from it
   const full = String(t.full || "").replace(/\s+/g, " ").trim().slice(0, 120);
-  return { name: `${first} ${last}`, first, last, batch, full };
+  // u: the trainee's Portal account id, kept on the record (portalUid): a Batch ID move follows it, never a name alone
+  const u = String(t.u == null ? "" : t.u).trim().slice(0, 80);
+  return { name: `${first} ${last}`, first, last, batch, full, u };
 }
 // Like readToken, but an expired token still counts for a while (same signature, same trainee), so a trainee
 // midway through the course whose 30 days run out isn't sent back to the portal in the middle of a lesson.
@@ -209,7 +211,11 @@ async function movedRecord(env, kv, who) {
   const ids = candidateIds(who.name, who.batch);
   for (const c of new Set([ids.newId, ids.rawId])) if (await kv.get(`trainee:${c}`)) return null;   // a record under this batch: nothing moved
   const alias = await kv.get(`trainee-alias:${ids.newId}`);
-  if (alias && /^[a-z0-9-]{1,100}$/.test(alias) && await kv.get(`trainee:${alias}`)) return (await blockedIds(env, true))[alias] ? null : alias;
+  if (alias && /^[a-z0-9-]{1,100}$/.test(alias)) {
+    let ar = null; try { ar = JSON.parse((await kv.get(`trainee:${alias}`)) || "null"); } catch (e) { ar = null; }
+    if (ar && who.u && String(ar.portalUid || "") === String(who.u)) return (await blockedIds(env, true))[alias] ? null : alias;
+    return null;
+  }
   const slug = ids.newId.split("--")[0];
   if (!slug || !ids.newId.includes("--")) return null;
   const list = await kv.list({ prefix: `trainee:${slug}--` }).catch(() => null);
@@ -218,7 +224,10 @@ async function movedRecord(env, kv, who) {
   const hits = [];
   for (const k of keys) {
     let r = null; try { r = JSON.parse((await kv.get(k)) || "null"); } catch (e) { r = null; }
-    if (r && !r.archived && !r.rejected && slugPart(r.name || "") === slugPart(who.name) && batchKey(r.batch || "") !== batchKey(who.batch)) hits.push([k.slice("trainee:".length), r]);
+    // (the same Portal account only: two trainees with one name in two batches are two people, and a record from before portalUid
+    // was kept is never moved on a name alone; a trainer merges it. Data-safety review 2026-11-19)
+    if (r && r.approved === true && !r.archived && !r.rejected && slugPart(r.name || "") === slugPart(who.name) && batchKey(r.batch || "") !== batchKey(who.batch)
+      && !!who.u && String(r.portalUid || "") === String(who.u)) hits.push([k.slice("trainee:".length), r]);
   }
   if (hits.length !== 1) return null;
   const [id, rec] = hits[0];
@@ -232,7 +241,10 @@ async function movedRecord(env, kv, who) {
 // settings:course holds the admin's overrides of a module's deck or video address (Admin → Course links).
 const PUBLIC_READ = [/^settings:course$/];
 const OWN = (id) => [`trainee:${id}`, `progress:${id}`];
-const PROTECTED_TRAINEE_FIELDS = ["approved", "rejected", "archived", "registeredAt"];
+// (name, firstName, lastName, batch, fullName, portalUid, batchFrom: who the record is, set from the Portal's ticket and by a trainer:
+// a trainee who could change them could pass for someone else. Security review 2026-11-19.)
+const FIRST_WRITE_FIELDS = ["name", "firstName", "lastName", "batch"];
+const PROTECTED_TRAINEE_FIELDS = ["name", "firstName", "lastName", "batch", "fullName", "portalUid", "batchFrom", "batchMovedAt", "approved", "rejected", "archived", "registeredAt"];
 function canRead(tok, key) {
   if (tok.role === "a") return true;
   // assign:<id> (the Lien Desk case a trainer assigned) and release:<id> (a fully executed release a trainer uploaded):
@@ -258,7 +270,8 @@ function keepServerScores(merged, existing) {
   const inc = merged.dayProgress && typeof merged.dayProgress === "object" ? merged.dayProgress : null;
   if (!inc) return;
   const old = (existing && existing.dayProgress) || {};
-  for (const n of Object.values(SCORED_DAYS)) {
+  // (every day, not only the Desk's: no score on the record comes from the trainee's own write. Security review 2026-11-19)
+  for (const n of Object.keys(inc)) {
     if (!inc[n] || typeof inc[n] !== "object") continue;
     const o = old[n] || {};
     inc[n] = Object.assign({}, inc[n]);
@@ -275,7 +288,8 @@ async function traineeWrite(env, tok, key, value) {
     const existingRaw = await kv.get(key);
     let existing = null; try { existing = existingRaw ? JSON.parse(existingRaw) : null; } catch (e) { /* a damaged record is replaced */ }
     const merged = Object.assign({}, incoming);
-    PROTECTED_TRAINEE_FIELDS.forEach((f) => { if (existing && f in existing) merged[f] = existing[f]; else delete merged[f]; });
+    // (a brand-new record's own name and batch are taken from its first write; after that they are the Worker's)
+    PROTECTED_TRAINEE_FIELDS.forEach((f) => { if (existing && f in existing) merged[f] = existing[f]; else if (existing || !FIRST_WRITE_FIELDS.includes(f)) delete merged[f]; });
     if (!existing) { merged.approved = false; merged.registeredAt = new Date().toISOString(); }
     // 🏅 Day 2's and Day 3's scores (the Lien Desk's grade, the number the Portal shows) are the Worker's to write, from the grade
     // saved with the trainee's work (deskScoresFrom, on every progress:<id> save): a score typed straight into the record is ignored.
@@ -481,9 +495,17 @@ export default {
           out.existing = rec;
         }
         // the full name as registered on the Portal (with a middle name or initial), kept beside the record's name
-        if (out.existing && who.full && who.full !== who.name && out.existing.fullName !== who.full) {
-          out.existing = Object.assign({}, out.existing, { fullName: who.full });
-          await kv.put(`trainee:${out.id}`, JSON.stringify(out.existing));
+        // ... and the Portal account id (portalUid, set once) and the first and last name: who the record is, which the trainee
+        // can't change here (PROTECTED_TRAINEE_FIELDS). Security and data-safety reviews 2026-11-19.
+        if (out.existing) {
+          const add = {};
+          if (who.full && who.full !== who.name && out.existing.fullName !== who.full) add.fullName = who.full;
+          if (who.u && !out.existing.portalUid) add.portalUid = who.u;
+          if (!out.existing.firstName && !out.existing.lastName) { add.firstName = who.first; add.lastName = who.last; }
+          if (Object.keys(add).length) {
+            out.existing = Object.assign({}, out.existing, add);
+            await kv.put(`trainee:${out.id}`, JSON.stringify(out.existing));
+          }
         }
         return json(Object.assign(out, { name: who.name, first: who.first, last: who.last, batch: who.batch }, who.full ? { fullName: who.full } : {}));
       }

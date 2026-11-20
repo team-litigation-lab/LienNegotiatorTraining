@@ -485,7 +485,9 @@ function mergeUpload(){
   // (an attachment saved before the release was kept by reference carries the whole file: drop it, the file is in release:<id>,
   // so a trainee whose work had grown past the Worker's 1 MB limit can save again)
   let healed = false;
-  (w.mail || []).forEach((m) => (m.att || []).forEach((a) => { if(a && a.kind === "upload" && a.url){ delete a.url; healed = true; } }));
+  // (only an attachment that IS the release on file now: one from an earlier release the trainer has since replaced keeps its file.
+  // Data-safety review 2026-11-19)
+  (w.mail || []).forEach((m) => (m.att || []).forEach((a) => { if(a && a.kind === "upload" && a.url && up && up.url && a.url === up.url){ delete a.url; healed = true; } }));
   if(healed) save();
   if(!up || !up.url || w.got.uploadAt === up.at) return;
   w.got.uploadAt = up.at; w.got.exec = true; w.got.execOn = w.got.execOn || todayStr();

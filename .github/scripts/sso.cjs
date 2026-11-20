@@ -116,6 +116,10 @@ const ticket = (t, secret = SECRET) => { const p = b64u(JSON.stringify(Object.as
     r = await call(base, '/api/storage/set', { key: 'trainee:jane-doe--b100926', value: JSON.stringify(forged) }, tTok); assert.equal(r.status, 200);
     let rec = JSON.parse(store.get('ln:trainee:jane-doe--b100926'));
     assert.ok(rec.dayProgress[2].done && rec.dayProgress[2].score === undefined && rec.dayProgress[3].score === undefined, 'a score written straight into the record is dropped: ' + JSON.stringify(rec.dayProgress));
+    // (any day: security review 2026-11-19)
+    r = await call(base, '/api/storage/set', { key: 'trainee:jane-doe--b100926', value: JSON.stringify(Object.assign({}, rec, { dayProgress: Object.assign({}, rec.dayProgress, { 1: { done: true, score: 100 }, 9: { score: 100 } }) })) }, tTok);
+    rec = JSON.parse(store.get('ln:trainee:jane-doe--b100926'));
+    assert.ok(rec.dayProgress[1].score === undefined && (!rec.dayProgress[9] || rec.dayProgress[9].score === undefined), 'no day takes a score from the trainee: ' + JSON.stringify(rec.dayProgress));
     const prog = { desk: { caseId: 'miller', cases: { miller: { grade: { day2: { score: 72 }, day3: { score: 140 } } } } } };
     r = await call(base, '/api/storage/set', { key: 'progress:jane-doe--b100926', value: JSON.stringify(prog) }, tTok); assert.equal(r.status, 200);
     rec = JSON.parse(store.get('ln:trainee:jane-doe--b100926'));
@@ -125,9 +129,9 @@ const ticket = (t, secret = SECRET) => { const p = b64u(JSON.stringify(Object.as
   }
   // 🔁 a Batch ID changed on the Portal: the trainee keeps their record (platform QA 2026-11-19, LN finding 5)
   {
-    r = await call(base, '/api/auth/portal', { ticket: ticket({ first: 'Mark', last: 'Lee', b: 'B100126', exp: exp() }) }); assert.equal(r.status, 200);
+    r = await call(base, '/api/auth/portal', { ticket: ticket({ first: 'Mark', last: 'Lee', b: 'B100126', u: 'ML1', exp: exp() }) }); assert.equal(r.status, 200);
     const rec = JSON.parse(store.get('ln:trainee:mark-lee--b100126')); rec.dayProgress = { 1: { done: true } }; store.set('ln:trainee:mark-lee--b100126', JSON.stringify(rec));
-    r = await call(base, '/api/auth/portal', { ticket: ticket({ first: 'Mark', last: 'Lee', b: 'B110226', exp: exp() }) });
+    r = await call(base, '/api/auth/portal', { ticket: ticket({ first: 'Mark', last: 'Lee', b: 'B110226', u: 'ML1', exp: exp() }) });
     assert.equal(r.status, 200); assert.equal(r.j.id, 'mark-lee--b100126', 'the kept record opens');
     const kept = JSON.parse(store.get('ln:trainee:mark-lee--b100126'));
     assert.equal(kept.batch, 'B110226'); assert.equal(kept.batchFrom, 'B100126'); assert.ok(kept.dayProgress[1].done);
@@ -135,6 +139,16 @@ const ticket = (t, secret = SECRET) => { const p = b64u(JSON.stringify(Object.as
     assert.equal(store.get('ln:trainee-alias:mark-lee--b110226'), 'mark-lee--b100126');
     const rn = await call(base, '/api/auth/trainee', { name: 'Mark Lee', batch: 'B110226' }, r.j.token);
     assert.equal(rn.status, 200, JSON.stringify(rn.j)); assert.equal(rn.j.id, 'mark-lee--b100126');
+    // (data-safety review 2026-11-19) another person with the same name (another Portal account) never takes the record
+    r = await call(base, '/api/auth/portal', { ticket: ticket({ first: 'Mia', last: 'Same', b: 'B100126', u: 'S1', exp: exp() }) });
+    r = await call(base, '/api/auth/portal', { ticket: ticket({ first: 'Mia', last: 'Same', b: 'B110226', u: 'S2', exp: exp() }) });
+    assert.equal(r.j.id, 'mia-same--b110226'); assert.equal(JSON.parse(store.get('ln:trainee:mia-same--b100126')).batch, 'B100126');
+    assert.ok(!store.has('ln:trainee-alias:mia-same--b110226'));
+    // and a trainee can't rewrite who their record is
+    const recS = JSON.parse(store.get('ln:trainee:mia-same--b110226')); assert.equal(recS.portalUid, 'S2');
+    await call(base, '/api/storage/set', { key: 'trainee:mia-same--b110226', value: JSON.stringify(Object.assign({}, recS, { name: 'Bob Victim', batch: 'B200000', portalUid: 'X' })) }, r.j.token);
+    const afterS = JSON.parse(store.get('ln:trainee:mia-same--b110226'));
+    assert.equal(afterS.name, 'Mia Same'); assert.equal(afterS.batch, 'B110226'); assert.equal(afterS.portalUid, 'S2');
   }
   console.log('OK: single sign-on and storage rules hold.');
 })().catch((e) => { console.error(e); process.exit(1); });
