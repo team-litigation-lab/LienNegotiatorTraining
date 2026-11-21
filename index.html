@@ -653,7 +653,7 @@ function topbar(){
     COURSE.days.forEach((d) => nav.push(`<button class="${(state.view === "day" || state.view === "player") && state.dayNum === d.day ? "active" : ""}" onclick="goto('day',${d.day})">Day ${d.day}</button>`));
     nav.push(`<button class="${state.view === "desk" ? "active" : ""}" onclick="goto('desk')">🗂 Lien Desk</button>`);
     if(state.isAdmin) nav.push(`<button class="${state.view === "admin" ? "active" : ""}" onclick="goto('admin')">🛡 Admin</button>`);
-    nav.push(`<a class="nav-out" href="${PORTAL_HOME}">← Training Directory</a>`);
+    nav.push(`<a class="nav-out" href="${PORTAL_HOME}">← 🎓 LSH Academy Index</a>`);
     nav.push(`<button onclick="logout()">Sign out</button>`);
   }
   const who = state.isAdmin ? "Trainer" : (state.trainee && state.trainee.name) || "";
