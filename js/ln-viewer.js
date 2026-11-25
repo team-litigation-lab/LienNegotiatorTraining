@@ -1,5 +1,5 @@
 /* ============================================================
-   🎬 The pop-out viewer, as the Standard Foundational Training has it (Foundational-Training,
+   🎬 The pop-out viewer, as the Legal VA Foundational Track has it (Foundational-Training,
    js/ft-updates.js: "Drive files open in the pop-out viewer", itself the LSH Training Portal's
    Recorded Lectures viewer). A video card, or ⛶ Pop out under a video, plays the video here:
    wide and centred, draggable by its header, ⛶ Full Screen (the browser's own full screen, so

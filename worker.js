@@ -1,5 +1,5 @@
 /**
- * LSH Lien Negotiator Training — Cloudflare Worker (secured)
+ * LSH Lien Negotiator Track — Cloudflare Worker (secured)
  *
  * The same sign-in and storage rules as the Case Management course's Worker
  * (Case-Management-Training/worker.js), cut down to what this course uses:

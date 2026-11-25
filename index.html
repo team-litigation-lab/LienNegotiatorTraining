@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>LSH Lien Negotiator Training</title>
+<title>LSH Lien Negotiator Track</title>
 <link rel="icon" type="image/png" href="favicon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -293,7 +293,7 @@ main.main-wide{max-width:1600px;}
 .lab-tasks{list-style:none;margin:0 0 10px;padding:0;font-size:14px}.lab-tasks li{padding:5px 0;border-bottom:1px solid var(--line)}.lab-tasks li.ok{color:var(--success)}
 .lab-foot{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
 
-/* ---------- videos, as in the Standard Foundational Training: cards that play in the pop-out viewer (js/ln-viewer.js),
+/* ---------- videos, as in the Legal VA Foundational Track: cards that play in the pop-out viewer (js/ln-viewer.js),
    and the action row under a deck or video (⛶ Full screen · ⧉ Pop out · Open ↗) ---------- */
 .frame-actions{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-top:8px;font-size:12.5px;color:#C9CDE3;font-weight:600;}
 .frame-btns{display:flex;gap:6px;flex-wrap:wrap;}
@@ -658,11 +658,11 @@ function topbar(){
   }
   const who = state.isAdmin ? "Trainer" : (state.trainee && state.trainee.name) || "";
   return `<header class="topbar"><div class="topbar-inner">
-    <button class="brand" onclick="goto('dashboard')" aria-label="Dashboard"><img class="brand-mark" src="/js/lsh-logo-dark.png" alt="Legal Support Help"><span class="brand-text"><b>Lien Negotiator Training</b></span></button>
+    <button class="brand" onclick="goto('dashboard')" aria-label="Dashboard"><img class="brand-mark" src="/js/lsh-logo-dark.png" alt="Legal Support Help"><span class="brand-text"><b>Lien Negotiator Track</b></span></button>
     <div class="topbar-right">${who ? `<span class="who">${esc(who)}</span>` : ""}${nav.length ? `<nav class="nav">${nav.join("")}</nav>` : ""}</div>
   </div></header>`;
 }
-function footer(){ return `<div class="footer-note">LSH Lien Negotiator Training · Internal Training Portal · <span class="mono">build ${APP_BUILD}</span></div>`; }
+function footer(){ return `<div class="footer-note">LSH Lien Negotiator Track · Internal Training Portal · <span class="mono">build ${APP_BUILD}</span></div>`; }
 
 // The dashboard banner, as the CM course draws it: the completion ribbon (its completionRibbonSvg), the eyebrow and the
 // title between two sparks, then ▶ Continue where you left off (once a day has been started).
@@ -707,7 +707,7 @@ function dashBanner(){
     <div class="dash-hero">
       <div class="dash-hero-ribbon">${completionRibbonSvg(pct)}</div>
       <div class="dash-hero-text">
-        <p class="eyebrow">LIEN NEGOTIATION ACCELERATOR</p>
+        <p class="eyebrow">LIEN NEGOTIATOR TRACK</p>
         <h1>${SPARK(true)}Lien Negotiator Professional Development Workshop${SPARK(false)}</h1>
       </div>
     </div>
@@ -804,7 +804,7 @@ function viewPlayer(){
   const i = Math.max(0, Math.min(steps.length - 1, state.step || 0)), s = steps[i];
   let head = "", banner = "", chip = "", chipExtra = "", body = "";
   if(s.type === "agenda"){
-    head = "Lien Negotiator Training"; banner = `Day ${d.day} · Training Agenda`; chip = "📅 Training Agenda";
+    head = "Lien Negotiator Track"; banner = `Day ${d.day} · Training Agenda`; chip = "📅 Training Agenda";
     body = `<div class="agenda-theme"><span class="theme-tag">${esc(d.theme)}</span><p>${esc(d.objectives.join("; "))}.</p></div>
       <div class="agenda-grid">${d.topics.map((t, k) => `<div class="agenda-item"><span class="agenda-n">${String(k + 1).padStart(2, "0")}</span><div><b>${esc(t.h)}</b>${t.slides ? `<small>📚 slides ${esc(t.slides)}</small>` : ""}</div></div>`).join("")}</div>
 `;

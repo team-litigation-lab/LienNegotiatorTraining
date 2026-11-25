@@ -1,4 +1,4 @@
-# LSH Lien Negotiator Training
+# LSH Lien Negotiator Track
 
 The Lien Negotiator program, set up the way the Case Management course (`Case-Management-Training`) is: its own Cloudflare Worker, opened from the LSH Training Portal with single sign-on, trainee records in the shared `LSH_KV` namespace under a prefix of its own, and the LSH standard page style.
 
@@ -12,7 +12,7 @@ In the CM course's format: **Day cards** on the dashboard → the day's **Object
 | **Day 2 · The Lien Negotiator Role, Pt. 2** | ERISA & Government Plan Liens (10 topics) | [72 slides](https://www.canva.com/design/DAHabx7BhKE/BPidIfAISKJuol56ntSmZg/view) | [Video](https://drive.google.com/file/d/1sUjQCpEqkrvf802Ck23aajx4Z2ox8zgE/view) |
 | **Day 3 · Process Questions, Live Demo & Shadowing** | Releases, Net Sheets & Closing Statements (12 modules) | [Exercise](https://www.canva.com/design/DAGva6b4Q_Q/sJk9AIQaiwaxO__NlgPplA/view) | 8 videos, each embedded in full (below) |
 
-- **Dashboard:** the CM banner (the completion ribbon, *Lien Negotiation Accelerator*, the workshop title, and **▶ Continue where you left off** once a day is started; no Roadmap button), then one Day card per day, drawn like the CM course's: *Day n · title* in the head, the day's icon and theme pill, **Start** / **Continue** / **Review**, and **☰ Topics** (the day's outline, with the slides each topic covers).
+- **Dashboard:** the CM banner (the completion ribbon, *Lien Negotiator Track*, the workshop title, and **▶ Continue where you left off** once a day is started; no Roadmap button), then one Day card per day, drawn like the CM course's: *Day n · title* in the head, the day's icon and theme pill, **Start** / **Continue** / **Review**, and **☰ Topics** (the day's outline, with the slides each topic covers).
 - **Objectives page** (the CM day page): *🎯 By the end of today you'll be able to …*, *📘 The Lesson* outline in two columns, *🧭 Today's Modules*, and **← Dashboard** / **Start Day n →**.
 - **The day's steps** (the CM lesson player): a stage with the step's title, banner and chip, **← Previous · 🗺 Slide Map · Step n of N · Next →** under it (← → keys too), and the side panel (the day, **📋 Objectives**, **⛶ Full screen**). The steps are **Training Agenda** (the theme, objectives and numbered topics) → **Module 1 · Slide Deck** (the Canva deck) → **Module 2 · Recorded Session** (the Drive video) → **Day Complete**. Every step fits on one screen. A module counts as done once the trainee moves on from it with Next; the day is done when they reach Day Complete with both modules done. A trainee who leaves mid-day continues from the same step.
 - **🛡 Admin:** every trainee who has opened the course, their batch, each day's status (modules done), when they were last active, with *Remove access* / *Restore access*; and **Course links**, to replace a module's deck or video without a deploy.
@@ -119,7 +119,7 @@ This repository is its own Worker, the same as the CM course.
 
 ### On the Training Portal (Training-Portal repo)
 
-The Portal already lists **Lien Negotiator Training** (`LIEN NEGOTIATION`). To open this site from it, add its address next to the other programs':
+The Portal already lists **Lien Negotiator Track** (`LIEN NEGOTIATION`). To open this site from it, add its address next to the other programs':
 
 - `functions/api/launch.js` and `programs.html`: `'LIEN NEGOTIATION': 'https://liennegotiatortraining.legalsupporthelp.workers.dev/'`
 - `functions/api/program-progress.js` (`PROGRAMS`), for progress: `{ id: 'ln', label: 'Lien Negotiator Training', prefix: 'ln:', days: 3, url: 'https://liennegotiatortraining.legalsupporthelp.workers.dev/' }`
