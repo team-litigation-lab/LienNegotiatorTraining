@@ -41,3 +41,5 @@ jobs:
           node .github/scripts/fit.cjs http://localhost:8787/
           node .github/scripts/desk.cjs http://localhost:8787/
           node .github/scripts/contrast.cjs http://localhost:8787/
+          node .github/scripts/load-fail.cjs http://localhost:8787/
+          node .github/scripts/sheet-reveal.cjs http://localhost:8787/

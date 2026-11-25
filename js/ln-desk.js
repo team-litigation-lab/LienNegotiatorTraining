@@ -166,7 +166,7 @@ function attDoc(c, w, a){
   }
   if(a.kind === "rr"){ const p = c.payees.find((x) => x.id === a.ref); return p ? { html: () => docRR(c, p, w.drafts.rr[p.id] || {}) } : null; }
   if(a.kind === "cs") return { html: () => docCS(c, w.drafts.cs || {}, a.signed) };
-  if(a.kind === "upload") return { url: a.url };
+  if(a.kind === "upload") return { url: a.url || ((window.state.deskRelease || {}).url) };
   if(a.kind === "reply") return { html: () => a.html };
   return null;
 }
@@ -266,22 +266,26 @@ function rowFor(cells, p){
 function checkSheet(stage){
   const c = CASE(), w = W(), cells = w.sheet.cells, o = sheetCalc(cells), x = expected(c, w, stage);
   const items = [
-    { what: "Settlement amount", got: o.gross, want: x.gross, why: `${c.settlements.map((s) => `${s.type} ${money(s.amount)}`).join(" + ")}. PIP is not recovery.` },
-    { what: "Attorney fees", got: o.fee, want: x.fee, why: `${c.fee.pct} of the settlement. ${c.fee.why} For one-third, type 33⅓% or 1/3 (33.33% gives a different figure).` },
+    // (why: where to look; full: the worked answer, shown only with "Show me (no credit)")
+    { what: "Settlement amount", got: o.gross, want: x.gross, why: "Every settlement on file (the offer and release letters), added up. PIP is not recovery.", full: `${c.settlements.map((s) => `${s.type} ${money(s.amount)}`).join(" + ")}. PIP is not recovery.` },
+    { what: "Attorney fees", got: o.fee, want: x.fee, why: "The fee tier in the retainer on file, and whether a lawsuit was filed. For one-third, type 33⅓% or 1/3 (33.33% gives a different figure).", full: `${c.fee.pct} of the settlement. ${c.fee.why} For one-third, type 33⅓% or 1/3 (33.33% gives a different figure).` },
     { what: "Total expenses", got: o.exp, want: x.costs, why: "Every cost on the Case Cost Ledger." }
   ];
   x.rows.forEach((y) => {
     const r = rowFor(cells, y.p);
     const got = !r ? 0 : stage === "initial" ? (r.k === "M" ? o["M" + r.i + "bal"] : num(cells["N" + r.i + "bal"])) : num(cells[r.k + r.i + "red"]);
     if(!r && y.want === 0) return;
-    items.push({ what: `${y.p.name}${stage === "initial" ? " · balance owed" : " · agreed reduction"}`, got, want: y.want, missing: !r,
+    items.push({ what: `${y.p.name}${stage === "initial" ? " · balance owed" : " · agreed reduction"}`, payee: true, got, want: y.want, missing: !r,
       why: stage === "initial" ? (y.p.lien ? "The lien or payoff on the letter on file." : y.p.onFile && y.p.onFile.reconcile ? "Total charges less the PIP payments on the PIP log (the provider's ledger hasn't posted them all) and any adjustments." : "Total charges less the payments and adjustments on the bill on file.")
         : (y.want === 0 ? "$0.00: waived, or nothing is owed." : reducible(y.p) && w.got.approved[y.p.id] != null ? "The amount the payee agreed to in writing (its reply)." : y.p.reduce && y.p.reduce.policy === "contract" ? "The updated payoff: funding companies don't reduce." : y.p.reduce && y.p.reduce.policy === "statute" ? "A statutory lien: paid in full." : "Its current balance (no reduction agreed).") });
   });
   items.push({ what: stage === "initial" ? "Total balances owed (medical + non-medical)" : "Total agreed (medical + non-medical)", got: stage === "initial" ? r2(o.medBal + o.nonBal) : r2(o.medRed + o.nonRed), want: x.total, why: "The sum of the rows." });
   items.push({ what: x.netLabel, got: stage === "initial" ? o.netBefore : o.net, want: x.net, why: "Settlement – fees – expenses – medical – non-medical." });
-  items.forEach((i) => { i.ok = !i.missing && Math.abs(i.got - i.want) < 0.005; });
-  w.checks[stage] = { at: new Date().toISOString(), passed: items.filter((i) => i.ok).length, total: items.length, ok: items.every((i) => i.ok) };
+  // 🔎 "Show me (no credit)": a line whose figure the trainee asked to see still ties out on the sheet, but earns no credit in
+  // the grade (passed counts only the lines they got themselves). A Check never shows a figure (or a payee's name) on its own.
+  const rv = w.reveal || {};
+  items.forEach((i) => { i.ok = !i.missing && Math.abs(i.got - i.want) < 0.005; i.revealed = !!rv[stage + "|" + i.what]; });
+  w.checks[stage] = { at: new Date().toISOString(), passed: items.filter((i) => i.ok && !i.revealed).length, total: items.length, ok: items.every((i) => i.ok), revealed: items.filter((i) => i.revealed).length };
   save();
   return items;
 }
@@ -302,7 +306,7 @@ function grade(stage, c, w){
   if(stage === "day2"){
     add("The Settlement Release(s) sent to the trainer, all attached", 10, w.got.releaseSent ? 10 : 0);
     add("The fully executed release received", 5, w.got.exec ? 5 : 0);
-    add("The initial Net Sheet ties out", 40, 40 * ck("initial"), w.checks.initial ? `${w.checks.initial.passed}/${w.checks.initial.total} lines at the last check` : "not checked yet");
+    add("The initial Net Sheet ties out", 40, 40 * ck("initial"), w.checks.initial ? `${w.checks.initial.passed}/${w.checks.initial.total} lines at the last check${w.checks.initial.revealed ? ` (${w.checks.initial.revealed} shown, no credit)` : ""}` : "not checked yet");
     add("The Reduction Requests drafted correctly", 45, share(red, 45, (p) => { const d = w.drafts.rr[p.id]; return d && d.file ? Math.max(0, 1 - rrValid(c, w, p).length / 4) : 0; }), `${red.length} letter${red.length === 1 ? "" : "s"}: file name, client, DOL, PIP, balance, amount`);
   } else {
     const out = c.payees.filter((p) => p.onFile), sent = (w.mail || []).filter((m) => m.dir === "out").length;
@@ -310,7 +314,7 @@ function grade(stage, c, w){
     add("Updated bills and payoffs requested", 15, share(out, 15, (p) => w.got.corrected[p.id] ? 1 : 0));
     add("Reduction Requests sent and answered", 20, share(red, 20, (p) => w.got.approved[p.id] != null ? 1 : 0));
     add("Email conventions, every email in the case (attachments, subject line, client's full name and DOL)", 10, sent ? 10 - 2 * refusals : 0, refusals ? `${refusals} repl${refusals === 1 ? "y" : "ies"} asked you to fix and resend` : sent ? "every email routed first time" : "no emails yet");
-    add("The final Net Sheet ties out", 30, 30 * ck("final"), w.checks.final ? `${w.checks.final.passed}/${w.checks.final.total} lines at the last check` : "not checked yet");
+    add("The final Net Sheet ties out", 30, 30 * ck("final"), w.checks.final ? `${w.checks.final.passed}/${w.checks.final.total} lines at the last check${w.checks.final.revealed ? ` (${w.checks.final.revealed} shown, no credit)` : ""}` : "not checked yet");
     add("The Closing Statement matches", 15, w.drafts.cs && w.drafts.cs.file ? 15 * Math.max(0, 1 - csIssues(c, w).length / 5) : 0);
     add("Sent to the client and signed", 10, w.got.signed ? 10 : w.got.clientSent ? 5 : 0);
   }
@@ -340,8 +344,9 @@ function rrValid(c, w, p){
   const issues = [];
   if(!fm) issues.push("File name: MED - Provider's name - Reduction Request (your first name only)");
   else { if(!low(fm[1]).includes(keyOf(p))) issues.push(`File name: the provider's name (${p.name}) goes in the middle`); if(traineeFirst() && low(fm[2]).trim() !== low(traineeFirst())) issues.push(`File name: your first name only in the brackets (${traineeFirst()})`); }
-  if(Math.abs(num(d.balance) - f.balance) >= 0.005) issues.push(`Balance Due: ${money(num(d.balance))} isn't the current balance (${money(f.balance)})`);
-  if(!p.lien && Math.abs(num(d.pip) - f.pip) >= 0.005) issues.push(`PIP Payment(s): ${money(num(d.pip))}; the PIP log shows ${money(f.pip)} paid to this provider`);
+  // (what is wrong and where to look, never the figure itself: the figures are what the trainee is learning to find)
+  if(Math.abs(num(d.balance) - f.balance) >= 0.005) issues.push(`Balance Due: ${money(num(d.balance))} isn't the current balance on the bill or payoff on file`);
+  if(!p.lien && Math.abs(num(d.pip) - f.pip) >= 0.005) issues.push(`PIP Payment(s): ${money(num(d.pip))} isn't what the PIP log shows paid to this provider`);
   if(!hasAsk(d) || !(num(d.requested) >= 0 && num(d.requested) < f.balance)) issues.push("The reduced amount: $0.00 (waive) up to less than the balance");
   if(!d.client || !low(d.client).includes(low(c.client.last))) issues.push("Client/Patient: the client's full name");
   if(String(d.dol || "").trim() !== c.dol) issues.push(`Date of Loss: ${c.dol}`);
@@ -351,8 +356,8 @@ function csIssues(c, w){
   const d = w.drafts.cs || {}, x = expected(c, w, "final"), issues = [];
   const fm = /^(.+?)\s*[–-]\s*Closing Statement\s*\((.+)\)\s*$/i.exec(String(d.file || "").trim());
   if(!fm || !low(fm[1]).includes(low(c.client.first)) || !low(fm[1]).includes(low(c.client.last))) issues.push("File name: Client's Name – Closing Statement (your name)");
-  [["gross", x.gross, "Total gross settlement"], ["fee", x.fee, "Attorney fees"], ["costs", x.costs, "Total costs and expenses"], ["net", x.net, "Total net settlement"]].forEach(([k, want, label]) => { if(Math.abs(num(d[k]) - want) >= 0.005) issues.push(`${label}: ${money(num(d[k]))} doesn't match the final figures (${money(want)})`); });
-  x.rows.forEach((y) => { if(Math.abs(num((d.pay || {})[y.p.id]) - y.want) >= 0.005) issues.push(`${y.p.name}: ${money(num((d.pay || {})[y.p.id]))}, the final figure is ${money(y.want)}`); });
+  [["gross", x.gross, "Total gross settlement"], ["fee", x.fee, "Attorney fees"], ["costs", x.costs, "Total costs and expenses"], ["net", x.net, "Total net settlement"]].forEach(([k, want, label]) => { if(Math.abs(num(d[k]) - want) >= 0.005) issues.push(`${label}: ${money(num(d[k]))} doesn't match the final figures`); });
+  x.rows.forEach((y) => { if(Math.abs(num((d.pay || {})[y.p.id]) - y.want) >= 0.005) issues.push(`${y.p.name}: ${money(num((d.pay || {})[y.p.id]))} isn't the final figure (its agreed reduction or payoff)`); });
   const o = sheetCalc(w.sheet.cells);
   if(Math.abs(o.net - num(d.net)) >= 0.005) issues.push(`The net must match your Net Sheet exactly (your sheet: ${money(o.net)})`);
   return issues;
@@ -477,9 +482,16 @@ function arrived(w){ (w.mail || []).forEach((m) => { if(m.dir !== "in" || m.done
 /* ---------- the trainer's real release (Admin upload) ---------- */
 function mergeUpload(){
   const S = window.state, up = S.deskRelease, w = W();
+  // (an attachment saved before the release was kept by reference carries the whole file: drop it, the file is in release:<id>,
+  // so a trainee whose work had grown past the Worker's 1 MB limit can save again)
+  let healed = false;
+  // (only an attachment that IS the release on file now: one from an earlier release the trainer has since replaced keeps its file.
+  // Data-safety review 2026-11-19)
+  (w.mail || []).forEach((m) => (m.att || []).forEach((a) => { if(a && a.kind === "upload" && a.url && up && up.url && a.url === up.url){ delete a.url; healed = true; } }));
+  if(healed) save();
   if(!up || !up.url || w.got.uploadAt === up.at) return;
   w.got.uploadAt = up.at; w.got.exec = true; w.got.execOn = w.got.execOn || todayStr();
-  w.mail.push({ id: mid(), dir: "in", at: up.at, unread: true, done: true, from: F.trainer.name, fromEmail: F.trainer.email, subject: `Fully Executed Release | ${clientLF(CASE())}`, body: "Hi,\n\nAttached is the fully executed release for your case.\n\nBest regards,\nYour trainer", att: [{ kind: "upload", ref: "upload", name: up.name || "Fully Executed Release", url: up.url }] });
+  w.mail.push({ id: mid(), dir: "in", at: up.at, unread: true, done: true, from: F.trainer.name, fromEmail: F.trainer.email, subject: `Fully Executed Release | ${clientLF(CASE())}`, body: "Hi,\n\nAttached is the fully executed release for your case.\n\nBest regards,\nYour trainer", att: [{ kind: "upload", ref: "upload", name: up.name || "Fully Executed Release" }] });   // (a reference only: the file stays in release:<id>, so a large PDF never makes progress:<id> too big to save)
   save();
 }
 
@@ -550,25 +562,35 @@ function vSheet(c, w){
   const cells = w.sheet.cells, o = sheetCalc(cells);
   const inp = (k, cls, ph) => `<input class="ld-in ${cls || ""}" data-k="${k}" value="${E(cells[k] != null ? cells[k] : "")}"${ph ? ` placeholder="${E(ph)}"` : ""}>`;
   const out = (k) => `<output data-o="${k}">${money(o[k])}</output>`;
-  const res = (stage) => { const r = UI.checks[stage]; return r ? `<div class="ld-check"><b>${r.every((i) => i.ok) ? "✓ Your sheet ties out" : `${r.filter((i) => i.ok).length} of ${r.length} tie out`}</b><ul>${r.map((i) => `<li class="${i.ok ? "ok" : "miss"}">${i.ok ? "✓" : "✗"} ${E(i.what)}: ${i.ok ? money(i.want) : i.missing ? `no row for it (put the name in the Provider / Entity column)` : `${money(i.got)}, the file says ${money(i.want)}`}${i.ok ? "" : ` <small>${E(i.why)}</small>`}</li>`).join("")}</ul></div>` : (w.checks[stage] ? `<p class="ld-muted">Last check (${stage}): ${w.checks[stage].passed}/${w.checks[stage].total}</p>` : ""); };
+  // A line that doesn't tie out says so and why (where to look), never the figure: the figure, and a missing payee's name, show
+  // only after "Show me (no credit)", and that line then earns nothing in the grade (checkSheet).
+  const reveal = (stage, i) => `<button class="btn btn-sm btn-ghost" onclick="LNDesk.reveal('${stage}','${E(String(i.what).replace(/'/g, ""))}')">Show me (no credit)</button>`;
+  const line = (stage, i) => {
+    const label = i.payee && i.missing && !i.revealed ? "A payee on the file" : i.what;
+    const body = i.ok ? money(i.want) + (i.revealed ? " <small>(shown: no credit)</small>" : "")
+      : i.revealed ? (i.missing ? `no row for it: the file says ${money(i.want)} (put the name in the Provider / Entity column)` : `${money(i.got)}: the file says ${money(i.want)}`)
+      : i.missing ? `has no row on your sheet: check every bill, lien letter and payoff on file` : `${money(i.got)} doesn't tie out`;
+    return `<li class="${i.ok ? "ok" : "miss"}">${i.ok ? "✓" : "✗"} ${E(label)}: ${body}${i.ok ? "" : ` <small>${E(i.revealed && i.full ? i.full : i.why)}</small>${i.revealed ? "" : " " + reveal(stage, i)}`}</li>`;
+  };
+  const res = (stage) => { const r = UI.checks[stage]; return r ? `<div class="ld-check"><b>${r.every((i) => i.ok) ? "✓ Your sheet ties out" : `${r.filter((i) => i.ok).length} of ${r.length} tie out`}</b><ul>${r.map((i) => line(stage, i)).join("")}</ul></div>` : (w.checks[stage] ? `<p class="ld-muted">Last check (${stage}): ${w.checks[stage].passed}/${w.checks[stage].total}</p>` : ""); };
   const med = Array.from({ length: MED_ROWS() }, (_, j) => j + 1), non = Array.from({ length: NON_ROWS }, (_, j) => j + 1);
   return `<div class="ld-card ld-sheet">
     <div class="ld-row"><h2 style="margin:0;flex:1">NET SETTLEMENT CALCULATIONS · ${E(clientLF(c))}</h2><button class="btn btn-sm btn-navy" onclick="LNDesk.check('initial')">✓ Check initial sheet (Day 2)</button><button class="btn btn-sm btn-primary" onclick="LNDesk.check('final')">✓ Check final sheet (Day 3)</button></div>
     ${res("initial")}${res("final")}
-    <h3>Settlement amount</h3><table class="ld-t"><tr><th>Insurance</th><th>Claim #</th><th class="m">Offer / Settlement</th></tr>
+    <h3>Settlement amount</h3><div class="ld-scroll"><table class="ld-t"><tr><th>Insurance</th><th>Claim #</th><th class="m">Offer / Settlement</th></tr>
       ${[1, 2, 3].map((i) => `<tr><td>${inp("S" + i + "c", "wide", i === 1 ? "Insurance company" : "")}</td><td>${inp("S" + i + "n", "wide")}</td><td class="m">${inp("S" + i + "a")}</td></tr>`).join("")}
       <tr class="tot"><td colspan="2">SETTLEMENT AMOUNT</td><td class="m">${out("gross")}</td></tr>
-      <tr><td>ATTY FEES</td><td>${inp("FEE", "pct", "33⅓%")} <small>from the retainer</small></td><td class="m">${out("fee")}</td></tr></table>
-    <h3>Expense log</h3><table class="ld-t"><tr><th>Expense</th><th class="m">Amount</th></tr>
+      <tr><td>ATTY FEES</td><td>${inp("FEE", "pct", "33⅓%")} <small>from the retainer</small></td><td class="m">${out("fee")}</td></tr></table></div>
+    <h3>Expense log</h3><div class="ld-scroll"><table class="ld-t"><tr><th>Expense</th><th class="m">Amount</th></tr>
       ${EXP_LABELS.map((l, j) => `<tr><td>${inp("X" + (j + 1) + "l", "wide", l)}</td><td class="m">${inp("X" + (j + 1) + "a")}</td></tr>`).join("")}
-      <tr class="tot"><td>TOTAL EXPENSES</td><td class="m">${out("exp")}</td></tr></table>
+      <tr class="tot"><td>TOTAL EXPENSES</td><td class="m">${out("exp")}</td></tr></table></div>
     <h3>Medical bills</h3><div class="ld-scroll"><table class="ld-t"><tr><th>Type</th><th>Med Provider</th><th class="m">Total Charges</th><th class="m">PIP Payments</th><th class="m">Med Payments</th><th class="m">Health Payments</th><th class="m">Adjustments</th><th class="m">Balance Owed</th><th class="m">Agreed Reduction</th><th class="m">Max Offer</th></tr>
       ${med.map((i) => `<tr><td>${inp("M" + i + "t")}</td><td>${inp("M" + i + "p", "wide")}</td>${["c", "pip", "med", "hea", "adj"].map((k) => `<td class="m">${inp("M" + i + k)}</td>`).join("")}<td class="m">${out("M" + i + "bal")}</td><td class="m">${inp("M" + i + "red")}</td><td class="m">${inp("M" + i + "max")}</td></tr>`).join("")}
       <tr class="tot"><td colspan="7">TOTAL MEDICAL</td><td class="m">${out("medBal")}</td><td class="m">${out("medRed")}</td><td></td></tr></table></div>
-    <h3>Non medical</h3><table class="ld-t"><tr><th>Type</th><th>Entity</th><th class="m">Balance Owed</th><th class="m">Agreed Reduction</th></tr>
+    <h3>Non medical</h3><div class="ld-scroll"><table class="ld-t"><tr><th>Type</th><th>Entity</th><th class="m">Balance Owed</th><th class="m">Agreed Reduction</th></tr>
       ${non.map((i) => `<tr><td>${inp("N" + i + "t", "", ["Pre-Settlement Funding", "Prior Attorney", "Child Support", ""][i - 1])}</td><td>${inp("N" + i + "p", "wide")}</td><td class="m">${inp("N" + i + "bal")}</td><td class="m">${inp("N" + i + "red")}</td></tr>`).join("")}
-      <tr class="tot"><td colspan="2">NON MEDICAL TOTAL OWED</td><td class="m">${out("nonBal")}</td><td class="m">${out("nonRed")}</td></tr></table>
-    <h3>Total net settlement</h3><table class="ld-t"><tr><td>Before reductions (settlement – fees – expenses – balances owed)</td><td class="m">${out("netBefore")}</td></tr><tr class="tot"><td>TOTAL NET SETTLEMENT (with the agreed reductions)</td><td class="m">${out("net")}</td></tr></table>
+      <tr class="tot"><td colspan="2">NON MEDICAL TOTAL OWED</td><td class="m">${out("nonBal")}</td><td class="m">${out("nonRed")}</td></tr></table></div>
+    <h3>Total net settlement</h3><div class="ld-scroll"><table class="ld-t"><tr><td>Before reductions (settlement – fees – expenses – balances owed)</td><td class="m">${out("netBefore")}</td></tr><tr class="tot"><td>TOTAL NET SETTLEMENT (with the agreed reductions)</td><td class="m">${out("net")}</td></tr></table></div>
   </div>`;
 }
 function vDrafts(c, w){
@@ -661,6 +683,8 @@ window.LNDesk = {
   },
   saveDraft(){ save(); window.render(); window.toast("Draft saved."); },
   check(stage){ UI.checks[stage] = checkSheet(stage); window.render(); },
+  // "Show me (no credit)" on one line of the Net Sheet check: the figure shows, and the line earns nothing in the grade
+  reveal(stage, what){ const w = W(); w.reveal = Object.assign({}, w.reveal || {}); const it = (UI.checks[stage] || []).find((i) => String(i.what).replace(/'/g, "") === what); if(!it) return; w.reveal[stage + "|" + it.what] = true; UI.checks[stage] = checkSheet(stage); window.render(); },
   // the trainer's view of one trainee's desk (Admin)
   summary(rec, progRec){ const d = (progRec || {}).desk; if(!d || !d.cases) return null; const id = d.caseId, w = d.cases[id]; if(!w) return null;
     return { caseId: id, emails: (w.mail || []).length, initial: w.checks.initial, final: w.checks.final, signed: !!(w.got || {}).signed, exec: !!(w.got || {}).exec, grade: w.grade || null }; }

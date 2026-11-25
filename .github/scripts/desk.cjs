@@ -10,7 +10,9 @@ const assert = require('node:assert/strict');
 
 const BASE = process.argv[2] || 'http://localhost:8787/';
 const b64u = (b) => Buffer.from(b).toString('base64').replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
-const ticket = (t) => { const p = b64u(JSON.stringify(t)); return `${p}.${b64u(crypto.createHmac('sha256', 'portal-sso:ci-portal').update(p).digest())}`; };
+// A Portal ticket names the program it is for (p, its topic key: the Portal's makeTicket); p: undefined leaves it out.
+const PORTAL_TOPIC = 'LIEN NEGOTIATION';
+const ticket = (t) => { const p = b64u(JSON.stringify(Object.assign({ p: PORTAL_TOPIC }, t))); return `${p}.${b64u(crypto.createHmac('sha256', 'portal-sso:ci-portal').update(p).digest())}`; };
 
 (async () => {
   const browser = await browser0();

@@ -387,7 +387,7 @@ main.main-wide{max-width:1600px;}
 .admin-table td{padding:10px 12px;border-bottom:1px solid var(--line);font-weight:600;vertical-align:middle;}
 .table-wrap{overflow-x:auto;}
 .field{display:block;margin:0 0 14px;}
-.field span{display:block;font-size:11.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-soft);margin-bottom:6px;}
+.field span{display:block;font-size:11.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-soft);margin-bottom:6px;overflow-wrap:anywhere;}   /* (a long default address in the label wraps instead of pushing a phone sideways) */
 .field input{width:100%;padding:10px 12px;border-radius:8px;border:1px solid var(--line);font:500 13px 'IBM Plex Mono',monospace;background:#fff;}
 .sec{padding:20px 22px;margin-bottom:18px;}
 .sec h2{margin:0 0 4px;font-size:20px;color:var(--navy);}
@@ -574,27 +574,33 @@ function resumeWhereLeftOff(){
 /* ---------- the trainee's record ----------
    trainee:<id> carries dayProgress, the field the Portal's program-progress and attendance read for every course:
    { "<day>": { done, doneAt, step, modules: { <module id>: true } } }, plus lastActive (see recordStep). */
+// Never save over a record that couldn't be read: one failed read (a 500, a network blip) used to look like a brand-new trainee,
+// and the empty record was saved over the real one, finished days and Desk scores and all. Saving waits until both reads worked.
+let loadedOk = false;
 async function loadTrainee(){
   if(!state.traineeId) return;
-  try{ state.trainee = await kvGet("trainee:" + state.traineeId); }catch(e){ state.trainee = null; }
+  loadedOk = false;
+  try{ state.trainee = await kvGet("trainee:" + state.traineeId); }
+  catch(e){ toast("Couldn't load your progress. Reload the page before you go on: nothing is saved until it loads."); state.trainee = state.trainee || { id: state.traineeId, name: state.traineeId, dayProgress: {} }; state.progress = state.progress || {}; return; }
   if(!state.trainee) state.trainee = { id: state.traineeId, name: state.traineeId, dayProgress: {} };
   state.trainee.dayProgress = state.trainee.dayProgress || {};
   state.trainee.lastActive = new Date().toISOString();
-  try{ state.progress = (await kvGet("progress:" + state.traineeId)) || {}; }catch(e){ state.progress = {}; }
+  try{ state.progress = (await kvGet("progress:" + state.traineeId)) || {}; }
+  catch(e){ toast("Couldn't load your work. Reload the page before you go on: nothing is saved until it loads."); state.progress = state.progress || {}; return; }
+  loadedOk = true;
   // the Lien Desk: the case a trainer assigned (assign:<id>), and a fully executed release they uploaded (release:<id>)
   try{
     const a = (await kvGet("assign:" + state.traineeId)) || {};
     state.deskAssign = a.caseId || "";
-    const merged = ((state.progress.desk || {}).cases || {});
-    const have = Object.values(merged).some((w) => w && w.got && w.got.uploadAt === a.releaseAt);
-    if(a.releaseAt && !have) state.deskRelease = await kvGet("release:" + state.traineeId);
+    // (read every time there is one: the Desk's mail attachment points at it rather than carrying the file)
+    if(a.releaseAt) state.deskRelease = await kvGet("release:" + state.traineeId);
   }catch(e){}
   saveTrainee();
   api("/api/checkin", {training: COURSE.title}).catch(() => {});
 }
 let saveTimer = null;
 function saveTrainee(){
-  if(!state.traineeId || !state.trainee) return;
+  if(!state.traineeId || !state.trainee || !loadedOk) return;
   clearTimeout(saveTimer);
   saveTimer = setTimeout(() => { kvSet("trainee:" + state.traineeId, state.trainee).catch(() => toast("Couldn't save your progress. Check your connection.")); }, 300);
 }
@@ -930,7 +936,7 @@ function answersOf(id, rec){ const a = ((rec || state.progress) || {}).answers |
 // progress:<id> (the process-question answers and the Lien Desk), saved a moment after the last change.
 let progressTimer = null;
 function saveProgress(){
-  if(state.isAdmin || !state.traineeId || !state.progress) return;
+  if(state.isAdmin || !state.traineeId || !state.progress || !loadedOk) return;
   clearTimeout(progressTimer);
   progressTimer = setTimeout(() => { kvSet("progress:" + state.traineeId, state.progress).catch(() => toast("Couldn't save your work. Check your connection.")); }, 600);
 }
@@ -957,14 +963,16 @@ function checkAnswers(id){
   // a one-line answer can't carry the reasoning: under 25 words, the question earns at most half
   const score = Math.round(per.reduce((s, x) => s + (x.total ? x.covered / x.total : 0) * (x.words < 25 ? 0.5 : 1), 0) / per.length * 100);
   state.progress = state.progress || {}; state.progress.answerGrades = state.progress.answerGrades || {};
-  state.progress.answerGrades[id] = { score, covered, total, at: new Date().toISOString(), per: per.map((x) => ({ c: x.covered, t: x.total, w: x.words })) };
+  const was = state.progress.answerGrades[id] || {};
+  state.progress.answerGrades[id] = { score, covered, total, at: new Date().toISOString(), per: per.map((x) => ({ c: x.covered, t: x.total, w: x.words })), checks: (was.checks || 0) + 1 };
   saveProgress(); render(); toast(`Your answers: ${score}/100.`);
 }
 function qaFeedback(m, j){
   const g = ((state.progress || {}).answerGrades || {})[m.id]; if(!g || state.isAdmin) return "";
   const q = m.questions[j], r = gradeAnswer(q, answersOf(m.id)[j]);
-  const miss = (q.keys || []).filter((_, k) => !r.hit[k]).map((grp) => grp[0]);
-  return `<div class="qa-fb ${r.covered === r.total && r.words >= 25 ? "ok" : ""}">${r.covered}/${r.total} key concepts${r.words < 25 ? " · add more detail (25 words or more)" : ""}${miss.length ? ` · think about: ${esc(miss.join(", "))}` : ""}</div>`;
+  // (how many ideas the answer covers, and where to look: never the grader's key words, which pasted in after filler used to score 100)
+  const left = r.total - r.covered;
+  return `<div class="qa-fb ${r.covered === r.total && r.words >= 25 ? "ok" : ""}">${r.covered} of ${r.total} key ideas covered${r.words < 25 ? " · add more detail (25 words or more)" : ""}${left ? ` · ${left} idea${left === 1 ? "" : "s"} missing: go back over this day's lesson and handouts, then explain it in your own words` : ""}</div>`;
 }
 function answersText(m, a){ return m.questions.map((q, j) => `${j + 1}. ${q.q}\n${(a[j] || "").trim() || "(no answer yet)"}`).join("\n\n"); }
 function copyText(t){ try{ navigator.clipboard.writeText(t).then(() => toast("Copied."), () => toast("Couldn't copy. Select the text and copy it.")); }catch(e){ toast("Couldn't copy. Select the text and copy it."); } }
@@ -1009,7 +1017,7 @@ const QUESTION_MODULES = ALL_MODULES.filter((m) => m.kind === "questions");
 function showAnswers(id){
   const r = (state.admin.rows || []).find((x) => x.id === id), p = (state.admin.progress || {})[id];
   overlay(`<div class="mh-day">${esc(r ? r.batch || "" : "")}</div><div class="mh-title">${esc(r ? r.name || id : id)}: answers</div>`,
-    QUESTION_MODULES.map((m) => `<h3 style="margin:4px 0 8px;color:var(--navy)">Day ${m.day} · ${esc(m.title)}${p && p.answerGrades && p.answerGrades[m.id] ? ` · 🏅 ${p.answerGrades[m.id].score}/100` : ""}</h3><ol class="topic-list">${m.questions.map((q, j) => `<li><b>${q.core ? "★ " : ""}${esc(q.q)}</b><div class="ans">${esc((answersOf(m.id, p)[j] || "").trim() || "(no answer)")}</div></li>`).join("")}</ol>`).join(""));
+    QUESTION_MODULES.map((m) => `<h3 style="margin:4px 0 8px;color:var(--navy)">Day ${m.day} · ${esc(m.title)}${p && p.answerGrades && p.answerGrades[m.id] ? ` · 🏅 ${p.answerGrades[m.id].score}/100${p.answerGrades[m.id].checks > 1 ? ` <small>(checked ${p.answerGrades[m.id].checks} times)</small>` : ""}` : ""}</h3><ol class="topic-list">${m.questions.map((q, j) => `<li><b>${q.core ? "★ " : ""}${esc(q.q)}</b><div class="ans">${esc((answersOf(m.id, p)[j] || "").trim() || "(no answer)")}</div></li>`).join("")}</ol>`).join(""));
 }
 async function assignCase(id, caseId){
   const a = Object.assign({}, (state.admin.assign || {})[id] || {}, { caseId });
@@ -1034,10 +1042,13 @@ function uploadRelease(id, input){
   rd.readAsDataURL(f);
 }
 async function setTraineeFlag(id, flag){
-  const r = (state.admin.rows || []).find((x) => x.id === id); if(!r) return;
+  const row = (state.admin.rows || []).find((x) => x.id === id); if(!row) return;
+  // read the record fresh and change only the flag: the copy the Admin page loaded may be hours old, and writing it back would
+  // undo the trainee's progress since then
+  let r; try{ r = (await kvGet("trainee:" + id)) || Object.assign({}, row); }catch(e){ toast(e.message); return; }
   if(flag === "archive") r.archived = true;
   if(flag === "restore"){ delete r.archived; delete r.rejected; r.approved = true; }
-  try{ await kvSet("trainee:" + id, r); toast(flag === "archive" ? "Access removed." : "Access restored."); }catch(e){ toast(e.message); }
+  try{ await kvSet("trainee:" + id, r); Object.assign(row, r); toast(flag === "archive" ? "Access removed." : "Access restored."); }catch(e){ toast(e.message); }
   render();
 }
 async function saveCourseLinks(){
