@@ -128,3 +128,5 @@ The Portal already lists **Lien Negotiator Training** (`LIEN NEGOTIATION`). To o
 ## 🎨 The standard page style
 
 The LSH standard, shared with the Training Portal and the other programs: the block at the end of the `<style>` in `index.html`, marked **"The LSH standard page style"**, is a vendored copy of the CM course's (and the Portal's `theme.css`, the source of truth). Change it there first, then copy it down. Each program keeps its own backdrop photo in its own `body::before`; this program uses a soft navy-and-orange wash until it has a photo (put a `background-image` on `body::before` near the top of the `<style>`).
+
+**The lesson deck** (the day's player: the stage, the slide frame, Previous · Slide Map · Step n of N · Next, the side panel, the Objectives page's frame and the Slide Map / Topics pop-ups) takes the Training Portal's elevated look from `css/ln-deck.css`: the blue-gold frame, mono uppercase tags, pill chips and dark-navy Next / Full screen buttons. `js/ln-deck.js` only sets the progress track's length from *Step n of N*. Both are design only: change the deck's look there, not its text.
