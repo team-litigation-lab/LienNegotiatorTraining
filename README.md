@@ -1,4 +1,4 @@
-# LSH Lien Negotiator Track
+# LSH Lien Negotiator Training
 
 The Lien Negotiator program, set up the way the Case Management course (`Case-Management-Training`) is: its own Cloudflare Worker, opened from the LSH Training Portal with single sign-on, trainee records in the shared `LSH_KV` namespace under a prefix of its own, and the LSH standard page style.
 
@@ -12,7 +12,7 @@ In the CM course's format: **Day cards** on the dashboard → the day's **Object
 | **Day 2 · The Lien Negotiator Role, Pt. 2** | ERISA & Government Plan Liens (10 topics) | [72 slides](https://www.canva.com/design/DAHabx7BhKE/BPidIfAISKJuol56ntSmZg/view) | [Video](https://drive.google.com/file/d/1sUjQCpEqkrvf802Ck23aajx4Z2ox8zgE/view) |
 | **Day 3 · Process Questions, Live Demo & Shadowing** | Releases, Net Sheets & Closing Statements (12 modules) | [Exercise](https://www.canva.com/design/DAGva6b4Q_Q/sJk9AIQaiwaxO__NlgPplA/view) | 8 videos, each embedded in full (below) |
 
-- **Dashboard:** the CM banner (the completion ribbon, *Lien Negotiator Track*, the workshop title, and **▶ Continue where you left off** once a day is started; no Roadmap button), then one Day card per day, drawn like the CM course's: *Day n · title* in the head, the day's icon and theme pill, **Start** / **Continue** / **Review**, and **☰ Topics** (the day's outline, with the slides each topic covers).
+- **Dashboard:** the CM banner (the completion ribbon, *Lien Negotiation Accelerator*, the workshop title, and **▶ Continue where you left off** once a day is started; no Roadmap button), then one Day card per day, drawn like the CM course's: *Day n · title* in the head, the day's icon and theme pill, **Start** / **Continue** / **Review**, and **☰ Topics** (the day's outline, with the slides each topic covers).
 - **Objectives page** (the CM day page): *🎯 By the end of today you'll be able to …*, *📘 The Lesson* outline in two columns, *🧭 Today's Modules*, and **← Dashboard** / **Start Day n →**.
 - **The day's steps** (the CM lesson player): a stage with the step's title, banner and chip, **← Previous · 🗺 Slide Map · Step n of N · Next →** under it (← → keys too), and the side panel (the day, **📋 Objectives**, **⛶ Full screen**). The steps are **Training Agenda** (the theme, objectives and numbered topics) → **Module 1 · Slide Deck** (the Canva deck) → **Module 2 · Recorded Session** (the Drive video) → **Day Complete**. Every step fits on one screen. A module counts as done once the trainee moves on from it with Next; the day is done when they reach Day Complete with both modules done. A trainee who leaves mid-day continues from the same step.
 - **🛡 Admin:** every trainee who has opened the course, their batch, each day's status (modules done), when they were last active, with *Remove access* / *Restore access*; and **Course links**, to replace a module's deck or video without a deploy.
@@ -57,13 +57,14 @@ Each trainee works one settled case, step by step like the demo (`js/ln-desk.js`
 | **Jane Doe** | Activity 1.1 | 40% fee; Brightcare $8,653.84 → $500, HighView MRI $2,018.26 → $900, Good Hope $66.65 → waived; net $4,144.81 before the two liens added |
 | **James Doe** | Activity 2 | BI $10,000 + UM $25,000; PIP exhausted; Spinewell, Allied and Triad Lakes squared with the PIP log; Pagewood's bill went to the deductible |
 
-and nine more from the CM course's mock PI cases (Sarah Miller, David Chen, Elena Rodriguez, Mark Thompson, Gladys Winslow, JT Taylor, Sophie Vane, Robert Lee, Bradley Peterson). Every case has a health subrogation lien and a pre-settlement funding lien. Provider and insurer names are made up, and every email address ends in `.example`. The answer keys themselves are not in this public repository.
+and nine more from the CM course's mock PI cases (Sarah Miller, David Chen, Elena Rodriguez, Mark Thompson, Gladys Winslow, JT Taylor, Sophie Vane, Robert Lee, Bradley Peterson). Every case has a health subrogation lien and a pre-settlement funding lien. Provider and insurer names are made up, and every email address ends in `.example`. The original activities' answer keys are not in this public repository. The page does compute each case's expected figures in the browser (it has to, to check a sheet), so a determined trainee can read them from the console: the Net Sheet's ✓ Check therefore never shows a figure or a payee's name on its own, a figure shown with "Show me (no credit)" earns nothing in the grade, the coaches say what is wrong and where to look rather than the number, and no score on the trainee's record comes from the trainee's own write: Day 2's and Day 3's are the Worker's copy of the Desk grade saved with the work (a score typed into the record is ignored). The grade itself is still computed in the browser: a trainer should treat a Desk score as the trainee's own work, checked on review.
 
 ## 🔐 Sign in on the Main Portal only
 
 The same as the CM course. Trainees sign in once, on the LSH Training Portal, and open this program from there. The Portal sends them here with a signed, short-lived ticket (`?ticket=…`); `js/portal-gate.js` posts it to `/api/auth/portal`, and the Worker signs the trainee in and approves them (the Portal's approval is the only trainee approval). Someone who opens this site's link directly gets the *Admin* sign-in, where an admin types the admin password (`MASTER_ADMIN_PASSWORD`); a name + batch typed here is refused (403 `portal-required`).
 
 - **Turning it on:** set `PORTAL_SSO_SECRET` (the same value as the Portal) and `MASTER_ADMIN_PASSWORD` as Worker secrets. Until `PORTAL_SSO_SECRET` is set, the sign-in screen tells an admin so, and no trainee can be signed in.
+- **Which tickets are taken (`p`, `SSO_REQUIRE_AUDIENCE`):** a Portal ticket names the program it is for (`p`, the topic key `LIEN NEGOTIATION`). A ticket whose `p` is another program, a tool, or a course's tool link (`p: "tool"`) is refused (`code: audience`), and every ticket, a trainee's, a trainer's or the Sign-in check's, works once. A ticket with no `p` is still taken while the rollout is under way. **Set `SSO_REQUIRE_AUDIENCE` to `1` on every program once the Portal and all programs are deployed**: from then on a ticket with no `p` is refused too. **Single use is best-effort here.** The Worker marks a used ticket in KV (a read, then a write); KV is eventually consistent, so two uses of one ticket within a few seconds of each other, from different places, could both get in. Case Management uses a Durable Object for this and Standard Training its RECORD_GUARD; this course has neither binding.
 - **If a Portal launch fails:** the message says why: `bad-signature` means the Portal's and this Worker's `PORTAL_SSO_SECRET` differ; "expired" means the link is old (open the program again from the Portal).
 
 ## What's saved
@@ -119,7 +120,7 @@ This repository is its own Worker, the same as the CM course.
 
 ### On the Training Portal (Training-Portal repo)
 
-The Portal already lists **Lien Negotiator Track** (`LIEN NEGOTIATION`). To open this site from it, add its address next to the other programs':
+The Portal already lists **Lien Negotiator Training** (`LIEN NEGOTIATION`). To open this site from it, add its address next to the other programs':
 
 - `functions/api/launch.js` and `programs.html`: `'LIEN NEGOTIATION': 'https://liennegotiatortraining.legalsupporthelp.workers.dev/'`
 - `functions/api/program-progress.js` (`PROGRAMS`), for progress: `{ id: 'ln', label: 'Lien Negotiator Training', prefix: 'ln:', days: 3, url: 'https://liennegotiatortraining.legalsupporthelp.workers.dev/' }`
