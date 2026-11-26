@@ -18,7 +18,7 @@ concurrency:
 jobs:
   checks:
     name: Syntax, files and build
-    runs-on: ubuntu-24.04   # Playwright cannot install Chromium on ubuntu-latest (now 26.04)
+    runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@v5
@@ -41,4 +41,6 @@ jobs:
           node .github/scripts/fit.cjs http://localhost:8787/
           node .github/scripts/desk.cjs http://localhost:8787/
           node .github/scripts/contrast.cjs http://localhost:8787/
+          node .github/scripts/load-fail.cjs http://localhost:8787/
+          node .github/scripts/sheet-reveal.cjs http://localhost:8787/
           node .github/scripts/compliance-monitor.cjs http://localhost:8787/
