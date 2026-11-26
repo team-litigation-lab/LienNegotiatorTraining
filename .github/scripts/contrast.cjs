@@ -17,8 +17,13 @@ function audit(){
   const over = (top, bot) => ({ r: top.r * top.a + bot.r * (1 - top.a), g: top.g * top.a + bot.g * (1 - top.a), b: top.b * top.a + bot.b * (1 - top.a), a: 1 });
   const lum = (c) => { const f = (x) => { x /= 255; return x <= 0.03928 ? x / 12.92 : Math.pow((x + 0.055) / 1.055, 2.4); }; return 0.2126 * f(c.r) + 0.7152 * f(c.g) + 0.0722 * f(c.b); };
   const ratio = (a, b) => { const x = lum(a), y = lum(b); return (Math.max(x, y) + 0.05) / (Math.min(x, y) + 0.05); };
+  // a gradient clipped to the text (background-clip: text, gold lettering) paints the letters, not what is behind them
+  const textClip = (cs) => /text/.test(cs.backgroundClip || "") || /text/.test(cs.webkitBackgroundClip || "");
+  const avgGrad = (img) => { const cols = [...String(img).matchAll(/rgba?\([^)]+\)/g)].map((m) => parse(m[0])).filter((c) => c && c.a > 0.5);
+    const n = cols.length; return n ? { r: cols.reduce((s, c) => s + c.r, 0) / n, g: cols.reduce((s, c) => s + c.g, 0) / n, b: cols.reduce((s, c) => s + c.b, 0) / n, a: 1 } : null; };
   function layer(el){
     const cs = getComputedStyle(el);
+    if(textClip(cs)){ const c = parse(cs.backgroundColor); return c && c.a > 0 ? c : null; }
     // a gradient drawn as a thin stripe (an underline under a title) is a decoration, not the text's background;
     // otherwise its opaque stops are what the text sits on
     const stripe = /(^|\s|,)\d(\.\d+)?px(\s|,|$)/.test(cs.backgroundSize || "");
@@ -45,7 +50,7 @@ function audit(){
     const r = el.getBoundingClientRect(), cs = getComputedStyle(el);
     if(!r.width || !r.height || cs.visibility === "hidden" || +cs.opacity === 0 || el.closest("[hidden]")) continue;
     let op = 1; for(let e = el; e; e = e.parentElement) op *= +getComputedStyle(e).opacity; if(op < 0.6) continue;   // a deliberately faded control
-    const fg = parse(cs.color); if(!fg) continue;
+    const fg = (textClip(cs) && /gradient/.test(cs.backgroundImage || "") && avgGrad(cs.backgroundImage)) || parse(cs.color); if(!fg) continue;
     const back = bg(el), fore = over(fg, back), size = parseFloat(cs.fontSize), bold = +cs.fontWeight >= 700;
     const need = size >= 24 || (bold && size >= 18.66) ? 3 : 4.5, got = ratio(fore, back);
     if(got < need) bad.push(`${got.toFixed(2)}:1 (needs ${need}) · ${size}px · "${n.textContent.trim().slice(0, 50)}" · <${el.tagName.toLowerCase()} class="${el.className}">`);
