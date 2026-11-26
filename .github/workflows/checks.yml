@@ -43,3 +43,4 @@ jobs:
           node .github/scripts/contrast.cjs http://localhost:8787/
           node .github/scripts/load-fail.cjs http://localhost:8787/
           node .github/scripts/sheet-reveal.cjs http://localhost:8787/
+          node .github/scripts/compliance-monitor.cjs http://localhost:8787/

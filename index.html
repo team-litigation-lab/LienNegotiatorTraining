@@ -56,6 +56,8 @@ button{font-family:inherit;cursor:pointer;}
 .brand{display:flex;align-items:center;gap:18px;cursor:pointer;flex:0 1 auto;min-width:0;background:none;border:0;color:inherit;padding:0;}
 .brand-mark{height:40px;width:auto;flex:0 0 auto;object-fit:contain;display:block;}
 .brand-text b{font-family:var(--font-ui);font-size:15px;font-weight:800;letter-spacing:.075em;text-transform:uppercase;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block;}
+/* the page title in the bar: the Academy Index's gold, the same lettering as the LSH Elev8 / Atlas / CommX / CaseWorX banners */
+.brand-text b{font-weight:900 !important;letter-spacing:.09em;background:linear-gradient(180deg,#ffffff 0%,#fde7b0 45%,#f5c451 75%,#e0a43a 100%);-webkit-background-clip:text;background-clip:text;color:#f5c451 !important;-webkit-text-fill-color:transparent;filter:drop-shadow(0 0 10px rgba(245,196,81,.30)) drop-shadow(0 2px 2px rgba(0,0,0,.45));}
 .topbar-right{display:flex;align-items:center;gap:10px;flex-wrap:wrap;justify-content:flex-end;min-width:0;}
 .nav{display:flex;gap:2px;background:rgba(255,255,255,.06);padding:4px;border-radius:10px;flex-wrap:wrap;}
 .nav button,.nav a{background:transparent;border:none;color:#D7DAEC;font-size:13px;font-weight:600;padding:8px 10px;border-radius:7px;white-space:nowrap;text-decoration:none;}
@@ -1072,7 +1074,7 @@ function viewAdmin(){
   const body = state.admin.loading && !rows.length ? `<tr><td colspan="${cols}">Loading…</td></tr>`
     : !rows.length ? `<tr><td colspan="${cols}">No trainees have opened this course yet. They appear here the first time they open it from the LSH Training Portal.</td></tr>`
     : rows.map((r) => `<tr>
-        <td>${esc(r.name || r.id)}</td><td class="mono">${esc(r.batch || "")}</td>
+        <td>${esc(r.name || r.id)}${window.lnCompliance ? lnCompliance.button(r) : ""}</td><td class="mono">${esc(r.batch || "")}</td>
         ${COURSE.days.map((d) => `<td>${pillFor(dayStatus(d, r))} <span class="mono" style="font-size:11.5px">${dayCount(d, r)}/${d.modules.length}</span></td>`).join("")}
         <td style="font-weight:500">${r.lastActive ? esc(new Date(r.lastActive).toLocaleString()) : "—"}</td>
         <td>${QUESTION_MODULES.some((m) => answersOf(m.id, state.admin.progress && state.admin.progress[r.id]).some((x) => (x || "").trim())) ? `<button class="btn btn-ghost btn-sm" onclick="showAnswers('${esc(r.id)}')">✍️ Answers</button>` : "—"}</td>
@@ -1159,5 +1161,9 @@ function render(){
 <script src="/js/ln-viewer.js?v=2026.11.12"></script>
 <script src="/js/ln-deck.js?v=2026.11.26"></script>
 <script src="/js/ln-desk.js?v=2026.11.12"></script>
+<!-- 📋 Compliance and Platform Utilization Monitoring: 🛡 Admin → a trainee's 📋 Monitoring (days, modules, process questions, last opened, last on the platform) -->
+<script src="/js/ln-compliance-monitor.js?v=2026.11.26"></script>
+<!-- 🟨 lesson cards framed as on the LSH Academy Index: navy along the top fading to gold, on a white card (the same file in every LSH course; the buttons stay as they are) -->
+<script src="/js/lsh-academy-frame.js?v=2026.11.26"></script>
 </body>
 </html>
