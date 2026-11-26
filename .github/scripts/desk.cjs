@@ -119,7 +119,13 @@ const ticket = (t) => { const p = b64u(JSON.stringify(Object.assign({ p: PORTAL_
   // email conventions 4/10, so 94
   const g3 = await p.evaluate(() => LNDesk.grade('day3'));
   assert.equal(g3.items.find((i) => /conventions/.test(i.label)).got, 4); assert.equal(g3.score, 94); assert.ok(g3.pass);
-  await tab('Tasks'); assert.match(await p.textContent('.ld-grade:last-child'), /94/);
+  await tab('Tasks'); assert.match(await p.textContent('.ld-grade >> nth=1'), /94/);
+  // the score card is the standard "why this score" table: one row per part of the grade, the standard headings
+  assert.deepEqual(await p.locator('.ld-grade >> nth=1').locator('.ld-st-t thead th').allTextContents(),
+    ['Activity', 'Score', '🧾 Why this score', '⭐ What you did great', '❌ What was wrong', '💡 What could have been done better']);
+  assert.equal(await p.locator('.ld-grade >> nth=1').locator('.ld-st-t tbody tr').count(), g3.items.length);
+  const conv = p.locator('.ld-grade >> nth=1').locator('.ld-st-t tbody tr', { hasText: 'Email conventions' });
+  assert.match(await conv.locator('.ld-pill').textContent(), /^4\/10$/); assert.match(await conv.locator('td.ld-b').textContent(), /6 points lost/);
   // the Final Net Sheet, embedded in Day 3's step: the same sheet, with its figures
   await p.click('.nav button:has-text("Day 3")'); await p.waitForSelector('.obj-list');
   await p.click('.stage-bar .btn-primary'); await p.click('text=Slide Map');
