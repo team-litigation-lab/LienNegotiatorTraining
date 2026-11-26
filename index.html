@@ -249,7 +249,7 @@ main{flex:1;max-width:1400px;margin:0 auto;padding:24px 20px 40px;width:100%;}
 .doc-frame{position:relative;height:max(260px, calc(100vh - 500px));border-radius:12px;overflow:hidden;background:#fff;}
 .doc-frame iframe{position:absolute;inset:0;width:100%;height:100%;border:0;}
 .qa-head{display:flex;align-items:center;gap:10px;flex-wrap:wrap;font-size:13px;font-weight:600;color:#C9CDE3;margin-bottom:8px;}
-.qa-head > span:first-child{flex:1 1 300px;}
+.qa-head > span:first-child{flex:1 1 300px;min-width:0;overflow-wrap:anywhere;}   /* the long document name breaks on a phone instead of running off the edge */
 .qa-head b{color:#F5C99A;}
 .qa-count{font-family:'IBM Plex Mono',monospace;font-size:12px;color:#fff;}
 .qa-list,.guide{max-height:max(280px, calc(100vh - 470px));overflow-y:auto;background:#FFFDF8;color:var(--ink);border-radius:12px;padding:12px 14px 12px 34px;margin:0;}
@@ -393,6 +393,10 @@ main.main-wide{max-width:1600px;}
 .sec h2{margin:0 0 4px;font-size:20px;color:var(--navy);}
 .sec > p{margin:0 0 14px;font-size:13.5px;color:var(--ink-soft);font-weight:500;}
 @media(max-width:760px){.page-hero{padding:20px 16px;border-radius:16px;} main{padding:20px 16px 40px;}}
+/* Phones: a long unbroken word (a deck link in Admin's course links, a document name) breaks instead of running off the
+   right edge; pictures and frames shrink to the screen. Every rule is in :where() (no specificity), so a page's own rule wins. */
+html{-webkit-text-size-adjust:100%;text-size-adjust:100%;}
+@media(max-width:760px){:where(body){overflow-wrap:break-word;} :where(.field span){overflow-wrap:anywhere;} :where(img,video,iframe){max-width:100%;}}
 /* ============================================================================
    The LSH standard page style — the see-through surfaces every LSH site shares.
    A vendored copy of the block at the end of the CM course's <style> (itself a copy of the Training Portal's
