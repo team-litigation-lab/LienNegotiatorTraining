@@ -1,0 +1,151 @@
+/* ============================================================================
+   🎞 The lesson deck, in the LSH Training Portal's elevated look (the Academy Index, LSH Elev8, LSH Atlas):
+   LSH navy and warm orange with gold, the blue-gold frame (a thick rounded outline, navy along the top fading to
+   gold at the bottom), small uppercase mono tags, a clean sans-serif, soft elevation, pill badges and
+   dark-navy primary buttons. Design only: it restyles the day's player (the stage, its title / tag / chip, the
+   slide frame, the action row, Previous · Slide Map · Step n of N · Next, the side panel), the Objectives page's
+   frame, and the Topics / Slide Map pop-ups. No text, order or behaviour changes, and the embedded Canva deck
+   and Drive video are never touched (only the frame around them).
+
+   The frame is drawn on a ::before ring (a mask cuts out the face), not as a border-box gradient on the element
+   itself, so the gold never counts as the background of the text (.github/scripts/contrast.cjs reads an
+   element's own gradients as what its text sits on).
+   ========================================================================= */
+:root{
+  --dk-navy:#1E2340;
+  --dk-navy-2:#2c3360;
+  --dk-ink:#14182e;
+  --dk-gold:#DB8437;
+  --dk-gold-soft:#F5C99A;
+  --dk-frame:linear-gradient(180deg,#1E2340 0%,#2c3360 30%,#a8692f 78%,#DB8437 100%);
+  --dk-face:linear-gradient(180deg,#232849 0%,#1E2340 55%,#191d38 100%);
+  --dk-lift:0 1px 0 rgba(255,255,255,.06) inset,0 28px 54px -30px rgba(20,24,48,.85),0 8px 18px -12px rgba(20,24,48,.45);
+  --dk-mono:'IBM Plex Mono',ui-monospace,SFMono-Regular,Menlo,monospace;
+}
+
+/* ---------- the blue-gold frame ---------- */
+.stage,.stage-shell,.player-bar,.player-side,.overlay-card{position:relative;isolation:isolate;}
+.stage::before,.stage-shell::before,.player-bar::before,.player-side::before,.overlay-card::before{
+  content:"";position:absolute;inset:0;z-index:3;pointer-events:none;border-radius:inherit;padding:4px;
+  background:var(--dk-frame);
+  -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);
+  -webkit-mask-composite:xor;mask-composite:exclude;}
+.stage:fullscreen::before{display:none;}
+
+/* ---------- the stage (a slide, the video, the agenda, Day complete) ---------- */
+.stage,.stage-shell{
+  background:radial-gradient(120% 70% at 100% 0%, rgba(219,132,55,.14) 0%, transparent 55%),
+             radial-gradient(90% 60% at 0% 100%, rgba(120,132,190,.12) 0%, transparent 70%),
+             var(--dk-face);
+  border-radius:22px;box-shadow:var(--dk-lift);}
+.stage{padding:18px 24px 18px;display:flex;flex-direction:column;}
+.stage .corner{display:none;}   /* the old orange corner brackets: the frame takes their place */
+/* the module's tag (DAY 1 · MODULE 1 · SLIDE DECK) sits above the title, in the Portal's mono */
+.stage-banner{order:-1;align-self:flex-start;max-width:100%;background:none;border:0;border-radius:0;padding:0;margin:0 0 6px;text-align:left;
+  font-family:var(--dk-mono);font-size:13.5px;font-weight:600;letter-spacing:.12em;color:var(--dk-gold-soft);
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.stage-banner::before{content:"";display:inline-block;width:18px;height:2px;margin-right:10px;vertical-align:.3em;border-radius:2px;background:var(--dk-gold);}
+.stage-title{font-family:var(--font-ui);font-weight:900;color:#fff;text-shadow:none;letter-spacing:-.02em;line-height:1.15;
+  margin:0 0 12px;padding-bottom:12px;border-bottom:1px solid rgba(255,255,255,.12);
+  background:linear-gradient(90deg,var(--dk-gold) 0 44px,transparent 44px) bottom left/100% 3px no-repeat;}
+.stage-chiprow{margin:0 0 12px;gap:8px;}
+/* the step's chip and the agenda's module badges are pills */
+.stage-chip{border-radius:999px;padding:5px 16px;background:linear-gradient(180deg,#ffffff 0%,#EEF0F6 100%);color:var(--dk-navy);
+  box-shadow:inset 0 1px 0 #fff,0 6px 14px -8px rgba(0,0,0,.55),inset 0 -2px 0 var(--dk-gold);letter-spacing:.01em;}
+.agenda-mods{margin-left:0;}
+.agenda-mod{border-radius:999px;padding:6px 14px;background:rgba(255,255,255,.07);border:1px solid rgba(245,201,154,.35);color:#fff;}
+.stage-body{position:relative;}
+
+/* ---------- the slide frame (the embed itself is untouched) ---------- */
+.stage .frame{border-radius:14px;background:#0f1324;
+  box-shadow:0 0 0 1px rgba(245,201,154,.35),0 0 0 6px rgba(255,255,255,.04),0 26px 50px -24px rgba(0,0,0,.85);}
+.stage .frame:fullscreen{border-radius:0;box-shadow:none;}
+.frame-actions{margin-top:12px;color:#E3E6F2;}
+.frame-actions .btn-ghost{border-radius:999px;background:rgba(255,255,255,.08);color:#fff;border:1px solid rgba(255,255,255,.28);box-shadow:none;}
+.frame-actions .btn-ghost:hover{background:rgba(255,255,255,.16);border-color:var(--dk-gold-soft);color:#fff;}
+.stage .empty{border:1px dashed rgba(245,201,154,.45);border-radius:14px;}
+
+/* ---------- the Training Agenda ---------- */
+.agenda-theme{background:linear-gradient(180deg,#ffffff 0%,#FBF8F3 100%);border:1px solid rgba(219,132,55,.4);border-radius:14px;padding:10px 16px;
+  box-shadow:inset 0 3px 0 var(--dk-gold),0 12px 24px -18px rgba(0,0,0,.6);}
+.theme-tag{border-radius:999px;padding:3px 11px;font-family:var(--dk-mono);letter-spacing:.1em;background:rgba(240,192,138,.42);border:1px solid rgba(219,132,55,.45);}
+.agenda-grid{gap:8px;}
+.agenda-item{border-radius:12px;background:linear-gradient(180deg,rgba(255,255,255,.08) 0%,rgba(255,255,255,.03) 100%);border:1px solid rgba(255,255,255,.14);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.06);transition:border-color .15s ease,background .15s ease;}
+.agenda-item:hover{border-color:rgba(245,201,154,.45);background:rgba(255,255,255,.1);}
+.agenda-n{border-radius:10px;font-family:var(--dk-mono);font-weight:700;color:var(--dk-ink);
+  background:linear-gradient(145deg,#F5C99A 0%,var(--dk-gold) 100%);box-shadow:inset 0 1px 0 rgba(255,255,255,.5),0 6px 12px -8px rgba(219,132,55,.8);}
+
+/* ---------- Day complete ---------- */
+.done-box{border-radius:16px;background:linear-gradient(180deg,#ffffff 0%,#F8FAFC 100%);box-shadow:inset 0 3px 0 var(--dk-gold),0 18px 34px -22px rgba(0,0,0,.6);}
+.done-box h2,.wrap-box h3{font-family:var(--font-ui);font-weight:900;letter-spacing:-.01em;}
+
+/* ---------- Previous · Slide Map · Step n of N · Next ---------- */
+.player-bar{margin-top:14px;padding:12px 14px;border-radius:18px;background:linear-gradient(180deg,#ffffff 0%,#F8FAFC 100%);box-shadow:var(--dk-lift);gap:10px;}
+.player-bar .btn{border-radius:12px;font-weight:800;}
+.player-bar .btn-ghost{background:#fff;border:1px solid rgba(30,35,64,.18);color:var(--dk-navy);box-shadow:0 4px 10px -8px rgba(30,35,64,.5);}
+.player-bar .btn-ghost:hover{border-color:var(--dk-navy);background:#F4F5FA;}
+.player-bar .btn-orange{background:linear-gradient(180deg,#FFF7EE 0%,#FBE6CF 100%);color:#5A2E08;border:1px solid rgba(219,132,55,.55);box-shadow:0 4px 10px -8px rgba(219,132,55,.8);}
+.player-bar .btn-orange:hover{background:linear-gradient(180deg,#FDEBD6 0%,#F8D6B0 100%);color:#5A2E08;}
+/* Next / Finish: the Portal's dark-navy Launch button, an orange keel along its bottom */
+.player-bar .btn-primary,.player-bar .btn-primary:not([disabled]):hover{background:linear-gradient(180deg,#2a3058 0%,var(--dk-navy) 100%);color:#fff;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.12),inset 0 -3px 0 var(--dk-gold),0 10px 18px -10px rgba(30,35,64,.85);}
+.player-bar .btn-primary:not([disabled]):hover{background:linear-gradient(180deg,#343b6b 0%,#262c52 100%);}
+.step-count{font-family:var(--dk-mono);font-size:13.5px;font-weight:600;letter-spacing:.08em;color:var(--dk-navy);}
+/* the progress track along the bar's foot (js/ln-deck.js sets --deck-progress from Step n of N) */
+.player-bar::after{content:"";position:absolute;left:18px;right:18px;bottom:7px;height:3px;border-radius:3px;pointer-events:none;
+  background:linear-gradient(90deg,var(--dk-navy) 0%,var(--dk-gold) 100%) left/calc(var(--deck-progress,0) * 100%) 100% no-repeat,rgba(30,35,64,.1);
+  transition:background-size .35s ease;}
+
+/* ---------- the side panel ---------- */
+.player-side{padding:16px 16px 14px;border-radius:18px;background:linear-gradient(180deg,#ffffff 0%,#F8FAFC 100%);box-shadow:var(--dk-lift);gap:10px;}
+.player-side .side-day{font-family:var(--dk-mono);font-weight:700;letter-spacing:.12em;font-size:13px;}
+.player-side h2{font-family:var(--font-ui);font-weight:900;letter-spacing:-.01em;color:var(--dk-navy);padding-bottom:10px;border-bottom:1px solid rgba(30,35,64,.1);}
+.side-btn{border-radius:12px;background:#fff;border:1px solid rgba(30,35,64,.16);color:var(--dk-navy);box-shadow:0 4px 10px -8px rgba(30,35,64,.5);transition:border-color .15s ease,background .15s ease;}
+.side-btn:hover{border-color:var(--dk-navy);background:#F4F5FA;}
+.side-btn.side-dark{background:linear-gradient(180deg,#2a3058 0%,var(--dk-navy) 100%);border-color:transparent;color:#fff;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.12),inset 0 -3px 0 var(--dk-gold),0 10px 18px -10px rgba(30,35,64,.85);}
+.side-btn.side-dark:hover{background:linear-gradient(180deg,#343b6b 0%,#262c52 100%);}
+.side-note-box{border-radius:12px;box-shadow:inset 3px 0 0 var(--dk-gold);}
+.player-side .trainer-notes{border-radius:12px;background:#F8FAFC;}
+
+/* ---------- a day's Objectives page: the same frame and type ---------- */
+.day-headline{border-bottom-color:rgba(30,35,64,.12);}
+.day-headline .mono{font-family:var(--dk-mono);letter-spacing:.12em;font-weight:700;}
+.day-headline h1{font-family:var(--font-ui);font-weight:900;letter-spacing:-.015em;color:var(--dk-navy);}
+.stage-shell{padding:14px 16px;}
+.obj-wrap{background:rgba(255,255,255,.94);border-top:0;border-radius:16px;box-shadow:inset 0 3px 0 var(--dk-gold);}
+.obj-box{background:#fff;border:1px solid rgba(30,35,64,.1);border-top:0;border-radius:14px;box-shadow:inset 0 3px 0 var(--dk-gold),0 10px 22px -18px rgba(30,35,64,.55);}
+.obj-box.obj-navy{box-shadow:inset 0 3px 0 var(--dk-navy),0 10px 22px -18px rgba(30,35,64,.55);}
+.obj-box h2{font-weight:900;letter-spacing:-.01em;}
+.obj-list li::before{border-radius:3px;transform:rotate(45deg) scale(.85);background:linear-gradient(145deg,#F5C99A,var(--dk-gold));}
+.stage-bar .mono{font-family:var(--dk-mono);letter-spacing:.12em;color:var(--dk-gold-soft);}
+.stage-bar .btn{border-radius:12px;font-weight:800;}
+
+/* ---------- the Topics and Slide Map pop-ups ---------- */
+.overlay{background:rgba(15,19,36,.62);backdrop-filter:blur(3px);-webkit-backdrop-filter:blur(3px);}
+.overlay-card{border:0;border-radius:20px;box-shadow:0 40px 80px -30px rgba(0,0,0,.7);}
+.overlay-card .module-head{background:var(--dk-face);text-align:left;padding:16px 20px 14px;}
+.overlay-card .mh-day{font-family:var(--dk-mono);letter-spacing:.12em;color:var(--dk-gold-soft);}
+.overlay-card .mh-title{font-weight:900;letter-spacing:-.01em;}
+.overlay-foot{border-top:1px solid rgba(30,35,64,.08);}
+.overlay-foot .btn{border-radius:12px;}
+.map-list li{border-bottom:0;padding:2px 0;}
+.map-list button{border-radius:10px;padding:8px 12px;border:1px solid transparent;}
+.map-list button.on{background:rgba(219,132,55,.12);border-color:rgba(219,132,55,.45);box-shadow:inset 3px 0 0 var(--dk-gold);}
+
+/* ---------- phones ---------- */
+@media (max-width:600px){
+  .stage{padding:16px 14px;border-radius:18px;}
+  .stage::before,.stage-shell::before,.player-bar::before,.player-side::before,.overlay-card::before{padding:3px;}
+  .stage-banner{white-space:normal;letter-spacing:.08em;}
+  .stage-title{white-space:normal;}   /* a long title wraps on a phone instead of being cut off */
+  .player-bar{padding:10px 10px 14px;}
+}
+
+@media (prefers-reduced-motion: reduce){
+  .agenda-item,.side-btn,.player-bar::after{transition:none;}
+}
+@media print{
+  .stage::before,.stage-shell::before,.player-bar::before,.player-side::before,.overlay-card::before,.player-bar::after{display:none;}
+}
