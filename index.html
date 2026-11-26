@@ -834,7 +834,7 @@ function viewPlayer(){
   } else {
     const all = d.modules.every((m) => moduleDone(Object.assign({ day: d.day }, m)));
     const next = dayByNum(d.day + 1);
-    head = "Day Complete"; banner = `Day ${d.day} · ${esc(d.title)}`; chip = "🏁 Wrap-up";
+    head = "Day Complete"; banner = `Day ${d.day} · ${d.title}`; chip = "🏁 Wrap-up";
     body = `<div class="done-box">
       <div class="done-icon">${state.isAdmin || all ? "🎉" : "🧭"}</div>
       <h2>${state.isAdmin ? "End of the day's steps" : all ? `Day ${d.day} is complete` : "Almost there"}</h2>
