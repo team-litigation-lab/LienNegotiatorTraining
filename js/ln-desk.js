@@ -696,7 +696,7 @@ css.textContent = `.ld{display:flex;flex-direction:column;gap:12px}
 .ld-head{background:linear-gradient(135deg,#1F2440 0%,#2B3158 55%,#353C68 100%);color:#fff;border-radius:18px;padding:14px 18px 10px;display:flex;flex-direction:column;gap:10px}
 .ld-case h1{margin:2px 0;font-size:22px;color:#fff}.ld-case .mono{color:#F5C99A;font-size:12px}.ld-case p{margin:0;color:#C9CDE3;font-size:13px;font-weight:500}
 .ld-tabs{display:flex;gap:4px;flex-wrap:wrap}.ld-tabs button{border:0;background:rgba(255,255,255,.08);color:#D7DAEC;padding:8px 14px;border-radius:9px;font-size:14px;font-weight:700}
-.ld-tabs button.on{background:var(--orange);color:#241304}.ld-badge{background:#b42318;color:#fff;border-radius:99px;padding:0 7px;font-size:11px}
+.ld-tabs button.on{background:var(--btn-gold,linear-gradient(180deg, #fde7b0 0%, #f5c451 50%, #e0a43a 100%));color:#1E2340}.ld-badge{background:#b42318;color:#fff;border-radius:99px;padding:0 7px;font-size:11px}
 .ld-card{background:rgba(255,255,255,.85);border:1px solid var(--line);border-radius:14px;padding:14px 16px}.ld-card h2{margin:0 0 8px;font-size:17px;color:var(--navy);font-family:var(--font-ui);font-weight:800}
 .ld-grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}@media(max-width:900px){.ld-grid2{grid-template-columns:1fr}}
 .ld-tasks{list-style:none;margin:0;padding:0;font-size:14px}.ld-tasks li{padding:5px 0;border-bottom:1px solid var(--line)}.ld-tasks li.ok{color:var(--success)}
