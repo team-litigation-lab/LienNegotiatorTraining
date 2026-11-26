@@ -1074,7 +1074,7 @@ function viewAdmin(){
   const body = state.admin.loading && !rows.length ? `<tr><td colspan="${cols}">Loading…</td></tr>`
     : !rows.length ? `<tr><td colspan="${cols}">No trainees have opened this course yet. They appear here the first time they open it from the LSH Training Portal.</td></tr>`
     : rows.map((r) => `<tr>
-        <td>${esc(r.name || r.id)}</td><td class="mono">${esc(r.batch || "")}</td>
+        <td>${esc(r.name || r.id)}${window.lnCompliance ? lnCompliance.button(r) : ""}</td><td class="mono">${esc(r.batch || "")}</td>
         ${COURSE.days.map((d) => `<td>${pillFor(dayStatus(d, r))} <span class="mono" style="font-size:11.5px">${dayCount(d, r)}/${d.modules.length}</span></td>`).join("")}
         <td style="font-weight:500">${r.lastActive ? esc(new Date(r.lastActive).toLocaleString()) : "—"}</td>
         <td>${QUESTION_MODULES.some((m) => answersOf(m.id, state.admin.progress && state.admin.progress[r.id]).some((x) => (x || "").trim())) ? `<button class="btn btn-ghost btn-sm" onclick="showAnswers('${esc(r.id)}')">✍️ Answers</button>` : "—"}</td>
@@ -1161,6 +1161,8 @@ function render(){
 <script src="/js/ln-viewer.js?v=2026.11.12"></script>
 <script src="/js/ln-deck.js?v=2026.11.26"></script>
 <script src="/js/ln-desk.js?v=2026.11.12"></script>
+<!-- 📋 Compliance and Platform Utilization Monitoring: 🛡 Admin → a trainee's 📋 Monitoring (days, modules, process questions, last opened, last on the platform) -->
+<script src="/js/ln-compliance-monitor.js?v=2026.11.26"></script>
 <!-- 🟨 lesson cards framed as on the LSH Academy Index: navy along the top fading to gold, on a white card (the same file in every LSH course; the buttons stay as they are) -->
 <script src="/js/lsh-academy-frame.js?v=2026.11.26"></script>
 </body>
