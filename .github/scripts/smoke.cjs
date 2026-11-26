@@ -96,6 +96,7 @@ const DECK = /^https:\/\/www\.canva\.com\/design\/[\w-]+\/[\w-]+\/view\?embed$/,
       }
       await p.click('.next-btn');
       await p.waitForSelector('.stage-done');
+      assert.doesNotMatch(await p.textContent('.stage-banner'), /&amp;|&lt;|&gt;|&#39;|&quot;/, `day ${day}: the wrap-up banner shows its title once escaped`);
       // Days 2 and 3 have a Case Activity: clicking past it doesn't finish the case, so the day isn't complete yet
       // (.github/scripts/desk.cjs plays the case itself). Day 1 completes on its steps alone.
       const hasLab = day !== 1;
