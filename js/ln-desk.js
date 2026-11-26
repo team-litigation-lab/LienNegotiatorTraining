@@ -555,19 +555,19 @@ function vSheet(c, w){
   return `<div class="ld-card ld-sheet">
     <div class="ld-row"><h2 style="margin:0;flex:1">NET SETTLEMENT CALCULATIONS · ${E(clientLF(c))}</h2><button class="btn btn-sm btn-navy" onclick="LNDesk.check('initial')">✓ Check initial sheet (Day 2)</button><button class="btn btn-sm btn-primary" onclick="LNDesk.check('final')">✓ Check final sheet (Day 3)</button></div>
     ${res("initial")}${res("final")}
-    <h3>Settlement amount</h3><table class="ld-t"><tr><th>Insurance</th><th>Claim #</th><th class="m">Offer / Settlement</th></tr>
+    <h3>Settlement amount</h3><div class="ld-scroll"><table class="ld-t"><tr><th>Insurance</th><th>Claim #</th><th class="m">Offer / Settlement</th></tr>
       ${[1, 2, 3].map((i) => `<tr><td>${inp("S" + i + "c", "wide", i === 1 ? "Insurance company" : "")}</td><td>${inp("S" + i + "n", "wide")}</td><td class="m">${inp("S" + i + "a")}</td></tr>`).join("")}
       <tr class="tot"><td colspan="2">SETTLEMENT AMOUNT</td><td class="m">${out("gross")}</td></tr>
-      <tr><td>ATTY FEES</td><td>${inp("FEE", "pct", "33⅓%")} <small>from the retainer</small></td><td class="m">${out("fee")}</td></tr></table>
-    <h3>Expense log</h3><table class="ld-t"><tr><th>Expense</th><th class="m">Amount</th></tr>
+      <tr><td>ATTY FEES</td><td>${inp("FEE", "pct", "33⅓%")} <small>from the retainer</small></td><td class="m">${out("fee")}</td></tr></table></div>
+    <h3>Expense log</h3><div class="ld-scroll"><table class="ld-t"><tr><th>Expense</th><th class="m">Amount</th></tr>
       ${EXP_LABELS.map((l, j) => `<tr><td>${inp("X" + (j + 1) + "l", "wide", l)}</td><td class="m">${inp("X" + (j + 1) + "a")}</td></tr>`).join("")}
-      <tr class="tot"><td>TOTAL EXPENSES</td><td class="m">${out("exp")}</td></tr></table>
+      <tr class="tot"><td>TOTAL EXPENSES</td><td class="m">${out("exp")}</td></tr></table></div>
     <h3>Medical bills</h3><div class="ld-scroll"><table class="ld-t"><tr><th>Type</th><th>Med Provider</th><th class="m">Total Charges</th><th class="m">PIP Payments</th><th class="m">Med Payments</th><th class="m">Health Payments</th><th class="m">Adjustments</th><th class="m">Balance Owed</th><th class="m">Agreed Reduction</th><th class="m">Max Offer</th></tr>
       ${med.map((i) => `<tr><td>${inp("M" + i + "t")}</td><td>${inp("M" + i + "p", "wide")}</td>${["c", "pip", "med", "hea", "adj"].map((k) => `<td class="m">${inp("M" + i + k)}</td>`).join("")}<td class="m">${out("M" + i + "bal")}</td><td class="m">${inp("M" + i + "red")}</td><td class="m">${inp("M" + i + "max")}</td></tr>`).join("")}
       <tr class="tot"><td colspan="7">TOTAL MEDICAL</td><td class="m">${out("medBal")}</td><td class="m">${out("medRed")}</td><td></td></tr></table></div>
-    <h3>Non medical</h3><table class="ld-t"><tr><th>Type</th><th>Entity</th><th class="m">Balance Owed</th><th class="m">Agreed Reduction</th></tr>
+    <h3>Non medical</h3><div class="ld-scroll"><table class="ld-t"><tr><th>Type</th><th>Entity</th><th class="m">Balance Owed</th><th class="m">Agreed Reduction</th></tr>
       ${non.map((i) => `<tr><td>${inp("N" + i + "t", "", ["Pre-Settlement Funding", "Prior Attorney", "Child Support", ""][i - 1])}</td><td>${inp("N" + i + "p", "wide")}</td><td class="m">${inp("N" + i + "bal")}</td><td class="m">${inp("N" + i + "red")}</td></tr>`).join("")}
-      <tr class="tot"><td colspan="2">NON MEDICAL TOTAL OWED</td><td class="m">${out("nonBal")}</td><td class="m">${out("nonRed")}</td></tr></table>
+      <tr class="tot"><td colspan="2">NON MEDICAL TOTAL OWED</td><td class="m">${out("nonBal")}</td><td class="m">${out("nonRed")}</td></tr></table></div>
     <h3>Total net settlement</h3><table class="ld-t"><tr><td>Before reductions (settlement – fees – expenses – balances owed)</td><td class="m">${out("netBefore")}</td></tr><tr class="tot"><td>TOTAL NET SETTLEMENT (with the agreed reductions)</td><td class="m">${out("net")}</td></tr></table>
   </div>`;
 }
