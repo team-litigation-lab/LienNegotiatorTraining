@@ -49,6 +49,8 @@ Each trainee works one settled case, step by step like the demo (`js/ln-desk.js`
 - **Day 2:** download the Settlement Release(s) → email them to the trainer → the fully executed release comes back (or the trainer uploads a real one: Admin → 🗂 Lien Desk) → the initial Net Sheet, each balance squared with the PIP log → the Reduction Request(s), ready to send.
 - **Day 3:** request updated bills and payoffs → send the Reduction Requests → finalize the Net Sheet with the agreed amounts → the Closing Statement (it must match the Net Sheet exactly) → send it with the Settlement Release Form(s) to the client → the client signs.
 
+**🏅 The score card** (Lien Desk → 📋 Tasks, and under each Case Activity step) shows each day's automated grade out of 100 (80 passes) as the standard LSH "why this score" table: one row per part of the grade, with **Activity**, **Score** (points earned of the part's points, tinted against the pass mark), **🧾 Why this score** (the points, the rule that part is scored by, the grader's note), **⭐ What you did great**, **❌ What was wrong** (points lost) and **💡 What could have been done better** (what to do to earn the rest). It explains the grade the grader already works out; the scoring itself is unchanged.
+
 **12 cases.** Three are the original activities, rewritten (new names, LSH Law Firm, every scanned document recreated), with their figures checked against the answer keys:
 
 | Case | From | The original's figures |

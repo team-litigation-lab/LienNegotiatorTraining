@@ -330,10 +330,46 @@ function keepGrade(){
   [["day2", 2], ["day3", 3]].forEach(([k, n]) => { const p = t.dayProgress[n] = Object.assign({}, t.dayProgress[n] || {}); if(p.deskScore !== w.grade[k].score){ p.deskScore = w.grade[k].score; p.score = w.grade[k].score; } });
   if(typeof window.saveTrainee === "function") window.saveTrainee();
 }
+/* 🧾 the score card: the standard LSH "why this score" table, one row per part of the day's grade. Each row is explained
+   from what the grader already works out (points earned, its note, the rule each part is scored by, from the comment above
+   grade); nothing here changes the scoring. */
+const GRADE_RULES = [
+  [/Release\(s\) sent/, "All or nothing: earned once the release(s) go to your trainer with every one attached.", "Email the Settlement Release(s) to your trainer, with every release attached."],
+  [/executed release/, "All or nothing: earned once the fully executed release comes back.", "Send the release(s) to your trainer; the fully executed release comes back by email."],
+  [/Net Sheet ties out/, "Points by the share of lines that tie out at the last Check. A line shown with \"Show me (no credit)\" earns nothing.", "Fix the lines that don't tie out, then press Check again (without \"Show me\", so every line counts)."],
+  [/Reduction Requests drafted/, "Points by each letter's checks (file name, client, DOL, PIP, balance, amount), averaged over the letters.", "Draft a Reduction Request for each reducible bill and check its file name, client, DOL, PIP, balance and amount."],
+  [/Updated bills/, "Points by the share of providers on file asked for an updated bill or payoff.", "Ask every provider on file for an updated bill or payoff."],
+  [/sent and answered/, "Points by the share of reducible bills whose Reduction Request has an answer.", "Send a Reduction Request for every reducible bill and get each provider's answer."],
+  [/Email conventions/, "10 points, less 2 for each reply that asked you to fix and resend; none until an email is sent.", "Before sending, check each email: attachments, the subject line, and the client's full name and DOL."],
+  [/Closing Statement matches/, "Points by how many of the Closing Statement's checks pass.", "Draft the Closing Statement from the final Net Sheet and check each figure and payee before sending it."],
+  [/signed/, "Full points once the client returns it signed; half once it is sent to them.", "Send the Closing Statement and release(s) to the client so they come back signed."]
+];
+const PASS = 80, pts = (n) => `${n} point${n === 1 ? "" : "s"}`;
+const tintOf = (pct) => pct >= 85 ? "hi" : pct >= PASS ? "ok" : "lo";
+function gradeRows(g){
+  const day = g.stage === "day2" ? "Day 2" : "Day 3";
+  return g.items.map((i) => {
+    const rule = GRADE_RULES.find((r) => r[0].test(i.label)) || [null, "", ""], lost = Math.round((i.max - i.got) * 10) / 10, note = i.note ? i.note.charAt(0).toUpperCase() + i.note.slice(1) + "." : "";
+    return { name: i.label, sub: `${day} case work · worth ${pts(i.max)} of 100`, got: i.got, max: i.max,
+      why: [`${i.got} of ${pts(i.max)} earned.`, rule[1], note],
+      great: i.got >= i.max ? ["Full marks: this part was done right."] : i.got > 0 ? [`${i.got} of ${pts(i.max)} earned so far.`] : [],
+      wrong: i.got >= i.max ? [] : i.got > 0 ? [`${pts(lost)} lost.${i.note ? "" : " Which details cost them wasn't recorded with the score."}`] : ["No points yet: this part isn't done, or doesn't pass the grader's checks yet."],
+      better: i.got >= i.max ? [] : [rule[2] || "Go back over this part of the case and complete it."] };
+  });
+}
+const cellList = (xs, none) => (xs = (xs || []).filter(Boolean)).length ? `<ul>${xs.map((x) => `<li>${E(x)}</li>`).join("")}</ul>` : `<i>${none}</i>`;
 function gradeCard(g, title){
   return `<div class="ld-card ld-grade"><div class="ld-row"><h2 style="flex:1;margin:0">🏅 ${E(title)}</h2><span class="ld-score ${g.pass ? "pass" : ""}">${g.score}<small>/100</small></span></div>
-    <ul>${g.items.map((i) => `<li><span>${E(i.label)}${i.note ? ` <small>· ${E(i.note)}</small>` : ""}</span><b class="${i.got >= i.max ? "ok" : i.got > 0 ? "part" : ""}">${i.got}/${i.max}</b></li>`).join("")}</ul>
-    <p class="ld-muted">${g.pass ? "✓ Passing (80 or more)." : "Passing is 80 or more. It updates as you work."}</p></div>`;
+    <p class="ld-muted">${g.pass ? "✓ Passing (80 or more)." : "Passing is 80 or more. It updates as you work."} The score is the sum of the parts below.</p>
+    <div class="ld-sw"><table class="ld-st-t"><thead><tr><th>Activity</th><th>Score</th><th>🧾 Why this score</th><th>⭐ What you did great</th><th>❌ What was wrong</th><th>💡 What could have been done better</th></tr></thead>
+    <tbody>${gradeRows(g).map((x) => `<tr>
+      <th scope="row"><b>${E(x.name)}</b><small>${E(x.sub)}</small></th>
+      <td class="ld-sc"><span class="ld-pill ld-${tintOf(x.max ? x.got / x.max * 100 : 0)}">${x.got}/${x.max}</span></td>
+      <td class="ld-w">${cellList(x.why, "—")}</td>
+      <td class="ld-g">${cellList(x.great, "Nothing noted.")}</td>
+      <td class="ld-b">${cellList(x.wrong, "Nothing — full marks.")}</td>
+      <td class="ld-n">${cellList(x.better, "Keep the same approach.")}</td></tr>`).join("")}
+    </tbody></table></div></div>`;
 }
 
 /* ---------- the tasks, by day ---------- */
@@ -514,7 +550,7 @@ function head(c, w){
 function vTasks(c, w){
   const sec = (h, list) => `<div class="ld-card"><h2>${h}</h2><ol class="ld-tasks">${list.map((t) => `<li class="${t.ok ? "ok" : ""}">${t.ok ? "✅" : "⬜"} ${E(t.t)}</li>`).join("")}</ol></div>`;
   return `<div class="ld-grid2">${sec("Day 2 · The release, the initial Net Sheet, the Reduction Requests", tasks("day2"))}${sec("Day 3 · Updated bills, reductions, the Closing Statement", tasks("day3"))}</div>
-    <div class="ld-grid2">${gradeCard(grade("day2"), "Day 2 score")}${gradeCard(grade("day3"), "Day 3 score")}</div>
+    ${gradeCard(grade("day2"), "Day 2 score")}${gradeCard(grade("day3"), "Day 3 score")}
     <div class="ld-card"><div class="ld-row"><h2 style="flex:1;margin:0">How the demo does it</h2><button class="btn btn-sm btn-primary" onclick="LNDesk.demo()">▶ Watch the demo recording</button></div><ol class="ld-how">
       <li><b>Case File:</b> open the Settlement Release Form(s), the bills, the PIP log, the lien notices and payoff letters, and the cost ledger. Note the dates: a statement or payoff can be out of date.</li>
       <li><b>Email:</b> send the release(s) to your trainer; the fully executed release comes back.</li>
@@ -728,8 +764,18 @@ css.textContent = `.ld{display:flex;flex-direction:column;gap:12px}
 .ld-draft{display:grid;grid-template-columns:minmax(260px,360px) minmax(0,1fr);gap:10px}@media(max-width:1100px){.ld-draft{grid-template-columns:1fr}}
 .ld-form{display:flex;flex-direction:column;gap:6px;overflow-y:auto;max-height:calc(100vh - 300px);padding-right:4px}.ld-form label{display:flex;flex-direction:column;gap:2px;font-size:12px;font-weight:700;color:var(--ink-soft)}
 .ld-form fieldset{border:1px solid var(--line);border-radius:10px;padding:6px 10px;display:flex;flex-direction:column;gap:4px}.ld-form legend{font-size:12px;font-weight:800;color:var(--navy)}
-.ld-grade ul{list-style:none;margin:8px 0 4px;padding:0}.ld-grade li{display:flex;justify-content:space-between;gap:10px;padding:6px 0;border-bottom:1px solid var(--line);font-size:14.5px;font-weight:600}
-.ld-grade li small{color:var(--ink-soft);font-weight:500}.ld-grade li b{font-family:'IBM Plex Mono',monospace;white-space:nowrap}.ld-grade li b.ok{color:var(--success)}.ld-grade li b.part{color:#8F4A12}
+.ld-grade .ld-muted{margin:6px 0 8px}
+.ld-sw{overflow-x:auto;border:1px solid #E1E5EE;border-radius:10px;background:#fff;margin-bottom:4px}
+.ld-st-t{width:100%;min-width:980px;border-collapse:collapse;font-size:13px;line-height:1.42;color:#262B45}
+.ld-st-t thead th{background:#262B45;color:#fff;font:800 12.5px var(--font-ui);text-align:left;padding:8px 10px;border-bottom:2px solid #DB8437;white-space:nowrap;text-transform:none;letter-spacing:0}
+.ld-st-t td,.ld-st-t tbody th{padding:8px 10px;border-top:1px solid #E6E9F1;vertical-align:top;text-align:left}
+.ld-st-t tbody th{width:190px;font-weight:600;background:#fff !important;border-bottom:0 !important;box-shadow:none !important;color:#1B1E2E !important;text-transform:none !important;letter-spacing:0 !important;font-size:13px !important}
+.ld-st-t tbody th b{color:#0f2148}.ld-st-t tbody th small{display:block;font-size:12px;color:#4A5070 !important;font-weight:600;margin-top:2px}
+.ld-st-t td.ld-sc{width:64px;text-align:center}
+.ld-st-t ul{list-style:disc;margin:0;padding-left:16px}.ld-st-t li{display:list-item;padding:0;border:0;font-size:13px;font-weight:500}.ld-st-t li+li{margin-top:3px}.ld-st-t i{color:#5A6078}
+.ld-st-t td.ld-w{background:#F7F8FC}.ld-st-t td.ld-g{background:#F1F9F3}.ld-st-t td.ld-b{background:#FDF3F0}.ld-st-t td.ld-n{background:#F2F4FB}
+.ld-pill{display:inline-block;min-width:48px;text-align:center;font:800 13px var(--font-ui);border-radius:999px;padding:3px 8px;white-space:nowrap}
+.ld-pill.ld-hi{background:#DDF2E3;color:#0F4A28}.ld-pill.ld-ok{background:#EDF7EF;color:#14532D}.ld-pill.ld-lo{background:#FDE7E3;color:#8A1C10}
 .ld-score{font:800 30px/1 var(--font-ui);color:var(--danger)}.ld-score.pass{color:var(--success)}.ld-score small{font-size:15px;color:var(--ink-soft)}
 .ld-case p{font-size:15px !important}.ld-case h1{font-size:26px !important}.ld-tabs button{font-size:15.5px !important}
 .ld-list button{font-size:14.5px !important;font-weight:700 !important}.ld-list button span,.ld-list button small{font-size:13px !important}.ld-list h3{font-size:12.5px !important;color:var(--ink) !important}
