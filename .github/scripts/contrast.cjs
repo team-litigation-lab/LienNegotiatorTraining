@@ -28,7 +28,15 @@ function audit(){
     // otherwise its opaque stops are what the text sits on
     const stripe = /(^|\s|,)\d(\.\d+)?px(\s|,|$)/.test(cs.backgroundSize || "");
     if(cs.backgroundImage && cs.backgroundImage !== "none" && /gradient/.test(cs.backgroundImage) && !stripe){
-      const cols = [...cs.backgroundImage.matchAll(/rgba?\([^)]+\)/g)].map((m) => parse(m[0])).filter((c) => c && c.a > 0.5);
+      // (a frame drawn as a gradient clipped to the border box, under a face clipped to the padding box — the LSH Academy
+      // Index's card frame, js/lsh-academy-frame.js — shows only in the border: the text sits on the face's layers alone)
+      const layers = [], clips = String(cs.backgroundClip || "").split(",").map((x) => x.trim());
+      let depth = 0, cur = "";
+      for(const ch of cs.backgroundImage){ if(ch === "(") depth++; if(ch === ")") depth--; if(ch === "," && !depth){ layers.push(cur); cur = ""; } else cur += ch; }
+      layers.push(cur);
+      const face = layers.filter((l, i) => /padding-box|content-box/.test(clips[i % clips.length] || ""));
+      const src = face.length && face.length < layers.length ? face.join(",") : cs.backgroundImage;
+      const cols = [...src.matchAll(/rgba?\([^)]+\)/g)].map((m) => parse(m[0])).filter((c) => c && c.a > 0.5);
       if(cols.length){ const n = cols.length; return { r: cols.reduce((s, c) => s + c.r, 0) / n, g: cols.reduce((s, c) => s + c.g, 0) / n, b: cols.reduce((s, c) => s + c.b, 0) / n, a: 1 }; }
     }
     const c = parse(cs.backgroundColor); return c && c.a > 0 ? c : null;
