@@ -150,5 +150,60 @@ const ticket = (t, secret = SECRET) => { const p = b64u(JSON.stringify(Object.as
     const afterS = JSON.parse(store.get('ln:trainee:mia-same--b110226'));
     assert.equal(afterS.name, 'Mia Same'); assert.equal(afterS.batch, 'B110226'); assert.equal(afterS.portalUid, 'S2');
   }
+  // 🔓 signed in until 8 hours with no activity (worker.js SESSION_IDLE_HOURS, js/lsh-session.js): a trainee's and a
+  // trainer's sign-in lasts 8 hours and a page in use renews it, so 7 hours away is still signed in and 9 hours away isn't
+  // (a trainee's name + batch can't bring it back either). It was 12 hours for a trainer, however busy, and 30 days for a trainee.
+  {
+    const realNow = Date.now, later = (h) => { Date.now = () => realNow() + h * 3600e3; };
+    const tIn = await call(base, '/api/auth/portal', { ticket: ticket({ first: 'Ida', last: 'Idle', b: 'B100926', exp: exp() }) });
+    const aIn = await call(base, '/api/auth/admin', { passphrase: 'admin-pass' });
+    assert.ok(tIn.j.token && aIn.j.token, 'signed in');
+    try {
+      for (const [who, t0, renewBy] of [['a trainee', tIn.j.token, true], ['a trainer', aIn.j.token, false]]) {
+        const left = Number(t0.split('.')[2]) - realNow();
+        assert.ok(Math.abs(left - 8 * 3600e3) < 60e3, `${who}'s sign-in lasts 8 hours from the last activity (it lasts ${(left / 3600e3).toFixed(1)} h)`);
+        later(7);
+        const r7 = await call(base, '/api/auth/refresh', {}, t0);
+        assert.equal(r7.status, 200, `${who} 7 hours idle is still signed in`); assert.ok(r7.j.token, `${who}'s sign-in is renewed`);
+        if (renewBy) assert.equal((await call(base, '/api/auth/trainee', { name: 'Ida Idle', batch: 'B100926' }, t0)).status, 200, `${who} 7 hours idle still renews by name + batch`);
+        later(7 + 7);
+        assert.equal((await call(base, '/api/auth/refresh', {}, r7.j.token)).status, 200, `${who}'s renewed sign-in lasts 8 hours from the renewal`);
+        later(9);
+        assert.equal((await call(base, '/api/auth/refresh', {}, t0)).status, 401, `${who} 9 hours idle is signed out`);
+        assert.equal((await call(base, '/api/storage/get', { key: 'trainee:ida-idle--b100926' }, t0)).status, 401, `${who} 9 hours idle gets nothing`);
+        if (renewBy) {
+          const n9 = await call(base, '/api/auth/trainee', { name: 'Ida Idle', batch: 'B100926' }, t0);
+          assert.equal(n9.status, 403, `${who} 9 hours idle can't renew by name + batch`); assert.equal(n9.j.error, 'portal-required');
+        }
+        Date.now = realNow;
+      }
+    } finally { Date.now = realNow; }
+  }
+  // 🔓 the page's side (js/lsh-session.js, in <head>): a stored sign-in that has run out (9 hours idle) is dropped before
+  // the page reads it, one 7 hours idle is kept and renewed, and a hidden tab asks nothing
+  {
+    const vm = require('node:vm'), fs = require('node:fs');
+    const mkStore = (o) => { const m = new Map(Object.entries(o)); return { get length() { return m.size; }, key: (i) => [...m.keys()][i], getItem: (k) => m.has(k) ? m.get(k) : null, setItem: (k, v) => m.set(k, String(v)), removeItem: (k) => m.delete(k), m }; };
+    const tok = (role, h) => `${role}.someone.${Date.now() + h * 3600e3}.${'s'.repeat(43)}`;
+    const t7 = tok('t', 1), a9 = tok('a', -1);
+    const ls = mkStore({ t: t7, a: a9, other: 'kept' }), ss = mkStore({ old: tok('a', -0.5) });
+    const asked = [], set = []; let vis = 'visible', interval = null;
+    const sb = { localStorage: ls, sessionStorage: ss, document: { get visibilityState() { return vis; }, addEventListener() {} }, setInterval: (f) => { interval = f; }, setTimeout() {},
+      fetch: async (u, o) => { asked.push([u, o.headers.Authorization]); return { ok: true, json: async () => ({ token: 'renewed' }) }; } };
+    sb.window = sb; vm.createContext(sb);
+    vm.runInContext(fs.readFileSync(path.join(process.cwd(), 'js/lsh-session.js'), 'utf8'), sb);
+    const f = ((m) => assert.fail(m));
+    if (ls.getItem('a') !== null || ss.getItem('old') !== null) f('a stored sign-in that has run out (9 hours idle) should be dropped when the page opens');
+    if (ls.getItem('t') !== t7 || ls.getItem('other') !== 'kept') f('a stored sign-in 7 hours idle (and anything else stored) should be kept');
+    sb.state = { authToken: t7, adminToken: '' }; sb.setTraineeToken = (t) => { set.push(t); sb.state.authToken = t; }; sb.setAdminToken = () => {};
+    vis = 'hidden'; await sb.lshSessionRenew();
+    if (asked.length) f('a tab in the background should ask nothing');
+    vis = 'visible'; await sb.lshSessionRenew();
+    if (asked.length !== 1 || asked[0][0] !== '/api/auth/refresh' || asked[0][1] !== 'Bearer ' + t7 || set[0] !== 'renewed') f(`a sign-in in use should be renewed: ${JSON.stringify({ asked, set })}`);
+    sb.state.authToken = tok('t', 8); await sb.lshSessionRenew();
+    if (asked.length !== 1) f('a sign-in renewed in the last 10 minutes should not be renewed again');
+    if (typeof interval !== 'function') f('the renewal should run on a timer');
+  }
+
   console.log('OK: single sign-on and storage rules hold.');
 })().catch((e) => { console.error(e); process.exit(1); });

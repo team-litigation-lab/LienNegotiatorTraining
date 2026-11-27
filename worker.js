@@ -74,7 +74,13 @@ function adminPassStatus(env) {
   return "MASTER_ADMIN_PASSWORD" + (ignored.length ? ` (had ${ignored.join(", ")}: ignored)` : "") + odd;
 }
 function secretOf(env) { return env.SESSION_SECRET || adminPass(env); }
-async function makeToken(env, role, subject, hours) {
+// 🔓 A sign-in lasts until 8 hours with no activity (the LSH Training Portal's rule): every session token, a trainer's
+// and a trainee's, runs out SESSION_IDLE_HOURS after it was made, and a page of the course that is open and in view
+// renews it every 10 minutes (/api/auth/refresh, js/lsh-session.js). So closing the tab or the browser doesn't sign
+// anyone out; 8 hours with no page open does, and so do Log out and a revoked trainee. (It was 12 hours for a trainer
+// however busy; a trainee's was 30 days.)
+const SESSION_IDLE_HOURS = 8;
+async function makeToken(env, role, subject, hours = SESSION_IDLE_HOURS) {
   const exp = Date.now() + hours * 3600 * 1000;
   const body = `${role}.${encodeURIComponent(subject)}.${exp}`;
   return `${body}.${await hmac(secretOf(env), body)}`;
@@ -157,9 +163,10 @@ async function readPortalTicket(env, ticket, why = {}) {
   const u = String(t.u == null ? "" : t.u).trim().slice(0, 80);
   return { name: `${first} ${last}`, first, last, batch, full, u };
 }
-// Like readToken, but an expired token still counts for a while (same signature, same trainee), so a trainee
-// midway through the course whose 30 days run out isn't sent back to the portal in the middle of a lesson.
-const TOKEN_GRACE_MS = 60 * 24 * 3600 * 1000;
+// Like readToken, for a trainee's renewal by name + batch (and with PREVIOUS_SESSION_SECRET, below). A token that has
+// run out isn't renewed: that is 8 hours with no activity (SESSION_IDLE_HOURS), and the trainee comes back in from the
+// Portal. (It was kept 60 days after it ran out, so a trainee was never signed out.)
+const TOKEN_GRACE_MS = 0;
 async function readTraineeTokenGrace(env, request) {
   const h = request.headers.get("Authorization") || "";
   const parts = (h.startsWith("Bearer ") ? h.slice(7) : "").split(".");
@@ -412,7 +419,7 @@ export default {
         await new Promise((r) => setTimeout(r, 400)); // slow down guessing
         const given = normPass(passphrase), want = normPass(adminPass(env));
         if (!given || !want || !safeEqual(given, want)) return json({ error: "Incorrect password" }, 401);
-        return json({ token: await makeToken(env, "a", "admin", 12) });
+        return json({ token: await makeToken(env, "a", "admin", SESSION_IDLE_HOURS) });
       }
       // The trainee's session for a name + batch: their record id (new or legacy form) and token.
       // linked: the record movedRecord (or its alias) found for this trainee under an earlier Batch ID
@@ -433,7 +440,7 @@ export default {
         if (id && id !== chosen && id !== newId && id !== rawId && id !== legacyId) return json({ error: "Name/batch don't match this session" }, 403);
         if (id && id !== chosen && (id === newId || id === rawId || id === legacyId)) { chosen = id; existing = await kv.get(`trainee:${id}`); }
         if ((await blockedIds(env, true))[chosen]) return json({ error: BLOCK_MSG, code: "access-offboarded" }, 403);
-        return json({ id: chosen, token: await makeToken(env, "t", chosen, 24 * 30), existing: existing ? JSON.parse(existing) : null, batch: canonicalBatch(batch) || String(batch || "").trim() });
+        return json({ id: chosen, token: await makeToken(env, "t", chosen, SESSION_IDLE_HOURS), existing: existing ? JSON.parse(existing) : null, batch: canonicalBatch(batch) || String(batch || "").trim() });
       };
       if (path === "/api/auth/trainee") {
         if (!secure) return json({ error: "not-configured" }, 501);
@@ -477,11 +484,11 @@ export default {
         // Every Portal ticket works once (a trainee's, a trainer's and the Sign-in check's), so a copy of the link (browser
         // history, a forwarded URL) can't sign anyone in again inside its 5 minutes.
         if (!(await useTicketOnce(kv, ticket))) return json({ error: "This sign-in link was already used. Open the program again from the LSH Training Portal.", code: "used" }, 401);
-        if (who.system) return json({ admin: true, token: await makeToken(env, "a", "admin", 12) });
+        if (who.system) return json({ admin: true, token: await makeToken(env, "a", "admin", SESSION_IDLE_HOURS) });
         if (who.admin) {
           // Single sign-on for trainers too: an administrator signed in on the Main Portal opens every program as a
           // trainer, with no second password here (the ticket was taken once, above).
-          return json({ admin: true, name: who.name, token: await makeToken(env, "a", "admin", 12) });
+          return json({ admin: true, name: who.name, token: await makeToken(env, "a", "admin", SESSION_IDLE_HOURS) });
         }
         const res = await traineeSession(who.name, who.batch, "", (await movedRecord(env, kv, who)) || undefined);
         if (res.status !== 200) return res;   // 🚫 (blocked: access-offboarded)
@@ -522,13 +529,13 @@ export default {
         return json({ error: BLOCK_MSG, code: "access-offboarded" }, 403);
       }
 
-      /* ---------- a session that is still in use is renewed before it runs out ----------
-         The page asks for a fresh token in the last hours of a valid one (an admin's lasts 12 hours, a trainee's
-         30 days), so a trainer's tab left open through a long day never drops a live call with "Sign-in
-         required". An expired token is never renewed: that still takes a sign-in. */
+      /* ---------- 🔓 a session in use is renewed (js/lsh-session.js): 8 hours from now (SESSION_IDLE_HOURS) ----------
+         A page of the course that is open and in view asks every 10 minutes, so a trainer's tab left open through a long
+         day never drops a live call with "Sign-in required". An expired token (8 hours with no page of the course open)
+         is never renewed: that still takes a sign-in, and a revoked trainee was turned away just above. */
       if (path === "/api/auth/refresh") {
         if (!secure) return json({ token: "" });
-        return json({ token: await makeToken(env, tok.role, tok.id, tok.role === "a" ? 12 : 24 * 30) });
+        return json({ token: await makeToken(env, tok.role, tok.id, SESSION_IDLE_HOURS) });
       }
 
       /* ---------- 🕘 automatic Time In: a trainee's first visit today (see checkIn) ---------- */
